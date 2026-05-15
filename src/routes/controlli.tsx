@@ -37,6 +37,9 @@ function ControlliPage() {
   const [newLabel, setNewLabel] = useState("");
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
+  // Numero di partenza dei controlli: subito dopo i campi dei presenti,
+  // così non si scontra con i numeri dello Step 1.
+  const baseN = controlsBase(state.general.presenti.length);
 
   const handleAdd = () => {
     const trimmed = newLabel.trim();
@@ -86,8 +89,8 @@ function ControlliPage() {
                   htmlFor={c.id}
                   className="flex flex-1 cursor-pointer items-start gap-1 text-sm leading-relaxed"
                 >
-                  <sup className="mt-0.5 text-[10px] font-semibold text-muted-foreground">
-                    {idx + 1}
+                  <sup className="mt-0.5 text-[8px] font-semibold leading-none text-muted-foreground">
+                    {baseN + idx}
                   </sup>
                   <span>
                     {c.label}
