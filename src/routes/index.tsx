@@ -7,16 +7,10 @@ import { useEffect, useId } from "react";
 import { Trash2, Plus } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
+import { Lbl } from "@/components/lbl";
 import { useFat, newAttendee } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
-import {
-  N_MANUFACTURER_BASE,
-  N_CUSTOMER_BASE,
-  N_ATTENDEES_BASE,
-  partyFieldNumbers,
-  commonFieldNumbers,
-  attendeeFieldNumbers,
-} from "@/lib/fat-numbering";
+import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,31 +63,6 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-/** Numbered label with superscript index, top-left aligned. */
-function NumLabel({
-  n,
-  htmlFor,
-  required,
-  children,
-}: {
-  n: number;
-  htmlFor?: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Label htmlFor={htmlFor} className="flex items-start gap-1 leading-tight">
-      <sup className="mt-0.5 text-[8px] font-semibold leading-none text-muted-foreground">
-        {n}
-      </sup>
-      <span>
-        {children}
-        {required && <span className="ml-0.5 text-destructive">*</span>}
-      </span>
-    </Label>
-  );
-}
-
 function IndexPage() {
   const navigate = useNavigate();
   const { state, setGeneral } = useFat();
@@ -105,7 +74,6 @@ function IndexPage() {
     defaultValues: state.general as FormValues,
   });
 
-  // Re-sync after localStorage hydration
   useEffect(() => {
     form.reset(state.general);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,9 +88,6 @@ function IndexPage() {
     setGeneral(values);
     navigate({ to: "/controlli" });
   };
-
-  // Numerazione fissa e univoca (vedi src/lib/fat-numbering.ts)
-  const cn_ = commonFieldNumbers();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12">
@@ -142,13 +107,21 @@ function IndexPage() {
         {/* Manufacturer */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("manufacturerTitle")}</CardTitle>
+            <CardTitle>
+              <Lbl id={LABELS.manufacturerTitle.id}>{t("manufacturerTitle")}</Lbl>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <PartyFields
               path="produttore"
               form={form}
-              base={N_MANUFACTURER_BASE}
+              numbers={{
+                ragioneSociale: LABELS.mfgCompanyName.id,
+                indirizzo: LABELS.mfgAddress.id,
+                referente: LABELS.mfgContact.id,
+                email: LABELS.mfgEmail.id,
+                telefono: LABELS.mfgPhone.id,
+              }}
               required
             />
           </CardContent>
@@ -157,13 +130,21 @@ function IndexPage() {
         {/* Customer */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("customerTitle")}</CardTitle>
+            <CardTitle>
+              <Lbl id={LABELS.customerTitle.id}>{t("customerTitle")}</Lbl>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <PartyFields
               path="cliente"
               form={form}
-              base={N_CUSTOMER_BASE}
+              numbers={{
+                ragioneSociale: LABELS.cliCompanyName.id,
+                indirizzo: LABELS.cliAddress.id,
+                referente: LABELS.cliContact.id,
+                email: LABELS.cliEmail.id,
+                telefono: LABELS.cliPhone.id,
+              }}
               required
             />
           </CardContent>
@@ -172,11 +153,13 @@ function IndexPage() {
         {/* Common test data */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("commonTitle")}</CardTitle>
+            <CardTitle>
+              <Lbl id={LABELS.commonTitle.id}>{t("commonTitle")}</Lbl>
+            </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <NumberedField
-              n={cn_.numeroDisegno}
+              n={LABELS.drawingNo.id}
               label={t("drawingNo")}
               required
               error={form.formState.errors.numeroDisegno?.message && t("required")}
@@ -184,7 +167,7 @@ function IndexPage() {
               placeholder="DWG-2025-001"
             />
             <NumberedField
-              n={cn_.numeroMatricola}
+              n={LABELS.serialNo.id}
               label={t("serialNo")}
               required
               error={
@@ -194,13 +177,13 @@ function IndexPage() {
               placeholder="SN-00123"
             />
             <NumberedField
-              n={cn_.tagNumber}
+              n={LABELS.tagNo.id}
               label={t("tagNo")}
               {...form.register("tagNumber")}
               placeholder="TAG-001"
             />
             <NumberedField
-              n={cn_.dataCollaudo}
+              n={LABELS.testDate.id}
               label={t("testDate")}
               type="date"
               required
@@ -208,7 +191,7 @@ function IndexPage() {
               {...form.register("dataCollaudo")}
             />
             <NumberedField
-              n={cn_.luogoCollaudo}
+              n={LABELS.testPlace.id}
               label={t("testPlace")}
               required
               error={
@@ -224,14 +207,14 @@ function IndexPage() {
         {/* Attendees */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("attendeesTitle")}</CardTitle>
+            <CardTitle>
+              <Lbl id={LABELS.attendeesTitle.id}>{t("attendeesTitle")}</Lbl>
+            </CardTitle>
             <CardDescription>{t("attendeesDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {fields.map((f, idx) => {
-              const an = attendeeFieldNumbers(idx);
-              const nName = an.nome;
-              const nRole = an.ruolo;
+              const an = attendeeNumbers(idx);
               return (
                 <div
                   key={f.id}
@@ -242,7 +225,7 @@ function IndexPage() {
                     name={`presenti.${idx}.nome`}
                     render={({ field }) => (
                       <NumberedField
-                        n={nName}
+                        n={an.nome}
                         label={t("attendeeName")}
                         placeholder="Mario Rossi"
                         {...field}
@@ -254,7 +237,7 @@ function IndexPage() {
                     name={`presenti.${idx}.ruolo`}
                     render={({ field }) => (
                       <NumberedField
-                        n={nRole}
+                        n={an.ruolo}
                         label={t("attendeeRole")}
                         placeholder="QA Manager — Acme"
                         {...field}
@@ -280,14 +263,14 @@ function IndexPage() {
               onClick={() => append(newAttendee())}
             >
               <Plus className="mr-1 h-4 w-4" />
-              {t("addAttendee")}
+              <Lbl id={LABELS.addAttendee.id}>{t("addAttendee")}</Lbl>
             </Button>
           </CardContent>
         </Card>
 
         <div className="flex justify-end">
           <Button type="submit" size="lg">
-            {t("next")}
+            <Lbl id={LABELS.next.id}>{t("next")}</Lbl>
           </Button>
         </div>
       </form>
@@ -296,25 +279,32 @@ function IndexPage() {
 }
 
 /* ───────── Party (Manufacturer / Customer) sub-form ───────── */
+type PartyNums = {
+  ragioneSociale: number;
+  indirizzo: number;
+  referente: number;
+  email: number;
+  telefono: number;
+};
+
 function PartyFields({
   path,
   form,
-  base,
+  numbers,
   required,
 }: {
   path: "produttore" | "cliente";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: any;
-  base: number;
+  numbers: PartyNums;
   required?: boolean;
 }) {
   const { t } = useI18n();
   const err = form.formState.errors[path];
-  const n = partyFieldNumbers(base);
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <NumberedField
-        n={n.ragioneSociale}
+        n={numbers.ragioneSociale}
         label={t("companyName")}
         required={required}
         error={err?.ragioneSociale?.message && t("required")}
@@ -323,27 +313,27 @@ function PartyFields({
         placeholder="Acme S.p.A."
       />
       <NumberedField
-        n={n.indirizzo}
+        n={numbers.indirizzo}
         label={t("address")}
         {...form.register(`${path}.indirizzo` as const)}
         className="sm:col-span-2"
         placeholder="Via Roma 1, Milano"
       />
       <NumberedField
-        n={n.referente}
+        n={numbers.referente}
         label={t("contact")}
         {...form.register(`${path}.referente` as const)}
         placeholder="Mario Rossi"
       />
       <NumberedField
-        n={n.email}
+        n={numbers.email}
         label={t("email")}
         type="email"
         {...form.register(`${path}.email` as const)}
         placeholder="info@acme.com"
       />
       <NumberedField
-        n={n.telefono}
+        n={numbers.telefono}
         label={t("phone")}
         {...form.register(`${path}.telefono` as const)}
         placeholder="+39 02 1234567"
@@ -369,13 +359,18 @@ const NumberedField = React.forwardRef<HTMLInputElement, NumberedFieldProps>(
     const fieldId = id ?? autoId;
     return (
       <div className={"space-y-1.5 " + (className ?? "")}>
-        <NumLabel n={n} htmlFor={fieldId} required={required}>
-          {label}
-        </NumLabel>
+        <Label htmlFor={fieldId} className="flex items-start gap-1 leading-tight">
+          <sup className="mt-[1px] text-[8px] font-semibold leading-none text-muted-foreground">
+            {n}
+          </sup>
+          <span>
+            {label}
+            {required && <span className="ml-0.5 text-destructive">*</span>}
+          </span>
+        </Label>
         <Input id={fieldId} ref={ref} {...rest} />
         {error && <p className="text-xs text-destructive">{error}</p>}
       </div>
     );
   },
 );
-

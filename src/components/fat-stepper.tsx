@@ -1,13 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
+import { LABELS } from "@/lib/fat-numbering";
 
 export function FatStepper({ current }: { current: 1 | 2 | 3 }) {
   const { t } = useI18n();
   const steps = [
-    { to: "/" as const, label: t("stepGeneral") },
-    { to: "/controlli" as const, label: t("stepControls") },
-    { to: "/report" as const, label: t("stepReport") },
+    { to: "/" as const,          label: t("stepGeneral"),  num: LABELS.stepGeneral.id },
+    { to: "/controlli" as const, label: t("stepControls"), num: LABELS.stepControls.id },
+    { to: "/report" as const,    label: t("stepReport"),   num: LABELS.stepReport.id },
   ];
   return (
     <nav className="mb-8 flex items-center justify-center gap-2 sm:gap-4">
@@ -36,7 +37,12 @@ export function FatStepper({ current }: { current: 1 | 2 | 3 }) {
               >
                 {n}
               </span>
-              <span className="hidden sm:inline">{s.label}</span>
+              <span className="hidden items-start gap-1 sm:inline-flex">
+                <sup className="mt-[1px] text-[8px] font-semibold leading-none opacity-70">
+                  {s.num}
+                </sup>
+                <span>{s.label}</span>
+              </span>
             </Link>
             {i < steps.length - 1 && <div className="h-px w-6 bg-border sm:w-12" />}
           </div>

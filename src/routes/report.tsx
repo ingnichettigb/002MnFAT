@@ -2,8 +2,10 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { FileDown, RotateCcw } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
+import { Lbl } from "@/components/lbl";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
+import { LABELS } from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -73,15 +75,21 @@ function ReportPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <h3 className="mb-2 font-semibold">{t("manufacturerTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.manufacturerTitle.id}>{t("manufacturerTitle")}</Lbl>
+            </h3>
             <PartySummary p={general.produttore} />
           </div>
           <div>
-            <h3 className="mb-2 font-semibold">{t("customerTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.customerTitle.id}>{t("customerTitle")}</Lbl>
+            </h3>
             <PartySummary p={general.cliente} />
           </div>
           <div className="md:col-span-2">
-            <h3 className="mb-2 font-semibold">{t("commonTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.commonTitle.id}>{t("commonTitle")}</Lbl>
+            </h3>
             <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
               <Field label={t("drawingNo")} value={general.numeroDisegno} />
               <Field label={t("serialNo")} value={general.numeroMatricola} />
@@ -91,7 +99,9 @@ function ReportPage() {
             </dl>
           </div>
           <div className="md:col-span-2">
-            <h3 className="mb-2 font-semibold">{t("attendeesTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.attendeesTitle.id}>{t("attendeesTitle")}</Lbl>
+            </h3>
             {general.presenti.filter((a) => a.nome || a.ruolo).length === 0 ? (
               <p className="text-sm text-muted-foreground">—</p>
             ) : (
@@ -115,7 +125,7 @@ function ReportPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>
-            {t("summaryControls")} ({selected.length})
+            <Lbl id={LABELS.controlsTitle.id}>{t("summaryControls")}</Lbl> ({selected.length})
           </CardTitle>
           <CardDescription>{t("summaryControlsDesc")}</CardDescription>
         </CardHeader>
@@ -140,12 +150,14 @@ function ReportPage() {
 
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:justify-between">
         <Button asChild variant="outline">
-          <Link to="/controlli">{t("modifyControls")}</Link>
+          <Link to="/controlli">
+            <Lbl id={LABELS.modifyControls.id}>{t("modifyControls")}</Lbl>
+          </Link>
         </Button>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button variant="outline" onClick={handleReset}>
             <RotateCcw className="mr-2 h-4 w-4" />
-            {t("restart")}
+            <Lbl id={LABELS.restart.id}>{t("restart")}</Lbl>
           </Button>
           <Button
             size="lg"
@@ -155,7 +167,7 @@ function ReportPage() {
             }
           >
             <FileDown className="mr-2 h-4 w-4" />
-            {t("generatePdf")}
+            <Lbl id={LABELS.generatePdf.id}>{t("generatePdf")}</Lbl>
           </Button>
         </div>
       </div>

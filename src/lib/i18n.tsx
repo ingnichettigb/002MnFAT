@@ -4,7 +4,7 @@ export type Lang = "it" | "en";
 
 type Dict = Record<string, { it: string; en: string }>;
 
-const dict: Dict = {
+export const dict = {
   // Header
   appSubtitle: {
     it: "Generatore di verbali di Factory Acceptance Test",
