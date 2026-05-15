@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
+import { Lbl } from "@/components/lbl";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
-import { controlsBase } from "@/lib/fat-numbering";
+import { LABELS, controlNumber } from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,9 +38,6 @@ function ControlliPage() {
   const [newLabel, setNewLabel] = useState("");
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
-  // Numero di partenza dei controlli: subito dopo i campi dei presenti,
-  // così non si scontra con i numeri dello Step 1.
-  const baseN = controlsBase(state.general.presenti.length);
 
   const handleAdd = () => {
     const trimmed = newLabel.trim();
@@ -69,7 +67,9 @@ function ControlliPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("controlsTitle")}</CardTitle>
+          <CardTitle>
+            <Lbl id={LABELS.controlsTitle.id}>{t("controlsTitle")}</Lbl>
+          </CardTitle>
           <CardDescription>{t("controlsDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -89,8 +89,8 @@ function ControlliPage() {
                   htmlFor={c.id}
                   className="flex flex-1 cursor-pointer items-start gap-1 text-sm leading-relaxed"
                 >
-                  <sup className="mt-0.5 text-[8px] font-semibold leading-none text-muted-foreground">
-                    {baseN + idx}
+                  <sup className="mt-[1px] text-[8px] font-semibold leading-none text-muted-foreground">
+                    {controlNumber(idx)}
                   </sup>
                   <span>
                     {c.label}
@@ -116,7 +116,9 @@ function ControlliPage() {
           </ul>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">{t("addCustom")}</label>
+            <label className="text-sm font-medium">
+              <Lbl id={LABELS.addCustom.id}>{t("addCustom")}</Lbl>
+            </label>
             <div className="flex gap-2">
               <Input
                 value={newLabel}
@@ -146,10 +148,12 @@ function ControlliPage() {
             </span>
             <div className="flex gap-2">
               <Button asChild variant="outline">
-                <Link to="/">{t("back")}</Link>
+                <Link to="/">
+                  <Lbl id={LABELS.back.id}>{t("back")}</Lbl>
+                </Link>
               </Button>
               <Button onClick={handleNext} disabled={selectedCount === 0}>
-                {t("next")}
+                <Lbl id={LABELS.next.id}>{t("next")}</Lbl>
               </Button>
             </div>
           </div>
