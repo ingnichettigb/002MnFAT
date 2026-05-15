@@ -9,6 +9,14 @@ import { Trash2, Plus } from "lucide-react";
 import { FatStepper } from "@/components/fat-stepper";
 import { useFat, newAttendee } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
+import {
+  N_MANUFACTURER_BASE,
+  N_CUSTOMER_BASE,
+  N_ATTENDEES_BASE,
+  partyFieldNumbers,
+  commonFieldNumbers,
+  attendeeFieldNumbers,
+} from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
