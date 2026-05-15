@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
+import { I18nProvider } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -121,9 +122,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <FatProvider>
-        <Outlet />
-      </FatProvider>
+      <I18nProvider>
+        <FatProvider>
+          <Outlet />
+        </FatProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }
