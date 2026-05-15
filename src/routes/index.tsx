@@ -59,23 +59,6 @@ const schema = z.object({
   presenti: z.array(attendeeSchema),
 });
 
-const attendeeSchema = z.object({
-  id: z.string(),
-  nome: z.string().trim().max(150).optional().or(z.literal("")),
-  ruolo: z.string().trim().max(150).optional().or(z.literal("")),
-});
-
-const schema = z.object({
-  produttore: partySchema,
-  cliente: partySchema,
-  numeroDisegno: z.string().trim().min(1).max(120),
-  numeroMatricola: z.string().trim().min(1).max(120),
-  tagNumber: z.string().trim().max(120).optional().or(z.literal("")),
-  dataCollaudo: z.string().min(1),
-  luogoCollaudo: z.string().trim().min(1).max(200),
-  presenti: z.array(attendeeSchema),
-});
-
 type FormValues = z.infer<typeof schema>;
 
 /** Numbered label with superscript index, top-left aligned. */
@@ -375,4 +358,3 @@ const NumberedField = React.forwardRef<HTMLInputElement, NumberedFieldProps>(
   },
 );
 
-import * as React from "react";
