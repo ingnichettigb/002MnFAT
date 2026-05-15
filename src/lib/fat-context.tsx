@@ -1,13 +1,29 @@
 import * as React from "react";
 import { DEFAULT_CONTROLS } from "./fat-defaults";
 
-export type GeneralData = {
+export type Party = {
   ragioneSociale: string;
-  compilatore: string;
-  dataCollaudo: string;
-  luogoCollaudo: string;
+  indirizzo: string;
+  referente: string;
+  email: string;
+  telefono: string;
+};
+
+export type Attendee = {
+  id: string;
+  nome: string;
+  ruolo: string;
+};
+
+export type GeneralData = {
+  produttore: Party;
+  cliente: Party;
   numeroDisegno: string;
   numeroMatricola: string;
+  tagNumber: string;
+  dataCollaudo: string;
+  luogoCollaudo: string;
+  presenti: Attendee[];
 };
 
 export type ControlItem = {
@@ -22,15 +38,34 @@ export type FatState = {
   controls: ControlItem[];
 };
 
-const STORAGE_KEY = "mini-fat:v1";
+const STORAGE_KEY = "mini-fat:v2";
+
+const emptyParty: Party = {
+  ragioneSociale: "",
+  indirizzo: "",
+  referente: "",
+  email: "",
+  telefono: "",
+};
+
+const newAttendee = (): Attendee => ({
+  id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+  nome: "",
+  ruolo: "",
+});
 
 const emptyGeneral: GeneralData = {
-  ragioneSociale: "",
-  compilatore: "",
-  dataCollaudo: "",
-  luogoCollaudo: "",
+  produttore: { ...emptyParty },
+  cliente: { ...emptyParty },
   numeroDisegno: "",
   numeroMatricola: "",
+  tagNumber: "",
+  dataCollaudo: "",
+  luogoCollaudo: "",
+  presenti: [
+    { id: "att-default-1", nome: "", ruolo: "" },
+    { id: "att-default-2", nome: "", ruolo: "" },
+  ],
 };
 
 const initialControls = (): ControlItem[] =>
@@ -69,9 +104,7 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
           setState(parsed);
         }
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
     setHydrated(true);
   }, []);
 
@@ -79,9 +112,7 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
     if (!hydrated) return;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, [state, hydrated]);
 
   const value: Ctx = React.useMemo(
@@ -113,7 +144,16 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
           ...s,
           controls: s.controls.filter((c) => c.id !== id),
         })),
-      reset: () => setState({ general: emptyGeneral, controls: initialControls() }),
+      reset: () =>
+        setState({
+          general: {
+            ...emptyGeneral,
+            produttore: { ...emptyParty },
+            cliente: { ...emptyParty },
+            presenti: [newAttendee(), newAttendee()],
+          },
+          controls: initialControls(),
+        }),
     }),
     [state],
   );
@@ -126,3 +166,5 @@ export function useFat() {
   if (!ctx) throw new Error("useFat must be used within FatProvider");
   return ctx;
 }
+
+export { newAttendee };
