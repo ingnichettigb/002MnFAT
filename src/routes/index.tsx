@@ -1,3 +1,4 @@
+import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,10 +36,27 @@ export const Route = createFileRoute("/")({
 
 const partySchema = z.object({
   ragioneSociale: z.string().trim().min(1).max(200),
-  indirizzo: z.string().trim().max(300).optional().or(z.literal("")),
-  referente: z.string().trim().max(150).optional().or(z.literal("")),
-  email: z.string().trim().max(150).optional().or(z.literal("")),
-  telefono: z.string().trim().max(60).optional().or(z.literal("")),
+  indirizzo: z.string().trim().max(300).default(""),
+  referente: z.string().trim().max(150).default(""),
+  email: z.string().trim().max(150).default(""),
+  telefono: z.string().trim().max(60).default(""),
+});
+
+const attendeeSchema = z.object({
+  id: z.string(),
+  nome: z.string().trim().max(150).default(""),
+  ruolo: z.string().trim().max(150).default(""),
+});
+
+const schema = z.object({
+  produttore: partySchema,
+  cliente: partySchema,
+  numeroDisegno: z.string().trim().min(1).max(120),
+  numeroMatricola: z.string().trim().min(1).max(120),
+  tagNumber: z.string().trim().max(120).default(""),
+  dataCollaudo: z.string().min(1),
+  luogoCollaudo: z.string().trim().min(1).max(200),
+  presenti: z.array(attendeeSchema),
 });
 
 const attendeeSchema = z.object({

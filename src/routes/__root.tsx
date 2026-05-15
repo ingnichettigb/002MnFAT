@@ -122,9 +122,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <FatProvider>
-        <Outlet />
-      </FatProvider>
+      <I18nProvider>
+        <FatProvider>
+          <Outlet />
+        </FatProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }
