@@ -75,15 +75,21 @@ function ReportPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <h3 className="mb-2 font-semibold">{t("manufacturerTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.manufacturerTitle.id}>{t("manufacturerTitle")}</Lbl>
+            </h3>
             <PartySummary p={general.produttore} />
           </div>
           <div>
-            <h3 className="mb-2 font-semibold">{t("customerTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.customerTitle.id}>{t("customerTitle")}</Lbl>
+            </h3>
             <PartySummary p={general.cliente} />
           </div>
           <div className="md:col-span-2">
-            <h3 className="mb-2 font-semibold">{t("commonTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.commonTitle.id}>{t("commonTitle")}</Lbl>
+            </h3>
             <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
               <Field label={t("drawingNo")} value={general.numeroDisegno} />
               <Field label={t("serialNo")} value={general.numeroMatricola} />
@@ -93,7 +99,9 @@ function ReportPage() {
             </dl>
           </div>
           <div className="md:col-span-2">
-            <h3 className="mb-2 font-semibold">{t("attendeesTitle")}</h3>
+            <h3 className="mb-2 font-semibold">
+              <Lbl id={LABELS.attendeesTitle.id}>{t("attendeesTitle")}</Lbl>
+            </h3>
             {general.presenti.filter((a) => a.nome || a.ruolo).length === 0 ? (
               <p className="text-sm text-muted-foreground">—</p>
             ) : (
