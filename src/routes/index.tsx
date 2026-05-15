@@ -176,7 +176,7 @@ function IndexPage() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <NumberedField
-              n={next()}
+              n={cn_.numeroDisegno}
               label={t("drawingNo")}
               required
               error={form.formState.errors.numeroDisegno?.message && t("required")}
@@ -184,7 +184,7 @@ function IndexPage() {
               placeholder="DWG-2025-001"
             />
             <NumberedField
-              n={next()}
+              n={cn_.numeroMatricola}
               label={t("serialNo")}
               required
               error={
@@ -194,13 +194,13 @@ function IndexPage() {
               placeholder="SN-00123"
             />
             <NumberedField
-              n={next()}
+              n={cn_.tagNumber}
               label={t("tagNo")}
               {...form.register("tagNumber")}
               placeholder="TAG-001"
             />
             <NumberedField
-              n={next()}
+              n={cn_.dataCollaudo}
               label={t("testDate")}
               type="date"
               required
@@ -208,7 +208,7 @@ function IndexPage() {
               {...form.register("dataCollaudo")}
             />
             <NumberedField
-              n={next()}
+              n={cn_.luogoCollaudo}
               label={t("testPlace")}
               required
               error={
@@ -229,8 +229,9 @@ function IndexPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {fields.map((f, idx) => {
-              const nName = next();
-              const nRole = next();
+              const an = attendeeFieldNumbers(idx);
+              const nName = an.nome;
+              const nRole = an.ruolo;
               return (
                 <div
                   key={f.id}
