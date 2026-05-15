@@ -125,7 +125,7 @@ function ReportPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>
-            {t("summaryControls")} ({selected.length})
+            <Lbl id={LABELS.controlsTitle.id}>{t("summaryControls")}</Lbl> ({selected.length})
           </CardTitle>
           <CardDescription>{t("summaryControlsDesc")}</CardDescription>
         </CardHeader>
@@ -150,12 +150,14 @@ function ReportPage() {
 
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:justify-between">
         <Button asChild variant="outline">
-          <Link to="/controlli">{t("modifyControls")}</Link>
+          <Link to="/controlli">
+            <Lbl id={LABELS.modifyControls.id}>{t("modifyControls")}</Lbl>
+          </Link>
         </Button>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button variant="outline" onClick={handleReset}>
             <RotateCcw className="mr-2 h-4 w-4" />
-            {t("restart")}
+            <Lbl id={LABELS.restart.id}>{t("restart")}</Lbl>
           </Button>
           <Button
             size="lg"
@@ -165,7 +167,7 @@ function ReportPage() {
             }
           >
             <FileDown className="mr-2 h-4 w-4" />
-            {t("generatePdf")}
+            <Lbl id={LABELS.generatePdf.id}>{t("generatePdf")}</Lbl>
           </Button>
         </div>
       </div>
