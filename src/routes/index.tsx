@@ -9,6 +9,14 @@ import { Trash2, Plus } from "lucide-react";
 import { FatStepper } from "@/components/fat-stepper";
 import { useFat, newAttendee } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
+import {
+  N_MANUFACTURER_BASE,
+  N_CUSTOMER_BASE,
+  N_ATTENDEES_BASE,
+  partyFieldNumbers,
+  commonFieldNumbers,
+  attendeeFieldNumbers,
+} from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,7 +83,7 @@ function NumLabel({
 }) {
   return (
     <Label htmlFor={htmlFor} className="flex items-start gap-1 leading-tight">
-      <sup className="mt-0.5 text-[10px] font-semibold text-muted-foreground">
+      <sup className="mt-0.5 text-[8px] font-semibold leading-none text-muted-foreground">
         {n}
       </sup>
       <span>
@@ -113,9 +121,8 @@ function IndexPage() {
     navigate({ to: "/controlli" });
   };
 
-  // Stable counter for superscript numbering across the whole form
-  let counter = 0;
-  const next = () => ++counter;
+  // Numerazione fissa e univoca (vedi src/lib/fat-numbering.ts)
+  const cn_ = commonFieldNumbers();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12">
@@ -138,7 +145,12 @@ function IndexPage() {
             <CardTitle>{t("manufacturerTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <PartyFields path="produttore" form={form} next={next} required />
+            <PartyFields
+              path="produttore"
+              form={form}
+              base={N_MANUFACTURER_BASE}
+              required
+            />
           </CardContent>
         </Card>
 
@@ -148,7 +160,12 @@ function IndexPage() {
             <CardTitle>{t("customerTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <PartyFields path="cliente" form={form} next={next} required />
+            <PartyFields
+              path="cliente"
+              form={form}
+              base={N_CUSTOMER_BASE}
+              required
+            />
           </CardContent>
         </Card>
 
@@ -159,7 +176,7 @@ function IndexPage() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <NumberedField
-              n={next()}
+              n={cn_.numeroDisegno}
               label={t("drawingNo")}
               required
               error={form.formState.errors.numeroDisegno?.message && t("required")}
@@ -167,7 +184,7 @@ function IndexPage() {
               placeholder="DWG-2025-001"
             />
             <NumberedField
-              n={next()}
+              n={cn_.numeroMatricola}
               label={t("serialNo")}
               required
               error={
@@ -177,13 +194,13 @@ function IndexPage() {
               placeholder="SN-00123"
             />
             <NumberedField
-              n={next()}
+              n={cn_.tagNumber}
               label={t("tagNo")}
               {...form.register("tagNumber")}
               placeholder="TAG-001"
             />
             <NumberedField
-              n={next()}
+              n={cn_.dataCollaudo}
               label={t("testDate")}
               type="date"
               required
@@ -191,7 +208,7 @@ function IndexPage() {
               {...form.register("dataCollaudo")}
             />
             <NumberedField
-              n={next()}
+              n={cn_.luogoCollaudo}
               label={t("testPlace")}
               required
               error={
@@ -212,8 +229,9 @@ function IndexPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {fields.map((f, idx) => {
-              const nName = next();
-              const nRole = next();
+              const an = attendeeFieldNumbers(idx);
+              const nName = an.nome;
+              const nRole = an.ruolo;
               return (
                 <div
                   key={f.id}
@@ -281,21 +299,22 @@ function IndexPage() {
 function PartyFields({
   path,
   form,
-  next,
+  base,
   required,
 }: {
   path: "produttore" | "cliente";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: any;
-  next: () => number;
+  base: number;
   required?: boolean;
 }) {
   const { t } = useI18n();
   const err = form.formState.errors[path];
+  const n = partyFieldNumbers(base);
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <NumberedField
-        n={next()}
+        n={n.ragioneSociale}
         label={t("companyName")}
         required={required}
         error={err?.ragioneSociale?.message && t("required")}
@@ -304,27 +323,27 @@ function PartyFields({
         placeholder="Acme S.p.A."
       />
       <NumberedField
-        n={next()}
+        n={n.indirizzo}
         label={t("address")}
         {...form.register(`${path}.indirizzo` as const)}
         className="sm:col-span-2"
         placeholder="Via Roma 1, Milano"
       />
       <NumberedField
-        n={next()}
+        n={n.referente}
         label={t("contact")}
         {...form.register(`${path}.referente` as const)}
         placeholder="Mario Rossi"
       />
       <NumberedField
-        n={next()}
+        n={n.email}
         label={t("email")}
         type="email"
         {...form.register(`${path}.email` as const)}
         placeholder="info@acme.com"
       />
       <NumberedField
-        n={next()}
+        n={n.telefono}
         label={t("phone")}
         {...form.register(`${path}.telefono` as const)}
         placeholder="+39 02 1234567"
