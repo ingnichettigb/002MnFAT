@@ -75,7 +75,7 @@ function NumLabel({
 }) {
   return (
     <Label htmlFor={htmlFor} className="flex items-start gap-1 leading-tight">
-      <sup className="mt-0.5 text-[10px] font-semibold text-muted-foreground">
+      <sup className="mt-0.5 text-[8px] font-semibold leading-none text-muted-foreground">
         {n}
       </sup>
       <span>
@@ -113,9 +113,8 @@ function IndexPage() {
     navigate({ to: "/controlli" });
   };
 
-  // Stable counter for superscript numbering across the whole form
-  let counter = 0;
-  const next = () => ++counter;
+  // Numerazione fissa e univoca (vedi src/lib/fat-numbering.ts)
+  const cn_ = commonFieldNumbers();
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:py-12">
@@ -138,7 +137,12 @@ function IndexPage() {
             <CardTitle>{t("manufacturerTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <PartyFields path="produttore" form={form} next={next} required />
+            <PartyFields
+              path="produttore"
+              form={form}
+              base={N_MANUFACTURER_BASE}
+              required
+            />
           </CardContent>
         </Card>
 
@@ -148,7 +152,12 @@ function IndexPage() {
             <CardTitle>{t("customerTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <PartyFields path="cliente" form={form} next={next} required />
+            <PartyFields
+              path="cliente"
+              form={form}
+              base={N_CUSTOMER_BASE}
+              required
+            />
           </CardContent>
         </Card>
 
