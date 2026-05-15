@@ -92,8 +92,9 @@ function IndexPage() {
   const { t } = useI18n();
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: state.general,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
+    defaultValues: state.general as FormValues,
   });
 
   // Re-sync after localStorage hydration
@@ -284,7 +285,8 @@ function PartyFields({
   required,
 }: {
   path: "produttore" | "cliente";
-  form: ReturnType<typeof useForm<FormValues>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  form: any;
   next: () => number;
   required?: boolean;
 }) {
