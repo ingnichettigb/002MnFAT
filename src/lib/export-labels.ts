@@ -6,12 +6,11 @@
 // Genera un file `mini-fat-labels.csv` con colonne: id, key, it, en, descrizione.
 
 import { getStaticLabelTable } from "./fat-numbering";
-import { getDict } from "./i18n";
+import { dict } from "./i18n";
 
 export function buildLabelRows() {
-  const dict = getDict();
   return getStaticLabelTable().map((e) => {
-    const tr = dict[e.i18nKey as keyof typeof dict];
+    const tr = (dict as Record<string, { it: string; en: string }>)[e.i18nKey];
     return {
       id: e.id,
       key: e.i18nKey,
