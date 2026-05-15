@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { FatProvider } from "@/lib/fat-context";
 
 function NotFoundComponent() {
   return (
@@ -72,11 +73,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "mini FAT — Verbali di Collaudo" },
+      {
+        name: "description",
+        content:
+          "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test.",
+      },
+      { name: "author", content: "mini FAT" },
+      { property: "og:title", content: "mini FAT — Verbali di Collaudo" },
+      {
+        property: "og:description",
+        content: "Compila e genera in PDF il verbale FAT.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -113,7 +121,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <FatProvider>
+        <Outlet />
+      </FatProvider>
     </QueryClientProvider>
   );
 }
