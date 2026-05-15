@@ -1,0 +1,17 @@
+export const DEFAULT_CONTROLS: string[] = [
+  "Controllo corrispondenza al disegno tecnico e layout generale",
+  "Controllo visivo delle saldature e assenza di difetti superficiali",
+  "Controllo dimensionale e tolleranze geometriche",
+  "Controllo spessore e adesione della verniciatura / trattamenti superficiali",
+  "Verifica della targhetta identificativa e marcatura CE",
+  "Controllo accoppiamenti meccanici e serraggio bulloneria (prove di coppia)",
+  "Verifica della tenuta idraulica / pneumatica (controllo serbatoi e tubazioni)",
+  "Controllo isolamento elettrico e continuità della messa a terra",
+  "Verifica del senso di rotazione del motore elettrico e assorbimento di corrente",
+  "Controllo della temperatura dei cuscinetti e vibrazioni meccaniche",
+  "Verifica funzionale dei sensori e della strumentazione di bordo",
+  "Test di continuità dei segnali I/O (Input/Output) verso il PLC",
+  "Verifica della versione software installata e della logica di interblocco",
+  "Test di simulazione delle condizioni di allarme e arresto di emergenza",
+  "Verifica della presenza di tutta la documentazione tecnica e certificati materiali",
+];
