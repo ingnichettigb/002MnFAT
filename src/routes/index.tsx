@@ -299,21 +299,22 @@ function IndexPage() {
 function PartyFields({
   path,
   form,
-  next,
+  base,
   required,
 }: {
   path: "produttore" | "cliente";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: any;
-  next: () => number;
+  base: number;
   required?: boolean;
 }) {
   const { t } = useI18n();
   const err = form.formState.errors[path];
+  const n = partyFieldNumbers(base);
   return (
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <NumberedField
-        n={next()}
+        n={n.ragioneSociale}
         label={t("companyName")}
         required={required}
         error={err?.ragioneSociale?.message && t("required")}
@@ -322,27 +323,27 @@ function PartyFields({
         placeholder="Acme S.p.A."
       />
       <NumberedField
-        n={next()}
+        n={n.indirizzo}
         label={t("address")}
         {...form.register(`${path}.indirizzo` as const)}
         className="sm:col-span-2"
         placeholder="Via Roma 1, Milano"
       />
       <NumberedField
-        n={next()}
+        n={n.referente}
         label={t("contact")}
         {...form.register(`${path}.referente` as const)}
         placeholder="Mario Rossi"
       />
       <NumberedField
-        n={next()}
+        n={n.email}
         label={t("email")}
         type="email"
         {...form.register(`${path}.email` as const)}
         placeholder="info@acme.com"
       />
       <NumberedField
-        n={next()}
+        n={n.telefono}
         label={t("phone")}
         {...form.register(`${path}.telefono` as const)}
         placeholder="+39 02 1234567"
