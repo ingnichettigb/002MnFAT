@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import { FatStepper } from "@/components/fat-stepper";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
+import { controlsBase } from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
