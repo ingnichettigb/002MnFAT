@@ -292,6 +292,9 @@ function IndexPage() {
           </CardContent>
         </Card>
 
+        {/* Conclusioni / Final results */}
+        <ConclusioniSection form={form} />
+
         <div className="flex justify-end">
           <Button type="submit" size="lg">
             <Lbl id={LABELS.next.id}>{t("next")}</Lbl>
