@@ -50,6 +50,19 @@ const attendeeSchema = z.object({
   ruolo: z.string().trim().max(150).default(""),
 });
 
+const conclusioniSchema = z.object({
+  accettato: z.enum(["", "si", "no"]).default(""),
+  motivoNonAccettazione: z.string().trim().max(500).default(""),
+  note: z.string().trim().max(2000).default(""),
+  azioniCorrettive: z.enum(["", "si", "no"]).default(""),
+  dataIspezione: z.string().default(""),
+  ispettoreEsterno: z.string().trim().max(200).default(""),
+  controlloInterno: z.string().trim().max(200).default(""),
+  dopoAzioni: z.enum(["", "si", "no", "na"]).default(""),
+  dataFinale: z.string().default(""),
+  firma: z.string().trim().max(200).default(""),
+});
+
 const schema = z.object({
   produttore: partySchema,
   cliente: partySchema,
@@ -58,7 +71,9 @@ const schema = z.object({
   tagNumber: z.string().trim().max(120).default(""),
   dataCollaudo: z.string().min(1),
   luogoCollaudo: z.string().trim().min(1).max(200),
+  descrizione: z.string().trim().max(2000).default(""),
   presenti: z.array(attendeeSchema),
+  conclusioni: conclusioniSchema,
 });
 
 type FormValues = z.infer<typeof schema>;
