@@ -181,6 +181,7 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
             produttore: { ...emptyParty },
             cliente: { ...emptyParty },
             presenti: [newAttendee(), newAttendee()],
+            conclusioni: { ...emptyConclusioni },
           },
           controls: initialControls(),
         }),
