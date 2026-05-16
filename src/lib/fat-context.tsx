@@ -15,6 +15,19 @@ export type Attendee = {
   ruolo: string;
 };
 
+export type Conclusioni = {
+  accettato: "" | "si" | "no";
+  motivoNonAccettazione: string;
+  note: string;
+  azioniCorrettive: "" | "si" | "no";
+  dataIspezione: string;
+  ispettoreEsterno: string;
+  controlloInterno: string;
+  dopoAzioni: "" | "si" | "no" | "na";
+  dataFinale: string;
+  firma: string;
+};
+
 export type GeneralData = {
   produttore: Party;
   cliente: Party;
@@ -23,7 +36,9 @@ export type GeneralData = {
   tagNumber: string;
   dataCollaudo: string;
   luogoCollaudo: string;
+  descrizione: string;
   presenti: Attendee[];
+  conclusioni: Conclusioni;
 };
 
 export type ControlItem = {
