@@ -15,6 +15,19 @@ export type Attendee = {
   ruolo: string;
 };
 
+export type Conclusioni = {
+  accettato: "" | "si" | "no";
+  motivoNonAccettazione: string;
+  note: string;
+  azioniCorrettive: "" | "si" | "no";
+  dataIspezione: string;
+  ispettoreEsterno: string;
+  controlloInterno: string;
+  dopoAzioni: "" | "si" | "no" | "na";
+  dataFinale: string;
+  firma: string;
+};
+
 export type GeneralData = {
   produttore: Party;
   cliente: Party;
@@ -23,7 +36,9 @@ export type GeneralData = {
   tagNumber: string;
   dataCollaudo: string;
   luogoCollaudo: string;
+  descrizione: string;
   presenti: Attendee[];
+  conclusioni: Conclusioni;
 };
 
 export type ControlItem = {
@@ -54,6 +69,19 @@ const newAttendee = (): Attendee => ({
   ruolo: "",
 });
 
+const emptyConclusioni: Conclusioni = {
+  accettato: "",
+  motivoNonAccettazione: "",
+  note: "",
+  azioniCorrettive: "",
+  dataIspezione: "",
+  ispettoreEsterno: "",
+  controlloInterno: "",
+  dopoAzioni: "",
+  dataFinale: "",
+  firma: "",
+};
+
 const emptyGeneral: GeneralData = {
   produttore: { ...emptyParty },
   cliente: { ...emptyParty },
@@ -62,10 +90,12 @@ const emptyGeneral: GeneralData = {
   tagNumber: "",
   dataCollaudo: "",
   luogoCollaudo: "",
+  descrizione: "",
   presenti: [
     { id: "att-default-1", nome: "", ruolo: "" },
     { id: "att-default-2", nome: "", ruolo: "" },
   ],
+  conclusioni: { ...emptyConclusioni },
 };
 
 const initialControls = (): ControlItem[] =>
@@ -151,6 +181,7 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
             produttore: { ...emptyParty },
             cliente: { ...emptyParty },
             presenti: [newAttendee(), newAttendee()],
+            conclusioni: { ...emptyConclusioni },
           },
           controls: initialControls(),
         }),

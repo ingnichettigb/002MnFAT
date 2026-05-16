@@ -51,6 +51,39 @@ export const dict = {
   testPlace: { it: "Luogo del Collaudo", en: "Test Location" },
   attendeeName: { it: "Nome e Cognome", en: "Full Name" },
   attendeeRole: { it: "Ruolo / Azienda", en: "Role / Company" },
+  descrizione: { it: "Descrizione", en: "Description" },
+  descrizionePlaceholder: {
+    it: "Oggetto del collaudo, descrizione dell'apparecchiatura, riferimenti…",
+    en: "Test object, equipment description, references…",
+  },
+
+  // Conclusioni / Final results
+  conclusioniTitle: { it: "Conclusioni", en: "Final results" },
+  serbAccettato: { it: "Serb. accettato", en: "Tank accepted" },
+  motivoNonAccettazione: {
+    it: "Motivo della non-accettazione",
+    en: "Reason for non-acceptance",
+  },
+  noteRilievi: { it: "Note / Rilievi", en: "Notes / Remarks" },
+  azioniCorrettive: {
+    it: "Azioni correttive da intraprendere",
+    en: "Corrective actions to be taken",
+  },
+  dataIspezione: { it: "Data", en: "Date" },
+  ispettoreEsterno: {
+    it: "Ispettore esterno / cliente",
+    en: "External / client inspector",
+  },
+  controlloInterno: { it: "Controllo interno", en: "Internal control" },
+  dopoAzioni: {
+    it: "Dopo azioni correttive il serbatoio è stato accettato",
+    en: "After corrective actions the tank was accepted",
+  },
+  dataFinale: { it: "Data finale", en: "Final date" },
+  firma: { it: "Firma", en: "Signature" },
+  optYes: { it: "SI", en: "YES" },
+  optNo: { it: "NO", en: "NO" },
+  optNa: { it: "NA", en: "NA" },
 
   required: { it: "Campo obbligatorio", en: "Required field" },
 

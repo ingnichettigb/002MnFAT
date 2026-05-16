@@ -13,6 +13,7 @@ import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
   Card,
@@ -50,6 +51,19 @@ const attendeeSchema = z.object({
   ruolo: z.string().trim().max(150).default(""),
 });
 
+const conclusioniSchema = z.object({
+  accettato: z.enum(["", "si", "no"]).default(""),
+  motivoNonAccettazione: z.string().trim().max(500).default(""),
+  note: z.string().trim().max(2000).default(""),
+  azioniCorrettive: z.enum(["", "si", "no"]).default(""),
+  dataIspezione: z.string().default(""),
+  ispettoreEsterno: z.string().trim().max(200).default(""),
+  controlloInterno: z.string().trim().max(200).default(""),
+  dopoAzioni: z.enum(["", "si", "no", "na"]).default(""),
+  dataFinale: z.string().default(""),
+  firma: z.string().trim().max(200).default(""),
+});
+
 const schema = z.object({
   produttore: partySchema,
   cliente: partySchema,
@@ -58,7 +72,9 @@ const schema = z.object({
   tagNumber: z.string().trim().max(120).default(""),
   dataCollaudo: z.string().min(1),
   luogoCollaudo: z.string().trim().min(1).max(200),
+  descrizione: z.string().trim().max(2000).default(""),
   presenti: z.array(attendeeSchema),
+  conclusioni: conclusioniSchema,
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -201,6 +217,14 @@ function IndexPage() {
               placeholder="Milano, Stab. Nord"
               className="sm:col-span-2"
             />
+            <NumberedTextarea
+              n={LABELS.descrizione.id}
+              label={t("descrizione")}
+              rows={3}
+              {...form.register("descrizione")}
+              placeholder={t("descrizionePlaceholder")}
+              className="sm:col-span-2"
+            />
           </CardContent>
         </Card>
 
@@ -267,6 +291,9 @@ function IndexPage() {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Conclusioni / Final results */}
+        <ConclusioniSection form={form} />
 
         <div className="flex justify-end">
           <Button type="submit" size="lg">
@@ -374,3 +401,225 @@ const NumberedField = React.forwardRef<HTMLInputElement, NumberedFieldProps>(
     );
   },
 );
+
+/* ───────── Numbered textarea ───────── */
+type NumberedTextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  n: number;
+  label: string;
+  required?: boolean;
+};
+
+const NumberedTextarea = React.forwardRef<
+  HTMLTextAreaElement,
+  NumberedTextareaProps
+>(function NumberedTextarea(
+  { n, label, required, className, id, ...rest },
+  ref,
+) {
+  const autoId = useId();
+  const fieldId = id ?? autoId;
+  return (
+    <div className={"space-y-1.5 " + (className ?? "")}>
+      <Label htmlFor={fieldId} className="flex items-start gap-1 leading-tight">
+        <sup className="mt-[1px] text-[8px] font-semibold leading-none text-muted-foreground">
+          {n}
+        </sup>
+        <span>
+          {label}
+          {required && <span className="ml-0.5 text-destructive">*</span>}
+        </span>
+      </Label>
+      <Textarea id={fieldId} ref={ref} {...rest} />
+    </div>
+  );
+});
+
+/* ───────── Conclusioni / Final results ───────── */
+type YesNo = "" | "si" | "no";
+type YesNoNa = "" | "si" | "no" | "na";
+
+function ChoiceGroup<T extends string>({
+  value,
+  onChange,
+  options,
+  name,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: { value: T; label: string }[];
+  name: string;
+}) {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {options.map((o) => (
+        <label
+          key={o.value}
+          className="flex cursor-pointer items-center gap-1.5 text-sm"
+        >
+          <input
+            type="radio"
+            name={name}
+            value={o.value}
+            checked={value === o.value}
+            onChange={() => onChange(o.value)}
+            className="h-4 w-4 accent-primary"
+          />
+          <span>{o.label}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
+function NumberedRow({
+  n,
+  label,
+  children,
+}: {
+  n: number;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-start gap-1 text-sm font-medium leading-tight">
+        <sup className="mt-[1px] text-[8px] font-semibold leading-none text-muted-foreground">
+          {n}
+        </sup>
+        <span>{label}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ConclusioniSection({ form }: { form: any }) {
+  const { t } = useI18n();
+  const yesNoOpts: { value: YesNo; label: string }[] = [
+    { value: "si", label: t("optYes") },
+    { value: "no", label: t("optNo") },
+  ];
+  const yesNoNaOpts: { value: YesNoNa; label: string }[] = [
+    { value: "si", label: t("optYes") },
+    { value: "no", label: t("optNo") },
+    { value: "na", label: t("optNa") },
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <Lbl id={LABELS.conclusioniTitle.id}>{t("conclusioniTitle")}</Lbl>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {/* SERB. ACCETTATO + motivo */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[auto_1fr] sm:items-start">
+          <NumberedRow n={LABELS.serbAccettato.id} label={t("serbAccettato")}>
+            <Controller
+              control={form.control}
+              name="conclusioni.accettato"
+              render={({ field }) => (
+                <ChoiceGroup
+                  name="conclusioni.accettato"
+                  value={(field.value ?? "") as YesNo}
+                  onChange={field.onChange}
+                  options={yesNoOpts}
+                />
+              )}
+            />
+          </NumberedRow>
+          <NumberedTextarea
+            n={LABELS.motivoNonAccettazione.id}
+            label={t("motivoNonAccettazione")}
+            rows={2}
+            {...form.register("conclusioni.motivoNonAccettazione")}
+          />
+        </div>
+
+        {/* NOTE / REMARKS */}
+        <NumberedTextarea
+          n={LABELS.noteRilievi.id}
+          label={t("noteRilievi")}
+          rows={4}
+          {...form.register("conclusioni.note")}
+        />
+
+        {/* AZIONI CORRETTIVE */}
+        <NumberedRow
+          n={LABELS.azioniCorrettive.id}
+          label={t("azioniCorrettive")}
+        >
+          <Controller
+            control={form.control}
+            name="conclusioni.azioniCorrettive"
+            render={({ field }) => (
+              <ChoiceGroup
+                name="conclusioni.azioniCorrettive"
+                value={(field.value ?? "") as YesNo}
+                onChange={field.onChange}
+                options={yesNoOpts}
+              />
+            )}
+          />
+        </NumberedRow>
+
+        {/* Data + ispettore esterno / controllo interno */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <NumberedField
+            n={LABELS.dataIspezione.id}
+            label={t("dataIspezione")}
+            type="date"
+            {...form.register("conclusioni.dataIspezione")}
+          />
+          <NumberedField
+            n={LABELS.ispettoreEsterno.id}
+            label={t("ispettoreEsterno")}
+            {...form.register("conclusioni.ispettoreEsterno")}
+            placeholder="PPG Coatings Nederland BV"
+          />
+          <NumberedField
+            n={LABELS.controlloInterno.id}
+            label={t("controlloInterno")}
+            {...form.register("conclusioni.controlloInterno")}
+            placeholder="Azzini SpA"
+            className="sm:col-span-2"
+          />
+        </div>
+
+        {/* DOPO AZIONI */}
+        <NumberedRow n={LABELS.dopoAzioni.id} label={t("dopoAzioni")}>
+          <Controller
+            control={form.control}
+            name="conclusioni.dopoAzioni"
+            render={({ field }) => (
+              <ChoiceGroup
+                name="conclusioni.dopoAzioni"
+                value={(field.value ?? "") as YesNoNa}
+                onChange={field.onChange}
+                options={yesNoNaOpts}
+              />
+            )}
+          />
+        </NumberedRow>
+
+        {/* Data + firma finali */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <NumberedField
+            n={LABELS.dataFinale.id}
+            label={t("dataFinale")}
+            type="date"
+            {...form.register("conclusioni.dataFinale")}
+          />
+          <NumberedField
+            n={LABELS.firma.id}
+            label={t("firma")}
+            {...form.register("conclusioni.firma")}
+            placeholder="—"
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

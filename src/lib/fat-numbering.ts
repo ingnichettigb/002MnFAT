@@ -66,9 +66,23 @@ export const LABELS = {
   tagNo:           { id: 34, i18nKey: "tagNo",       desc: "Tag Number Cliente" },
   testDate:        { id: 35, i18nKey: "testDate",    desc: "Data del Collaudo" },
   testPlace:       { id: 36, i18nKey: "testPlace",   desc: "Luogo del Collaudo" },
+  descrizione:     { id: 37, i18nKey: "descrizione", desc: "Descrizione (oggetto del collaudo)" },
 
   // ── 41 — Presenti al FAT (header) ─────────────────────────────────────────
   attendeesTitle:  { id: 41, i18nKey: "attendeesTitle", desc: "Sezione Presenti al FAT (header)" },
+
+  // ── 300..310 — Conclusioni / Final results ───────────────────────────────
+  conclusioniTitle:      { id: 300, i18nKey: "conclusioniTitle",      desc: "Sezione Conclusioni / Final results (header)" },
+  serbAccettato:         { id: 301, i18nKey: "serbAccettato",         desc: "Serb. accettato / Tank accepted (SI/NO)" },
+  motivoNonAccettazione: { id: 302, i18nKey: "motivoNonAccettazione", desc: "Motivo della non-accettazione / Reason for non-acceptance" },
+  noteRilievi:           { id: 303, i18nKey: "noteRilievi",           desc: "Note / Remarks" },
+  azioniCorrettive:      { id: 304, i18nKey: "azioniCorrettive",      desc: "Azioni correttive da intraprendere / Corrective actions to be taken (SI/NO)" },
+  dataIspezione:         { id: 305, i18nKey: "dataIspezione",         desc: "Data ispezione / Date" },
+  ispettoreEsterno:      { id: 306, i18nKey: "ispettoreEsterno",      desc: "Ispettore esterno / cliente · External / client inspector" },
+  controlloInterno:      { id: 307, i18nKey: "controlloInterno",      desc: "Controllo interno · Internal control" },
+  dopoAzioni:            { id: 308, i18nKey: "dopoAzioni",            desc: "Dopo azioni correttive il serbatoio è stato accettato / After corrective actions (SI/NO/NA)" },
+  dataFinale:            { id: 309, i18nKey: "dataFinale",            desc: "Data finale / Final date" },
+  firma:                 { id: 310, i18nKey: "firma",                 desc: "Firma / Signature" },
 
   // ── 100 — Lista Controlli (header) ────────────────────────────────────────
   controlsTitle:   { id: 100, i18nKey: "controlsTitle", desc: "Sezione Lista Controlli (header)" },
