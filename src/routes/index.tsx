@@ -217,6 +217,14 @@ function IndexPage() {
               placeholder="Milano, Stab. Nord"
               className="sm:col-span-2"
             />
+            <NumberedTextarea
+              n={LABELS.descrizione.id}
+              label={t("descrizione")}
+              rows={3}
+              {...form.register("descrizione")}
+              placeholder={t("descrizionePlaceholder")}
+              className="sm:col-span-2"
+            />
           </CardContent>
         </Card>
 
