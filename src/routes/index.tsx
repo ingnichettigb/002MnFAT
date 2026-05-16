@@ -174,6 +174,14 @@ function IndexPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <NumberedTextarea
+              n={LABELS.descrizione.id}
+              label={t("descrizione")}
+              rows={3}
+              {...form.register("descrizione")}
+              placeholder={t("descrizionePlaceholder")}
+              className="sm:col-span-2"
+            />
             <NumberedField
               n={LABELS.drawingNo.id}
               label={t("drawingNo")}
@@ -215,14 +223,6 @@ function IndexPage() {
               }
               {...form.register("luogoCollaudo")}
               placeholder="Milano, Stab. Nord"
-              className="sm:col-span-2"
-            />
-            <NumberedTextarea
-              n={LABELS.descrizione.id}
-              label={t("descrizione")}
-              rows={3}
-              {...form.register("descrizione")}
-              placeholder={t("descrizionePlaceholder")}
               className="sm:col-span-2"
             />
           </CardContent>
