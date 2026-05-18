@@ -67,6 +67,7 @@ export const LABELS = {
   testDate:        { id: 35, i18nKey: "testDate",    desc: "Data del Collaudo" },
   testPlace:       { id: 36, i18nKey: "testPlace",   desc: "Luogo del Collaudo" },
   descrizione:     { id: 37, i18nKey: "descrizione", desc: "Descrizione (oggetto del collaudo)" },
+  commessa:        { id: 38, i18nKey: "commessa",    desc: "Commessa / Job number" },
 
   // ── 41 — Presenti al FAT (header) ─────────────────────────────────────────
   attendeesTitle:  { id: 41, i18nKey: "attendeesTitle", desc: "Sezione Presenti al FAT (header)" },

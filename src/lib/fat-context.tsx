@@ -34,6 +34,7 @@ export type GeneralData = {
   numeroDisegno: string;
   numeroMatricola: string;
   tagNumber: string;
+  commessa: string;
   dataCollaudo: string;
   luogoCollaudo: string;
   descrizione: string;
@@ -88,6 +89,7 @@ const emptyGeneral: GeneralData = {
   numeroDisegno: "",
   numeroMatricola: "",
   tagNumber: "",
+  commessa: "",
   dataCollaudo: "",
   luogoCollaudo: "",
   descrizione: "",

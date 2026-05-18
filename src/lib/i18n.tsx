@@ -49,6 +49,7 @@ export const dict = {
   tagNo: { it: "Tag Number Cliente", en: "Customer Tag Number" },
   testDate: { it: "Data del Collaudo", en: "Test Date" },
   testPlace: { it: "Luogo del Collaudo", en: "Test Location" },
+  commessa: { it: "Commessa", en: "Job Number" },
   attendeeName: { it: "Nome e Cognome", en: "Full Name" },
   attendeeRole: { it: "Ruolo / Azienda", en: "Role / Company" },
   descrizione: { it: "Descrizione", en: "Description" },

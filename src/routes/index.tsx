@@ -70,6 +70,7 @@ const schema = z.object({
   numeroDisegno: z.string().trim().min(1).max(120),
   numeroMatricola: z.string().trim().min(1).max(120),
   tagNumber: z.string().trim().max(120).default(""),
+  commessa: z.string().trim().max(120).default(""),
   dataCollaudo: z.string().min(1),
   luogoCollaudo: z.string().trim().min(1).max(200),
   descrizione: z.string().trim().max(2000).default(""),
@@ -207,12 +208,10 @@ function IndexPage() {
               placeholder="TAG-001"
             />
             <NumberedField
-              n={LABELS.testDate.id}
-              label={t("testDate")}
-              type="date"
-              required
-              error={form.formState.errors.dataCollaudo?.message && t("required")}
-              {...form.register("dataCollaudo")}
+              n={LABELS.commessa.id}
+              label={t("commessa")}
+              {...form.register("commessa")}
+              placeholder="JOB-2025-001"
             />
             <NumberedField
               n={LABELS.testPlace.id}
@@ -223,7 +222,14 @@ function IndexPage() {
               }
               {...form.register("luogoCollaudo")}
               placeholder="Milano, Stab. Nord"
-              className="sm:col-span-2"
+            />
+            <NumberedField
+              n={LABELS.testDate.id}
+              label={t("testDate")}
+              type="date"
+              required
+              error={form.formState.errors.dataCollaudo?.message && t("required")}
+              {...form.register("dataCollaudo")}
             />
           </CardContent>
         </Card>
