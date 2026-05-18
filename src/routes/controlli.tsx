@@ -7,6 +7,7 @@ import { Lbl } from "@/components/lbl";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, controlNumber } from "@/lib/fat-numbering";
+import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,7 +35,7 @@ export const Route = createFileRoute("/controlli")({
 function ControlliPage() {
   const navigate = useNavigate();
   const { state, toggleControl, addCustomControl, removeControl } = useFat();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [newLabel, setNewLabel] = useState("");
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
@@ -48,6 +49,7 @@ function ControlliPage() {
 
   const handleNext = () => {
     if (selectedCount === 0) return;
+    generateFatPdf(state, lang);
     navigate({ to: "/report" });
   };
 
