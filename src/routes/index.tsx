@@ -83,7 +83,7 @@ type FormValues = z.infer<typeof schema>;
 
 function IndexPage() {
   const navigate = useNavigate();
-  const { state, setGeneral } = useFat();
+  const { state, setGeneral, activeId } = useFat();
   const { t } = useI18n();
 
   const form = useForm<FormValues>({
@@ -95,7 +95,7 @@ function IndexPage() {
   useEffect(() => {
     form.reset(state.general);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.general.numeroMatricola]);
+  }, [activeId]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
