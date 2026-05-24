@@ -7,6 +7,7 @@ import { useEffect, useId } from "react";
 import { Trash2, Plus } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
+import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
 import { useFat, newAttendee } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
@@ -82,7 +83,7 @@ type FormValues = z.infer<typeof schema>;
 
 function IndexPage() {
   const navigate = useNavigate();
-  const { state, setGeneral } = useFat();
+  const { state, setGeneral, activeId } = useFat();
   const { t } = useI18n();
 
   const form = useForm<FormValues>({
@@ -94,7 +95,7 @@ function IndexPage() {
   useEffect(() => {
     form.reset(state.general);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.general.numeroMatricola]);
+  }, [activeId]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -118,7 +119,9 @@ function IndexPage() {
         <LangSwitcher />
       </header>
 
+      <FatToolbar />
       <FatStepper current={1} />
+
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Manufacturer */}

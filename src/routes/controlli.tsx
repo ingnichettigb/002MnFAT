@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
+import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
@@ -34,7 +35,8 @@ export const Route = createFileRoute("/controlli")({
 
 function ControlliPage() {
   const navigate = useNavigate();
-  const { state, toggleControl, addCustomControl, removeControl } = useFat();
+  const { state, toggleControl, addCustomControl, removeControl, markDone } =
+    useFat();
   const { t, lang } = useI18n();
   const [newLabel, setNewLabel] = useState("");
 
@@ -50,6 +52,7 @@ function ControlliPage() {
   const handleNext = () => {
     if (selectedCount === 0) return;
     generateFatPdf(state, lang);
+    markDone();
     navigate({ to: "/report" });
   };
 
@@ -65,6 +68,7 @@ function ControlliPage() {
         <LangSwitcher />
       </header>
 
+      <FatToolbar />
       <FatStepper current={2} />
 
       <Card>
