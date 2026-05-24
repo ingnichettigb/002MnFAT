@@ -87,6 +87,20 @@ export const LABELS = {
 
   // ── 100 — Lista Controlli (header) ────────────────────────────────────────
   controlsTitle:   { id: 100, i18nKey: "controlsTitle", desc: "Sezione Lista Controlli (header)" },
+
+  // ── 400..420 — Archivio FAT ──────────────────────────────────────────────
+  archiveTitle:    { id: 400, i18nKey: "archiveTitle",    desc: "Sezione Archivio FAT (header)" },
+  archiveOpen:     { id: 401, i18nKey: "archiveOpen",     desc: "Pulsante Apri archivio FAT" },
+  saveDraft:       { id: 402, i18nKey: "saveDraft",       desc: "Pulsante Salva bozza" },
+  newFatBtn:       { id: 403, i18nKey: "newFat",          desc: "Pulsante Nuovo FAT" },
+  archiveOpenRow:  { id: 404, i18nKey: "open",            desc: "Riga archivio · Apri" },
+  archiveDuplicate:{ id: 405, i18nKey: "duplicate",       desc: "Riga archivio · Duplica" },
+  archiveDelete:   { id: 406, i18nKey: "deleteAction",    desc: "Riga archivio · Elimina" },
+  archiveStatus:   { id: 407, i18nKey: "status",          desc: "Colonna Stato" },
+  archiveUpdated:  { id: 408, i18nKey: "lastUpdated",     desc: "Colonna Ultima modifica" },
+  tabTodo:         { id: 409, i18nKey: "statusTodo",      desc: "Tab Da lavorare" },
+  tabInProgress:   { id: 410, i18nKey: "statusInProgress",desc: "Tab In lavorazione" },
+  tabDone:         { id: 411, i18nKey: "statusDone",      desc: "Tab Completati" },
 } as const satisfies Record<string, LabelEntry>;
 
 export type LabelKey = keyof typeof LABELS;

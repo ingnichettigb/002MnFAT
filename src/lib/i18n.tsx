@@ -155,6 +155,33 @@ export const dict = {
   pdfInspectorSign: { it: "Firma Ispettore", en: "Inspector Signature" },
   pdfPage: { it: "Pagina", en: "Page" },
   pdfOf: { it: "di", en: "of" },
+
+  // Archivio FAT
+  archiveTitle: { it: "Archivio FAT", en: "FAT Archive" },
+  archiveDesc: {
+    it: "Tutti i FAT salvati, suddivisi per stato. Puoi aprirli, duplicarli o eliminarli.",
+    en: "All saved FATs grouped by status. Open, duplicate or delete them.",
+  },
+  archiveOpen: { it: "Archivio", en: "Archive" },
+  saveDraft: { it: "Salva bozza", en: "Save draft" },
+  newFat: { it: "Nuovo FAT", en: "New FAT" },
+  open: { it: "Apri", en: "Open" },
+  duplicate: { it: "Duplica", en: "Duplicate" },
+  deleteAction: { it: "Elimina", en: "Delete" },
+  status: { it: "Stato", en: "Status" },
+  lastUpdated: { it: "Ultima modifica", en: "Last updated" },
+  statusTodo: { it: "Da lavorare", en: "To do" },
+  statusInProgress: { it: "In lavorazione", en: "In progress" },
+  statusDone: { it: "Completati", en: "Completed" },
+  statusAll: { it: "Tutti", en: "All" },
+  noFats: { it: "Nessun FAT in questa categoria.", en: "No FAT in this category." },
+  confirmDelete: {
+    it: "Eliminare definitivamente questo FAT?",
+    en: "Permanently delete this FAT?",
+  },
+  draftSaved: { it: "Bozza salvata.", en: "Draft saved." },
+  untitledFat: { it: "FAT senza titolo", en: "Untitled FAT" },
+  activeFat: { it: "FAT attivo", en: "Active FAT" },
 };
 
 type Ctx = {
