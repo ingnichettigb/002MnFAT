@@ -23,7 +23,8 @@ const D: Record<string, { it: string; en: string }> = {
   testPlace: { it: "Luogo Collaudo", en: "Test Location" },
   descrizione: { it: "Descrizione", en: "Description" },
   attName: { it: "Nome e Cognome", en: "Full Name" },
-  attRole: { it: "Ruolo / Azienda", en: "Role / Company" },
+  attRole: { it: "Ruolo", en: "Role" },
+  attCompany: { it: "Azienda", en: "Company" },
   chapter: { it: "Controllo", en: "Check" },
   outcome: { it: "Esito", en: "Outcome" },
   notes: { it: "Note / Rilievi", en: "Notes / Findings" },
@@ -155,23 +156,24 @@ export function generateFatPdf(state: FatState, lang: Lang = "it") {
   ]);
 
   const attRows = general.presenti
-    .filter((a) => a.nome || a.ruolo)
-    .map((a) => [a.nome || "—", a.ruolo || "—"]);
+    .filter((a) => a.nome || a.ruolo || a.azienda)
+    .map((a) => [a.nome || "—", a.ruolo || "—", a.azienda || "—"]);
   if (attRows.length > 0) {
     autoTable(doc, {
       startY: cursorY,
       margin: { left: margin, right: margin, top: TOP },
-      head: [[tr("attendees", lang), ""]],
+      head: [[tr("attendees", lang), "", ""]],
       body: [
         [
           { content: tr("attName", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
           { content: tr("attRole", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
+          { content: tr("attCompany", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
         ] as any,
         ...attRows,
       ],
       styles: { fontSize: 9, cellPadding: 1.8 },
       headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "left" },
-      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: "auto" } },
+      columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 50 }, 2: { cellWidth: "auto" } },
     });
   }
 

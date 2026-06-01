@@ -51,7 +51,10 @@ export const dict = {
   testPlace: { it: "Luogo del Collaudo", en: "Test Location" },
   commessa: { it: "Commessa", en: "Job Number" },
   attendeeName: { it: "Nome e Cognome", en: "Full Name" },
-  attendeeRole: { it: "Ruolo / Azienda", en: "Role / Company" },
+  attendeeRole: { it: "Ruolo", en: "Role" },
+  attendeeCompany: { it: "Azienda", en: "Company" },
+  companyOther: { it: "Altro…", en: "Other…" },
+  companyOtherPlaceholder: { it: "Specifica azienda", en: "Specify company" },
   descrizione: { it: "Descrizione", en: "Description" },
   descrizionePlaceholder: {
     it: "Oggetto del collaudo, descrizione dell'apparecchiatura, riferimenti…",

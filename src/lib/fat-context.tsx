@@ -13,6 +13,7 @@ export type Attendee = {
   id: string;
   nome: string;
   ruolo: string;
+  azienda: string;
 };
 
 export type Conclusioni = {
@@ -80,6 +81,7 @@ const newAttendee = (): Attendee => ({
   id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
   nome: "",
   ruolo: "",
+  azienda: "",
 });
 
 const emptyConclusioni: Conclusioni = {

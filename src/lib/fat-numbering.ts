@@ -113,10 +113,11 @@ export const ATTENDEES_BASE = 50;
 export const CONTROLS_BASE = 101;
 
 /** Restituisce i numeri univoci per la riga presente all'indice indicato. */
-export function attendeeNumbers(index: number): { nome: number; ruolo: number } {
+export function attendeeNumbers(index: number): { nome: number; ruolo: number; azienda: number } {
   return {
-    nome: ATTENDEES_BASE + index * 2,
-    ruolo: ATTENDEES_BASE + index * 2 + 1,
+    nome: ATTENDEES_BASE + index * 3,
+    ruolo: ATTENDEES_BASE + index * 3 + 1,
+    azienda: ATTENDEES_BASE + index * 3 + 2,
   };
 }
 
