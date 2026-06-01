@@ -1,9 +1,12 @@
 import jsPDF from "jspdf";
+import * as JsPdfNS from "jspdf";
 import autoTable from "jspdf-autotable";
+// TextField (AcroForm) è esportato a runtime da jspdf ma non è tipizzato.
+const TextField: any = (JsPdfNS as any).TextField;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
-const D: Record<string, { it: string; en: string }> = {
+const D = {
   title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT" },
   subtitle: { it: "FACTORY ACCEPTANCE TEST", en: "FACTORY ACCEPTANCE TEST" },
   manufacturer: { it: "Ditta Produttrice", en: "Manufacturer" },
@@ -48,12 +51,21 @@ const D: Record<string, { it: string; en: string }> = {
   status: { it: "Stato", en: "Status" },
   signature: { it: "Firma", en: "Signature" },
   date: { it: "Data", en: "Date" },
+} as const;
+
+type DKey = keyof typeof D;
+
+/** Etichetta bilingue: prima lingua dell'utente / l'altra. */
+const bl = (key: DKey, lang: Lang): string => {
+  const it = D[key].it;
+  const en = D[key].en;
+  // it/en sono identici => mostra una sola volta
+  if (it === en) return it;
+  return lang === "en" ? `${en} / ${it}` : `${it} / ${en}`;
 };
 
-const tr = (key: keyof typeof D, lang: Lang) => D[key][lang];
-
 const fmtDate = (iso: string, lang: Lang) => {
-  if (!iso) return "—";
+  if (!iso) return "";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
   return d.toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
@@ -64,131 +76,252 @@ export function generateFatPdf(state: FatState, lang: Lang = "it") {
   const selected = controls.filter((c) => c.selected);
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
+  // Helvetica nei PDF è metricamente equivalente ad Arial e viene
+  // visualizzato come Arial nei lettori principali.
+  doc.setFont("helvetica", "normal");
+
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
-  const HEADER_H = 22; // altezza riservata all'intestazione di pagina
+  const HEADER_H = 26;
 
-  // ── Helper: intestazione comune in alto su OGNI pagina ──
+  // Counter per nomi univoci di field
+  let fieldSeq = 0;
+  const uid = (s: string) => `${s}_${++fieldSeq}`;
+
+  /** Crea un TextField AcroForm posizionato in mm. */
+  const addField = (opts: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    value?: string;
+    name: string;
+    multiline?: boolean;
+    fontSize?: number;
+  }) => {
+    const f = new TextField();
+    f.Rect = [opts.x, opts.y, opts.w, opts.h];
+    f.value = opts.value ?? "";
+    f.fontName = "helvetica";
+    f.fontSize = opts.fontSize ?? 12;
+    f.T = uid(opts.name);
+    if (opts.multiline) f.multiline = true;
+    doc.addField(f);
+  };
+
+  // ── Intestazione comune (senza nome cliente) ────────────
   const drawPageHeader = () => {
     const y = 8;
     doc.setDrawColor(180);
     doc.setLineWidth(0.3);
     doc.line(margin, y + HEADER_H - 4, pageW - margin, y + HEADER_H - 4);
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(40);
-    doc.text(
-      `${general.cliente.ragioneSociale || general.produttore.ragioneSociale || "—"}`,
-      margin,
-      y + 2,
-    );
-
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
     doc.setTextColor(60);
     const items: [string, string][] = [
-      [tr("commessa", lang), general.commessa || "—"],
-      [tr("drawingNo", lang), general.numeroDisegno || "—"],
-      [tr("serialNo", lang), general.numeroMatricola || "—"],
-      [tr("tagNo", lang), general.tagNumber || "—"],
-      [tr("testDate", lang), fmtDate(general.dataCollaudo, lang)],
+      [bl("commessa", lang), general.commessa || ""],
+      [bl("drawingNo", lang), general.numeroDisegno || ""],
+      [bl("serialNo", lang), general.numeroMatricola || ""],
+      [bl("tagNo", lang), general.tagNumber || ""],
+      [bl("testDate", lang), fmtDate(general.dataCollaudo, lang)],
     ];
     const colW = (pageW - margin * 2) / items.length;
     items.forEach(([k, v], i) => {
       const x = margin + colW * i;
       doc.setFont("helvetica", "bold");
-      doc.text(k + ":", x, y + 9);
+      doc.setFontSize(8);
+      doc.text(k + ":", x, y + 6, { maxWidth: colW - 2 });
       doc.setFont("helvetica", "normal");
-      doc.text(String(v), x, y + 14, { maxWidth: colW - 2 });
+      doc.setFontSize(9);
+      doc.text(String(v), x, y + 16, { maxWidth: colW - 2 });
     });
     doc.setTextColor(0);
   };
 
-  // jsPDF non ha un hook nativo per "ogni nuova pagina"; applichiamo l'header
-  // a tutte le pagine in chiusura. Tutto il contenuto parte sotto HEADER_H.
-  const TOP = HEADER_H + 6;
+  // Lascia spazio sufficiente tra l'header e il titolo del documento
+  const TOP = HEADER_H + 14;
 
   // ── PAGINA 1: dati generali ─────────────────────────────
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
-  doc.text(tr("title", lang), pageW / 2, TOP, { align: "center" });
-  doc.setFontSize(11);
-  doc.text(tr("subtitle", lang), pageW / 2, TOP + 6, { align: "center" });
+  doc.text(bl("title", lang), pageW / 2, TOP, { align: "center" });
+  doc.setFontSize(12);
+  doc.text(bl("subtitle", lang), pageW / 2, TOP + 7, { align: "center" });
 
-  let cursorY = TOP + 12;
+  let cursorY = TOP + 14;
 
-  const partyRows = (p: Party): [string, string][] => [
-    [tr("companyName", lang), p.ragioneSociale || "—"],
-    [tr("address", lang), p.indirizzo || "—"],
-    [tr("contact", lang), p.referente || "—"],
-    [tr("email", lang), p.email || "—"],
-    [tr("phone", lang), p.telefono || "—"],
-  ];
+  /** Tabella con cella-valore editabile (campo AcroForm). */
+  const partyTable = (title: string, p: Party, namePrefix: string) => {
+    const rows: Array<{ label: string; value: string; key: string }> = [
+      { label: bl("companyName", lang), value: p.ragioneSociale, key: "rag" },
+      { label: bl("address", lang), value: p.indirizzo, key: "ind" },
+      { label: bl("contact", lang), value: p.referente, key: "ref" },
+      { label: bl("email", lang), value: p.email, key: "email" },
+      { label: bl("phone", lang), value: p.telefono, key: "tel" },
+    ];
 
-  const sectionTable = (title: string, body: any[]) => {
     autoTable(doc, {
       startY: cursorY,
       margin: { left: margin, right: margin, top: TOP },
       head: [[title, ""]],
-      body,
-      styles: { fontSize: 9, cellPadding: 1.8 },
-      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "left" },
+      body: rows.map((r) => [r.label, ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2 },
+      headStyles: {
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 12,
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "left",
+      },
       columnStyles: {
-        0: { fontStyle: "bold", cellWidth: 50 },
+        0: { fontStyle: "bold", cellWidth: 70 },
         1: { cellWidth: "auto" },
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index !== 1) return;
+        const r = rows[data.row.index];
+        if (!r) return;
+        const { x, y, width, height } = data.cell;
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          value: r.value || "",
+          name: `${namePrefix}_${r.key}`,
+        });
       },
     });
     cursorY = (doc as any).lastAutoTable.finalY + 3;
   };
 
-  sectionTable(tr("manufacturer", lang), partyRows(general.produttore));
-  sectionTable(tr("customer", lang), partyRows(general.cliente));
-  sectionTable(tr("testData", lang), [
-    [tr("commessa", lang), general.commessa || "—"],
-    [tr("drawingNo", lang), general.numeroDisegno || "—"],
-    [tr("serialNo", lang), general.numeroMatricola || "—"],
-    [tr("tagNo", lang), general.tagNumber || "—"],
-    [tr("testDate", lang), fmtDate(general.dataCollaudo, lang)],
-    [tr("testPlace", lang), general.luogoCollaudo || "—"],
-    [tr("descrizione", lang), general.descrizione || "—"],
-  ]);
+  partyTable(bl("manufacturer", lang), general.produttore, "mfg");
+  partyTable(bl("customer", lang), general.cliente, "cli");
 
-  const attRows = general.presenti
-    .filter((a) => a.nome || a.ruolo || a.azienda)
-    .map((a) => [a.nome || "—", a.ruolo || "—", a.azienda || "—"]);
-  if (attRows.length > 0) {
+  // ── Test data ──
+  {
+    const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
+      { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
+      { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
+      { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
+      { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
+      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
+      { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
+      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 18 },
+    ];
     autoTable(doc, {
       startY: cursorY,
       margin: { left: margin, right: margin, top: TOP },
-      head: [[tr("attendees", lang), "", ""]],
+      head: [[bl("testData", lang), ""]],
+      body: rows.map((r) => [r.label, ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2 },
+      headStyles: {
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 12,
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "left",
+      },
+      columnStyles: {
+        0: { fontStyle: "bold", cellWidth: 70 },
+        1: { cellWidth: "auto" },
+      },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 1) {
+          const r = rows[data.row.index];
+          if (r?.minH) data.cell.styles.minCellHeight = r.minH;
+        }
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index !== 1) return;
+        const r = rows[data.row.index];
+        if (!r) return;
+        const { x, y, width, height } = data.cell;
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          value: r.value || "",
+          name: `td_${r.key}`,
+          multiline: r.multi,
+        });
+      },
+    });
+    cursorY = (doc as any).lastAutoTable.finalY + 3;
+  }
+
+  // ── Attendees ──
+  {
+    // Sempre almeno 5 righe per scrivere a mano altri presenti
+    const baseRows = general.presenti.map((a) => ({
+      nome: a.nome || "",
+      ruolo: a.ruolo || "",
+      azienda: a.azienda || "",
+    }));
+    while (baseRows.length < 5) baseRows.push({ nome: "", ruolo: "", azienda: "" });
+
+    autoTable(doc, {
+      startY: cursorY,
+      margin: { left: margin, right: margin, top: TOP },
+      head: [[bl("attendees", lang), "", ""]],
       body: [
         [
-          { content: tr("attName", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
-          { content: tr("attRole", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
-          { content: tr("attCompany", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
+          { content: bl("attName", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
+          { content: bl("attRole", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
+          { content: bl("attCompany", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
         ] as any,
-        ...attRows,
+        ...baseRows.map(() => ["", "", ""]),
       ],
-      styles: { fontSize: 9, cellPadding: 1.8 },
-      headStyles: { fillColor: [40, 40, 40], textColor: 255, halign: "left" },
-      columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 50 }, 2: { cellWidth: "auto" } },
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2, minCellHeight: 9 },
+      headStyles: {
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 12,
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "left",
+      },
+      columnStyles: {
+        0: { cellWidth: 70 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: "auto" },
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.row.index === 0) return;
+        const dataRowIdx = data.row.index - 1; // riga 0 è l'header bilingue
+        const row = baseRows[dataRowIdx];
+        if (!row) return;
+        const fields = ["nome", "ruolo", "azienda"] as const;
+        const key = fields[data.column.index];
+        const { x, y, width, height } = data.cell;
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          value: row[key],
+          name: `att_${dataRowIdx}_${key}`,
+        });
+      },
     });
   }
 
-  // ── Una pagina per ogni controllo selezionato ───────────
+  // ── Pagina per ogni controllo selezionato ───────────────
   selected.forEach((ctrl, idx) => {
     doc.addPage();
 
-    // Titolo del controllo BEN evidenziato, appena sotto l'header
     const titleY = TOP;
     doc.setFillColor(30, 41, 59);
     doc.rect(margin, titleY - 4, pageW - margin * 2, 12, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
-    const title = `${tr("chapter", lang)} ${idx + 1} — ${ctrl.label}`;
+    const title = `${bl("chapter", lang)} ${idx + 1} — ${ctrl.label}`;
     doc.text(title, margin + 3, titleY + 4, { maxWidth: pageW - margin * 2 - 6 });
     doc.setTextColor(0);
 
@@ -196,13 +329,13 @@ export function generateFatPdf(state: FatState, lang: Lang = "it") {
       startY: titleY + 14,
       margin: { left: margin, right: margin, top: TOP },
       body: [
-        [tr("outcome", lang), "[ ] PASS        [ ] FAIL        [ ] N/A"],
-        [tr("notes", lang), ""],
-        [tr("inspectorSign", lang), ""],
+        [bl("outcome", lang), ""],
+        [bl("notes", lang), ""],
+        [bl("inspectorSign", lang), ""],
       ],
-      styles: { fontSize: 11, cellPadding: 3, valign: "top" },
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 3, valign: "top" },
       columnStyles: {
-        0: { fontStyle: "bold", cellWidth: 45, fillColor: [240, 240, 240] },
+        0: { fontStyle: "bold", cellWidth: 55, fillColor: [240, 240, 240] },
         1: { cellWidth: "auto" },
       },
       didParseCell: (data) => {
@@ -213,21 +346,36 @@ export function generateFatPdf(state: FatState, lang: Lang = "it") {
         }
       },
       didDrawCell: (data) => {
-        if (data.section === "body" && data.row.index === 1 && data.column.index === 1) {
-          const { x, y, width, height } = data.cell;
-          doc.setDrawColor(210);
-          doc.setLineWidth(0.2);
-          const step = 8;
-          for (let yy = y + step; yy < y + height - 2; yy += step) {
-            doc.line(x + 2, yy, x + width - 2, yy);
-          }
-          doc.setDrawColor(0);
-        }
-        if (data.section === "body" && data.row.index === 2 && data.column.index === 1) {
-          const { x, y, width, height } = data.cell;
-          doc.setDrawColor(120);
-          doc.line(x + 4, y + height - 6, x + width - 4, y + height - 6);
-          doc.setDrawColor(0);
+        if (data.section !== "body" || data.column.index !== 1) return;
+        const { x, y, width, height } = data.cell;
+        if (data.row.index === 0) {
+          addField({
+            x: x + 0.5,
+            y: y + 0.5,
+            w: width - 1,
+            h: height - 1,
+            name: `ctrl_${idx}_outcome`,
+            value: "",
+          });
+        } else if (data.row.index === 1) {
+          addField({
+            x: x + 0.5,
+            y: y + 0.5,
+            w: width - 1,
+            h: height - 1,
+            name: `ctrl_${idx}_notes`,
+            value: "",
+            multiline: true,
+          });
+        } else if (data.row.index === 2) {
+          addField({
+            x: x + 0.5,
+            y: y + 0.5,
+            w: width - 1,
+            h: height - 1,
+            name: `ctrl_${idx}_sign`,
+            value: "",
+          });
         }
       },
     });
@@ -242,25 +390,47 @@ export function generateFatPdf(state: FatState, lang: Lang = "it") {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
-    doc.text(tr("deviazioni", lang), margin + 3, titleY + 4);
+    doc.text(bl("deviazioni", lang), margin + 3, titleY + 4);
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.text(tr("deviazioniDesc", lang), margin, titleY + 14);
+    doc.setFontSize(10);
+    doc.text(bl("deviazioniDesc", lang), margin, titleY + 14, {
+      maxWidth: pageW - margin * 2,
+    });
 
-    const emptyRows = Array.from({ length: 10 }, (_, i) => [String(i + 1), "", "", ""]);
+    const NUM_ROWS = 10;
+    const headerRow = [
+      bl("num", lang),
+      bl("description", lang),
+      bl("notes", lang),
+      bl("status", lang),
+    ];
     autoTable(doc, {
-      startY: titleY + 18,
+      startY: titleY + 22,
       margin: { left: margin, right: margin, top: TOP },
-      head: [[tr("num", lang), tr("description", lang), tr("notes", lang), tr("status", lang)]],
-      body: emptyRows,
-      styles: { fontSize: 10, cellPadding: 2.5, minCellHeight: 14, valign: "top" },
-      headStyles: { fillColor: [120, 30, 30], textColor: 255 },
+      head: [headerRow],
+      body: Array.from({ length: NUM_ROWS }, (_, i) => [String(i + 1), "", "", ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2.5, minCellHeight: 14, valign: "top" },
+      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 11, fillColor: [120, 30, 30], textColor: 255 },
       columnStyles: {
-        0: { cellWidth: 12, halign: "center" },
-        1: { cellWidth: 90 },
+        0: { cellWidth: 14, halign: "center" },
+        1: { cellWidth: 80 },
         2: { cellWidth: "auto" },
-        3: { cellWidth: 30 },
+        3: { cellWidth: 32 },
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index === 0) return;
+        const { x, y, width, height } = data.cell;
+        const cols = ["num", "desc", "notes", "status"];
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          name: `dev_${data.row.index}_${cols[data.column.index]}`,
+          value: "",
+          multiline: data.column.index === 1 || data.column.index === 2,
+        });
       },
     });
   }
@@ -274,43 +444,74 @@ export function generateFatPdf(state: FatState, lang: Lang = "it") {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
-    doc.text(tr("azioniCorrettive", lang), margin + 3, titleY + 4);
+    doc.text(bl("azioniCorrettive", lang), margin + 3, titleY + 4);
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.text(tr("azioniCorrettiveDesc", lang), margin, titleY + 14);
+    doc.setFontSize(10);
+    doc.text(bl("azioniCorrettiveDesc", lang), margin, titleY + 14, {
+      maxWidth: pageW - margin * 2,
+    });
 
-    const emptyRows = Array.from({ length: 10 }, (_, i) => [String(i + 1), "", "", "", ""]);
+    const NUM_ROWS = 10;
+    const headerRow = [
+      bl("num", lang),
+      bl("description", lang),
+      bl("responsible", lang),
+      bl("dueDate", lang),
+      bl("status", lang),
+    ];
     autoTable(doc, {
-      startY: titleY + 18,
+      startY: titleY + 22,
       margin: { left: margin, right: margin, top: TOP },
-      head: [[
-        tr("num", lang),
-        tr("description", lang),
-        tr("responsible", lang),
-        tr("dueDate", lang),
-        tr("status", lang),
-      ]],
-      body: emptyRows,
-      styles: { fontSize: 10, cellPadding: 2.5, minCellHeight: 14, valign: "top" },
-      headStyles: { fillColor: [30, 80, 30], textColor: 255 },
+      head: [headerRow],
+      body: Array.from({ length: NUM_ROWS }, (_, i) => [String(i + 1), "", "", "", ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2.5, minCellHeight: 14, valign: "top" },
+      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 11, fillColor: [30, 80, 30], textColor: 255 },
       columnStyles: {
-        0: { cellWidth: 12, halign: "center" },
+        0: { cellWidth: 14, halign: "center" },
         1: { cellWidth: "auto" },
-        2: { cellWidth: 40 },
-        3: { cellWidth: 28 },
-        4: { cellWidth: 24 },
+        2: { cellWidth: 42 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 26 },
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index === 0) return;
+        const { x, y, width, height } = data.cell;
+        const cols = ["num", "desc", "resp", "due", "status"];
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          name: `ac_${data.row.index}_${cols[data.column.index]}`,
+          value: "",
+          multiline: data.column.index === 1,
+        });
       },
     });
 
-    // riga firma in fondo
+    // riga firma in fondo (editabile)
     const fy = pageH - 30;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text(tr("date", lang) + ":", margin, fy);
-    doc.line(margin + 18, fy, margin + 70, fy);
-    doc.text(tr("signature", lang) + ":", margin + 90, fy);
-    doc.line(margin + 115, fy, pageW - margin, fy);
+    doc.setFontSize(12);
+    doc.text(bl("date", lang) + ":", margin, fy);
+    addField({
+      x: margin + 30,
+      y: fy - 5,
+      w: 55,
+      h: 7,
+      name: "final_date",
+      value: "",
+    });
+    doc.text(bl("signature", lang) + ":", margin + 95, fy);
+    addField({
+      x: margin + 130,
+      y: fy - 5,
+      w: pageW - margin - (margin + 130),
+      h: 7,
+      name: "final_signature",
+      value: "",
+    });
   }
 
   // ── Header + footer su OGNI pagina ──────────────────────
@@ -320,10 +521,10 @@ export function generateFatPdf(state: FatState, lang: Lang = "it") {
     drawPageHeader();
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    doc.setFontSize(9);
     doc.setTextColor(120);
     doc.text(
-      `${tr("page", lang)} ${i} ${tr("of", lang)} ${pageCount}`,
+      `${bl("page", lang)} ${i} ${bl("of", lang)} ${pageCount}`,
       pageW - margin,
       pageH - 8,
       { align: "right" },
