@@ -50,6 +50,7 @@ const attendeeSchema = z.object({
   id: z.string(),
   nome: z.string().trim().max(150).default(""),
   ruolo: z.string().trim().max(150).default(""),
+  azienda: z.string().trim().max(200).default(""),
 });
 
 const conclusioniSchema = z.object({
