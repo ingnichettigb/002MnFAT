@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { TextField } from "jspdf";
+// @ts-expect-error - TextField è esportato a runtime ma non tipizzato
+import { TextField } from "jspdf/types/modules/acroform";
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
