@@ -1,8 +1,8 @@
 import jsPDF from "jspdf";
+import * as JsPdfNS from "jspdf";
 import autoTable from "jspdf-autotable";
-// TextField è esportato a runtime da jspdf ma non è tipizzato
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const TextField: any = (require("jspdf") as any).TextField;
+// TextField (AcroForm) è esportato a runtime da jspdf ma non è tipizzato.
+const TextField: any = (JsPdfNS as any).TextField;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
