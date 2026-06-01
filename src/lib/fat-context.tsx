@@ -81,6 +81,7 @@ const newAttendee = (): Attendee => ({
   id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
   nome: "",
   ruolo: "",
+  azienda: "",
 });
 
 const emptyConclusioni: Conclusioni = {
