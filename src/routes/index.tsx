@@ -252,7 +252,7 @@ function IndexPage() {
               return (
                 <div
                   key={f.id}
-                  className="grid grid-cols-1 items-end gap-3 rounded-md border p-3 sm:grid-cols-[1fr_1fr_auto]"
+                  className="grid grid-cols-1 items-end gap-3 rounded-md border p-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
                 >
                   <Controller
                     control={form.control}
@@ -273,8 +273,21 @@ function IndexPage() {
                       <NumberedField
                         n={an.ruolo}
                         label={t("attendeeRole")}
-                        placeholder="QA Manager — Acme"
+                        placeholder="QA Manager"
                         {...field}
+                      />
+                    )}
+                  />
+                  <Controller
+                    control={form.control}
+                    name={`presenti.${idx}.azienda`}
+                    render={({ field }) => (
+                      <AziendaField
+                        n={an.azienda}
+                        value={field.value}
+                        onChange={field.onChange}
+                        mfg={form.watch("produttore.ragioneSociale")}
+                        cli={form.watch("cliente.ragioneSociale")}
                       />
                     )}
                   />
