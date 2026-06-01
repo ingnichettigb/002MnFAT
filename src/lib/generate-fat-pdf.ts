@@ -1,8 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as jspdfPkg from "jspdf";
-// jsPDF espone TextField (AcroForm) a runtime ma senza tipi
-const TextField: any = (jspdfPkg as any).TextField;
+// jsPDF attacca le classi AcroForm direttamente al costruttore (no tipi)
+const TextField: any = (jsPDF as any).AcroFormTextField;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
