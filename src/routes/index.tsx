@@ -457,6 +457,94 @@ const NumberedTextarea = React.forwardRef<
   );
 });
 
+/* ───────── Attendee Azienda field (dropdown + free text) ───────── */
+function AziendaField({
+  n,
+  value,
+  onChange,
+  mfg,
+  cli,
+}: {
+  n: number;
+  value: string;
+  onChange: (v: string) => void;
+  mfg: string;
+  cli: string;
+}) {
+  const { t } = useI18n();
+  const autoId = useId();
+  const mfgName = (mfg || "").trim();
+  const cliName = (cli || "").trim();
+
+  const isMfg = !!mfgName && value === mfgName;
+  const isCli = !!cliName && value === cliName;
+  const isOther = !!value && !isMfg && !isCli;
+
+  const [mode, setMode] = React.useState<"mfg" | "cli" | "other" | "">(
+    isMfg ? "mfg" : isCli ? "cli" : isOther ? "other" : "",
+  );
+
+  React.useEffect(() => {
+    if (isMfg) setMode("mfg");
+    else if (isCli) setMode("cli");
+    else if (isOther) setMode("other");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, mfgName, cliName]);
+
+  const handleSelect = (v: string) => {
+    if (v === "__mfg__") {
+      setMode("mfg");
+      onChange(mfgName);
+    } else if (v === "__cli__") {
+      setMode("cli");
+      onChange(cliName);
+    } else if (v === "__other__") {
+      setMode("other");
+      onChange("");
+    }
+  };
+
+  const selectValue =
+    mode === "mfg"
+      ? "__mfg__"
+      : mode === "cli"
+        ? "__cli__"
+        : mode === "other"
+          ? "__other__"
+          : "";
+
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={autoId} className="flex items-start gap-1 leading-tight">
+        <sup className="mt-[1px] text-[8px] font-semibold leading-none text-muted-foreground">
+          {n}
+        </sup>
+        <span>{t("attendeeCompany")}</span>
+      </Label>
+      <select
+        id={autoId}
+        value={selectValue}
+        onChange={(e) => handleSelect(e.target.value)}
+        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+      >
+        <option value="" disabled>
+          —
+        </option>
+        {mfgName && <option value="__mfg__">{mfgName}</option>}
+        {cliName && <option value="__cli__">{cliName}</option>}
+        <option value="__other__">{t("companyOther")}</option>
+      </select>
+      {mode === "other" && (
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={t("companyOtherPlaceholder")}
+        />
+      )}
+    </div>
+  );
+}
+
 /* ───────── Conclusioni / Final results ───────── */
 type YesNo = "" | "si" | "no";
 type YesNoNa = "" | "si" | "no" | "na";
