@@ -13,6 +13,7 @@ export type Attendee = {
   id: string;
   nome: string;
   ruolo: string;
+  azienda: string;
 };
 
 export type Conclusioni = {
