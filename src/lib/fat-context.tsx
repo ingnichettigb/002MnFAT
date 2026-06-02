@@ -48,6 +48,7 @@ export type ControlItem = {
   label: string;
   selected: boolean;
   custom?: boolean;
+  locked?: boolean;
 };
 
 export type FatState = {
