@@ -44,8 +44,16 @@ export const DEFAULT_CONTROLS: string[] = [
   "Targhetta identificativa – dati obbligatori (verifica)",
   "Presenza accessori – check list",
   "Dichiarazione di installazione a regola d'arte",
-  // ── Ultime righe fisse ──────────────────────────────────────────────────
+  // ── Ultime righe fisse (sempre selezionate, non disattivabili) ──────────
   "Varie – allegati tecnici",
   "Elenco deviazioni / non conformità",
   "Azioni correttive",
 ];
+
+/** Etichette degli ultimi 3 controlli che devono SEMPRE essere selezionati. */
+export const FINAL_LOCKED_LABELS: ReadonlySet<string> = new Set([
+  "Varie – allegati tecnici",
+  "Elenco deviazioni / non conformità",
+  "Azioni correttive",
+]);
+

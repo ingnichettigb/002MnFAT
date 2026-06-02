@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DEFAULT_CONTROLS } from "./fat-defaults";
+import { DEFAULT_CONTROLS, FINAL_LOCKED_LABELS } from "./fat-defaults";
 
 export type Party = {
   ragioneSociale: string;
@@ -48,6 +48,7 @@ export type ControlItem = {
   label: string;
   selected: boolean;
   custom?: boolean;
+  locked?: boolean;
 };
 
 export type FatState = {
@@ -112,11 +113,24 @@ const emptyGeneral = (): GeneralData => ({
 });
 
 const initialControls = (): ControlItem[] =>
-  DEFAULT_CONTROLS.map((label, i) => ({
-    id: `default-${i}`,
-    label,
-    selected: false,
-  }));
+  DEFAULT_CONTROLS.map((label, i) => {
+    const locked = FINAL_LOCKED_LABELS.has(label);
+    return {
+      id: `default-${i}`,
+      label,
+      selected: locked,
+      ...(locked ? { locked: true as const } : {}),
+    };
+  });
+
+/** Forza selected+locked sulle ultime voci obbligatorie. */
+function normalizeControls(list: ControlItem[]): ControlItem[] {
+  return list.map((c) =>
+    FINAL_LOCKED_LABELS.has(c.label)
+      ? { ...c, selected: true, locked: true }
+      : c,
+  );
+}
 
 const emptyState = (): FatState => ({
   general: emptyGeneral(),
@@ -213,6 +227,11 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
       if (arch.length === 0) {
         arch = [newSavedFat()];
       }
+      // Normalizza i controlli: ultime righe sempre selezionate/locked
+      arch = arch.map((f) => ({
+        ...f,
+        state: { ...f.state, controls: normalizeControls(f.state.controls) },
+      }));
       let active = rawActive && arch.find((f) => f.id === rawActive)?.id;
       if (!active) active = arch[0].id;
       setArchive(arch);
@@ -277,37 +296,44 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
         updateActiveState((s) => ({
           ...s,
           controls: s.controls.map((c) =>
-            c.id === id ? { ...c, selected: !c.selected } : c,
+            c.id === id && !c.locked ? { ...c, selected: !c.selected } : c,
           ),
         })),
       addCustomControl: (label) =>
-        updateActiveState((s) => ({
-          ...s,
-          controls: [
-            ...s.controls,
-            {
-              id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-              label,
-              selected: true,
-              custom: true,
-            },
-          ],
-        })),
+        updateActiveState((s) => {
+          // inserisci PRIMA degli ultimi 3 locked se presenti
+          const lockedTail = s.controls.filter((c) => c.locked);
+          const head = s.controls.filter((c) => !c.locked);
+          const newItem: ControlItem = {
+            id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            label,
+            selected: true,
+            custom: true,
+          };
+          return { ...s, controls: [...head, newItem, ...lockedTail] };
+        }),
       removeControl: (id) =>
         updateActiveState((s) => ({
           ...s,
-          controls: s.controls.filter((c) => c.id !== id),
+          controls: s.controls.filter((c) => c.id !== id || c.locked),
         })),
       refreshDefaultControls: () =>
         updateActiveState((s) => {
           const customs = s.controls.filter((c) => c.custom);
           const prevSel = new Map(s.controls.map((c) => [c.label, c.selected]));
-          const fresh: ControlItem[] = DEFAULT_CONTROLS.map((label, i) => ({
-            id: `default-${i}`,
-            label,
-            selected: prevSel.get(label) ?? false,
-          }));
-          return { ...s, controls: [...fresh, ...customs] };
+          const fresh: ControlItem[] = DEFAULT_CONTROLS.map((label, i) => {
+            const locked = FINAL_LOCKED_LABELS.has(label);
+            return {
+              id: `default-${i}`,
+              label,
+              selected: locked || (prevSel.get(label) ?? false),
+              ...(locked ? { locked: true as const } : {}),
+            };
+          });
+          // customs vanno PRIMA degli ultimi 3 locked
+          const lockedTail = fresh.filter((c) => c.locked);
+          const head = fresh.filter((c) => !c.locked);
+          return { ...s, controls: [...head, ...customs, ...lockedTail] };
         }),
       reset: () => updateActiveState(() => emptyState()),
 

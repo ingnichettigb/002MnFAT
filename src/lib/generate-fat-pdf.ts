@@ -7,68 +7,78 @@ import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
 const D = {
-  title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT" },
-  subtitle: { it: "FACTORY ACCEPTANCE TEST", en: "FACTORY ACCEPTANCE TEST" },
-  manufacturer: { it: "Ditta Produttrice", en: "Manufacturer" },
-  customer: { it: "Ditta Cliente", en: "Customer" },
-  testData: { it: "Dati del Collaudo", en: "Test Data" },
-  attendees: { it: "Presenti al FAT", en: "FAT Attendees" },
-  companyName: { it: "Ragione Sociale", en: "Company Name" },
-  address: { it: "Indirizzo", en: "Address" },
-  contact: { it: "Referente", en: "Contact" },
-  email: { it: "Email", en: "Email" },
-  phone: { it: "Telefono", en: "Phone" },
-  drawingNo: { it: "N° Disegno", en: "Drawing No." },
-  serialNo: { it: "N° Matricola", en: "Serial No." },
-  tagNo: { it: "Tag Cliente", en: "Customer Tag" },
-  commessa: { it: "Commessa", en: "Job No." },
-  testDate: { it: "Data Collaudo", en: "Test Date" },
-  testPlace: { it: "Luogo Collaudo", en: "Test Location" },
-  descrizione: { it: "Descrizione", en: "Description" },
-  attName: { it: "Nome e Cognome", en: "Full Name" },
-  attRole: { it: "Ruolo", en: "Role" },
-  attCompany: { it: "Azienda", en: "Company" },
-  chapter: { it: "Controllo", en: "Check" },
-  outcome: { it: "Esito", en: "Outcome" },
-  notes: { it: "Note / Rilievi", en: "Notes / Findings" },
-  inspectorSign: { it: "Firma Ispettore", en: "Inspector Signature" },
-  page: { it: "Pagina", en: "Page" },
-  of: { it: "di", en: "of" },
-  deviazioni: { it: "DEVIAZIONI", en: "DEVIATIONS" },
+  title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA" },
+  subtitle: { it: "FACTORY ACCEPTANCE TEST", en: "FACTORY ACCEPTANCE TEST", de: "FACTORY ACCEPTANCE TEST", es: "FACTORY ACCEPTANCE TEST" },
+  manufacturer: { it: "Ditta Produttrice", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
+  customer: { it: "Ditta Cliente", en: "Customer", de: "Kunde", es: "Cliente" },
+  testData: { it: "Dati del Collaudo", en: "Test Data", de: "Prüfdaten", es: "Datos de la prueba" },
+  attendees: { it: "Presenti al FAT", en: "FAT Attendees", de: "FAT-Teilnehmer", es: "Asistentes al FAT" },
+  companyName: { it: "Ragione Sociale", en: "Company Name", de: "Firmenname", es: "Razón social" },
+  address: { it: "Indirizzo", en: "Address", de: "Adresse", es: "Dirección" },
+  contact: { it: "Referente", en: "Contact", de: "Ansprechpartner", es: "Contacto" },
+  email: { it: "Email", en: "Email", de: "E-Mail", es: "Correo" },
+  phone: { it: "Telefono", en: "Phone", de: "Telefon", es: "Teléfono" },
+  drawingNo: { it: "N° Disegno", en: "Drawing No.", de: "Zeichnungsnr.", es: "N.º Plano" },
+  serialNo: { it: "N° Matricola", en: "Serial No.", de: "Seriennr.", es: "N.º de serie" },
+  tagNo: { it: "Tag Cliente", en: "Customer Tag", de: "Kunden-Tag", es: "Tag Cliente" },
+  commessa: { it: "Commessa", en: "Job No.", de: "Auftragsnr.", es: "N.º Pedido" },
+  testDate: { it: "Data Collaudo", en: "Test Date", de: "Prüfdatum", es: "Fecha Prueba" },
+  testPlace: { it: "Luogo Collaudo", en: "Test Location", de: "Prüfort", es: "Lugar Prueba" },
+  descrizione: { it: "Descrizione", en: "Description", de: "Beschreibung", es: "Descripción" },
+  attName: { it: "Nome e Cognome", en: "Full Name", de: "Name", es: "Nombre y Apellido" },
+  attRole: { it: "Ruolo", en: "Role", de: "Rolle", es: "Rol" },
+  attCompany: { it: "Azienda", en: "Company", de: "Firma", es: "Empresa" },
+  chapter: { it: "Controllo", en: "Check", de: "Prüfung", es: "Control" },
+  outcome: { it: "Esito", en: "Outcome", de: "Ergebnis", es: "Resultado" },
+  notes: { it: "Note / Rilievi", en: "Notes / Findings", de: "Anmerkungen", es: "Notas / Observaciones" },
+  inspectorSign: { it: "Firma Ispettore", en: "Inspector Signature", de: "Unterschrift Prüfer", es: "Firma Inspector" },
+  page: { it: "Pagina", en: "Page", de: "Seite", es: "Página" },
+  of: { it: "di", en: "of", de: "von", es: "de" },
+  deviazioni: { it: "DEVIAZIONI", en: "DEVIATIONS", de: "ABWEICHUNGEN", es: "DESVIACIONES" },
   deviazioniDesc: {
     it: "Elenco delle deviazioni rilevate durante il collaudo.",
     en: "List of deviations observed during the test.",
+    de: "Liste der während der Prüfung festgestellten Abweichungen.",
+    es: "Lista de las desviaciones detectadas durante la prueba.",
   },
-  azioniCorrettive: { it: "AZIONI CORRETTIVE", en: "CORRECTIVE ACTIONS" },
+  azioniCorrettive: { it: "AZIONI CORRETTIVE", en: "CORRECTIVE ACTIONS", de: "KORREKTURMASSNAHMEN", es: "ACCIONES CORRECTIVAS" },
   azioniCorrettiveDesc: {
     it: "Azioni correttive da intraprendere e relativa verifica.",
     en: "Corrective actions to be taken and related verification.",
+    de: "Zu ergreifende Korrekturmaßnahmen und zugehörige Überprüfung.",
+    es: "Acciones correctivas a tomar y verificación correspondiente.",
   },
-  num: { it: "N°", en: "No." },
-  description: { it: "Descrizione", en: "Description" },
-  responsible: { it: "Responsabile", en: "Responsible" },
-  dueDate: { it: "Data prevista", en: "Due date" },
-  status: { it: "Stato", en: "Status" },
-  signature: { it: "Firma", en: "Signature" },
-  date: { it: "Data", en: "Date" },
+  num: { it: "N°", en: "No.", de: "Nr.", es: "N.º" },
+  description: { it: "Descrizione", en: "Description", de: "Beschreibung", es: "Descripción" },
+  responsible: { it: "Responsabile", en: "Responsible", de: "Verantwortlich", es: "Responsable" },
+  dueDate: { it: "Data prevista", en: "Due date", de: "Fälligkeitsdatum", es: "Fecha prevista" },
+  status: { it: "Stato", en: "Status", de: "Status", es: "Estado" },
+  signature: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma" },
+  date: { it: "Data", en: "Date", de: "Datum", es: "Fecha" },
 } as const;
 
 type DKey = keyof typeof D;
 
-/** Etichetta bilingue: prima lingua dell'utente / l'altra. */
+/**
+ * Etichetta bilingue. Regola:
+ *  - lang === "en"  → "EN / IT"
+ *  - altrimenti     → "<lang> / EN"
+ * Se le due stringhe coincidono mostra una sola volta.
+ */
 const bl = (key: DKey, lang: Lang): string => {
-  const it = D[key].it;
-  const en = D[key].en;
-  // it/en sono identici => mostra una sola volta
-  if (it === en) return it;
-  return lang === "en" ? `${en} / ${it}` : `${it} / ${en}`;
+  const primary = D[key][lang];
+  const secondary = lang === "en" ? D[key].it : D[key].en;
+  if (primary === secondary) return primary;
+  return `${primary} / ${secondary}`;
 };
 
 const fmtDate = (iso: string, lang: Lang) => {
   if (!iso) return "";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
+  const loc =
+    lang === "it" ? "it-IT" : lang === "de" ? "de-DE" : lang === "es" ? "es-ES" : "en-GB";
+  return d.toLocaleDateString(loc);
 };
 
 export function generateFatPdf(state: FatState, lang: Lang = "it") {
