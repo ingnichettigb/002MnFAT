@@ -121,7 +121,7 @@ function ControlliPage() {
                     )}
                   </span>
                 </label>
-                {c.custom && (
+                {c.custom && !c.locked && (
                   <button
                     type="button"
                     aria-label={t("remove")}
