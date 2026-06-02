@@ -296,37 +296,44 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
         updateActiveState((s) => ({
           ...s,
           controls: s.controls.map((c) =>
-            c.id === id ? { ...c, selected: !c.selected } : c,
+            c.id === id && !c.locked ? { ...c, selected: !c.selected } : c,
           ),
         })),
       addCustomControl: (label) =>
-        updateActiveState((s) => ({
-          ...s,
-          controls: [
-            ...s.controls,
-            {
-              id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-              label,
-              selected: true,
-              custom: true,
-            },
-          ],
-        })),
+        updateActiveState((s) => {
+          // inserisci PRIMA degli ultimi 3 locked se presenti
+          const lockedTail = s.controls.filter((c) => c.locked);
+          const head = s.controls.filter((c) => !c.locked);
+          const newItem: ControlItem = {
+            id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+            label,
+            selected: true,
+            custom: true,
+          };
+          return { ...s, controls: [...head, newItem, ...lockedTail] };
+        }),
       removeControl: (id) =>
         updateActiveState((s) => ({
           ...s,
-          controls: s.controls.filter((c) => c.id !== id),
+          controls: s.controls.filter((c) => c.id !== id || c.locked),
         })),
       refreshDefaultControls: () =>
         updateActiveState((s) => {
           const customs = s.controls.filter((c) => c.custom);
           const prevSel = new Map(s.controls.map((c) => [c.label, c.selected]));
-          const fresh: ControlItem[] = DEFAULT_CONTROLS.map((label, i) => ({
-            id: `default-${i}`,
-            label,
-            selected: prevSel.get(label) ?? false,
-          }));
-          return { ...s, controls: [...fresh, ...customs] };
+          const fresh: ControlItem[] = DEFAULT_CONTROLS.map((label, i) => {
+            const locked = FINAL_LOCKED_LABELS.has(label);
+            return {
+              id: `default-${i}`,
+              label,
+              selected: locked || (prevSel.get(label) ?? false),
+              ...(locked ? { locked: true as const } : {}),
+            };
+          });
+          // customs vanno PRIMA degli ultimi 3 locked
+          const lockedTail = fresh.filter((c) => c.locked);
+          const head = fresh.filter((c) => !c.locked);
+          return { ...s, controls: [...head, ...customs, ...lockedTail] };
         }),
       reset: () => updateActiveState(() => emptyState()),
 
