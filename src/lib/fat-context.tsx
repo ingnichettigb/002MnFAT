@@ -167,6 +167,7 @@ type Ctx = {
   toggleControl: (id: string) => void;
   addCustomControl: (label: string) => void;
   removeControl: (id: string) => void;
+  refreshDefaultControls: () => void;
   reset: () => void;
   // Archivio
   saveDraft: () => void;
