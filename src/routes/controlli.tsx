@@ -35,7 +35,7 @@ export const Route = createFileRoute("/controlli")({
 
 function ControlliPage() {
   const navigate = useNavigate();
-  const { state, toggleControl, addCustomControl, removeControl, markDone } =
+  const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls } =
     useFat();
   const { t, lang } = useI18n();
   const [newLabel, setNewLabel] = useState("");
@@ -77,6 +77,11 @@ function ControlliPage() {
             <Lbl id={LABELS.controlsTitle.id}>{t("controlsTitle")}</Lbl>
           </CardTitle>
           <CardDescription>{t("controlsDesc")}</CardDescription>
+          <div className="pt-2">
+            <Button type="button" variant="outline" size="sm" onClick={refreshDefaultControls}>
+              Aggiorna lista predefinita
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <ul className="divide-y rounded-md border">

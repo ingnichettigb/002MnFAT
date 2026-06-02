@@ -167,6 +167,7 @@ type Ctx = {
   toggleControl: (id: string) => void;
   addCustomControl: (label: string) => void;
   removeControl: (id: string) => void;
+  refreshDefaultControls: () => void;
   reset: () => void;
   // Archivio
   saveDraft: () => void;
@@ -297,6 +298,17 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
           ...s,
           controls: s.controls.filter((c) => c.id !== id),
         })),
+      refreshDefaultControls: () =>
+        updateActiveState((s) => {
+          const customs = s.controls.filter((c) => c.custom);
+          const prevSel = new Map(s.controls.map((c) => [c.label, c.selected]));
+          const fresh: ControlItem[] = DEFAULT_CONTROLS.map((label, i) => ({
+            id: `default-${i}`,
+            label,
+            selected: prevSel.get(label) ?? false,
+          }));
+          return { ...s, controls: [...fresh, ...customs] };
+        }),
       reset: () => updateActiveState(() => emptyState()),
 
       saveDraft: () => {
