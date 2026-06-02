@@ -93,12 +93,16 @@ function ControlliPage() {
                 <Checkbox
                   id={c.id}
                   checked={c.selected}
-                  onCheckedChange={() => toggleControl(c.id)}
+                  disabled={c.locked}
+                  onCheckedChange={() => !c.locked && toggleControl(c.id)}
                   className="mt-1"
                 />
                 <label
                   htmlFor={c.id}
-                  className="flex flex-1 cursor-pointer items-start gap-1 text-sm leading-relaxed"
+                  className={
+                    "flex flex-1 items-start gap-1 text-sm leading-relaxed " +
+                    (c.locked ? "cursor-default" : "cursor-pointer")
+                  }
                 >
                   <sup className="mt-[1px] text-[8px] font-semibold leading-none text-muted-foreground">
                     {controlNumber(idx)}
@@ -108,6 +112,11 @@ function ControlliPage() {
                     {c.custom && (
                       <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
                         {t("customLabel")}
+                      </span>
+                    )}
+                    {c.locked && (
+                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        🔒
                       </span>
                     )}
                   </span>
