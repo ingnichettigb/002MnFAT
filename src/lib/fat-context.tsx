@@ -113,11 +113,24 @@ const emptyGeneral = (): GeneralData => ({
 });
 
 const initialControls = (): ControlItem[] =>
-  DEFAULT_CONTROLS.map((label, i) => ({
-    id: `default-${i}`,
-    label,
-    selected: false,
-  }));
+  DEFAULT_CONTROLS.map((label, i) => {
+    const locked = FINAL_LOCKED_LABELS.has(label);
+    return {
+      id: `default-${i}`,
+      label,
+      selected: locked,
+      ...(locked ? { locked: true as const } : {}),
+    };
+  });
+
+/** Forza selected+locked sulle ultime voci obbligatorie. */
+function normalizeControls(list: ControlItem[]): ControlItem[] {
+  return list.map((c) =>
+    FINAL_LOCKED_LABELS.has(c.label)
+      ? { ...c, selected: true, locked: true }
+      : c,
+  );
+}
 
 const emptyState = (): FatState => ({
   general: emptyGeneral(),
