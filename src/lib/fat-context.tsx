@@ -227,6 +227,11 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
       if (arch.length === 0) {
         arch = [newSavedFat()];
       }
+      // Normalizza i controlli: ultime righe sempre selezionate/locked
+      arch = arch.map((f) => ({
+        ...f,
+        state: { ...f.state, controls: normalizeControls(f.state.controls) },
+      }));
       let active = rawActive && arch.find((f) => f.id === rawActive)?.id;
       if (!active) active = arch[0].id;
       setArchive(arch);
