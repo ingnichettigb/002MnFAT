@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DEFAULT_CONTROLS } from "./fat-defaults";
+import { DEFAULT_CONTROLS, FINAL_LOCKED_LABELS } from "./fat-defaults";
 
 export type Party = {
   ragioneSociale: string;
