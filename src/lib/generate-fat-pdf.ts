@@ -65,7 +65,7 @@ type DKey = keyof typeof D;
  *  - altrimenti     → "<lang> / EN"
  * Se le due stringhe coincidono mostra una sola volta.
  */
-const bl = (key: DKey, lang: Lang, secondary?: Lang | null): string => {
+const blGlobal = (key: DKey, lang: Lang, secondary?: Lang | null): string => {
   const p = D[key][lang];
   const s = secondary
     ? D[key][secondary]
@@ -92,6 +92,8 @@ export function generateFatPdf(
 ) {
   const { general, controls } = state;
   const selected = controls.filter((c) => c.selected);
+  // Shadow del bl() globale per includere la secondaria scelta dall'utente
+  const bl = (key: DKey, _l?: Lang) => blGlobal(key, lang, secondary);
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Helvetica nei PDF è metricamente equivalente ad Arial e viene
