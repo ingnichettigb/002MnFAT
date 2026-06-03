@@ -214,40 +214,98 @@ export const dict = {
 } satisfies Record<string, Entry>;
 
 type Ctx = {
+  /** Primary language (alias for back-compat). */
   lang: Lang;
+  primary: Lang;
+  secondary: Lang | null;
   setLang: (l: Lang) => void;
+  /** Cycle click logic: 1st click = primary, 2nd (different) = secondary, 3rd = reset. */
+  cycleLang: (l: Lang) => void;
   t: (key: keyof typeof dict) => string;
 };
 
 const I18nContext = React.createContext<Ctx | null>(null);
 
-const STORAGE = "mini-fat:lang";
+const STORAGE_P = "mini-fat:lang:primary";
+const STORAGE_S = "mini-fat:lang:secondary";
+const STORAGE_LEGACY = "mini-fat:lang";
+
+const isLang = (v: unknown): v is Lang =>
+  v === "it" || v === "en" || v === "de" || v === "es";
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = React.useState<Lang>("it");
+  const [primary, setPrimary] = React.useState<Lang>("it");
+  const [secondary, setSecondary] = React.useState<Lang | null>("en");
 
   React.useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE);
-      if (saved === "it" || saved === "en" || saved === "de" || saved === "es") {
-        setLangState(saved);
-      }
+      const p = localStorage.getItem(STORAGE_P) ?? localStorage.getItem(STORAGE_LEGACY);
+      const s = localStorage.getItem(STORAGE_S);
+      if (isLang(p)) setPrimary(p);
+      if (s === "" || s === "null") setSecondary(null);
+      else if (isLang(s)) setSecondary(s);
     } catch {}
   }, []);
 
-  const setLang = (l: Lang) => {
-    setLangState(l);
+  const persist = (p: Lang, s: Lang | null) => {
     try {
-      localStorage.setItem(STORAGE, l);
+      localStorage.setItem(STORAGE_P, p);
+      localStorage.setItem(STORAGE_S, s ?? "");
     } catch {}
   };
 
+  const setLang = (l: Lang) => {
+    setPrimary(l);
+    persist(l, secondary);
+  };
+
+  const cycleLang = (l: Lang) => {
+    // Stato 1: click su lingua primaria → reset secondaria (resta solo primaria)
+    if (l === primary && secondary) {
+      setSecondary(null);
+      persist(primary, null);
+      return;
+    }
+    // Stato 2: nessuna secondaria e click su lingua diversa → diventa secondaria
+    if (!secondary && l !== primary) {
+      setSecondary(l);
+      persist(primary, l);
+      return;
+    }
+    // Stato 3: c'è già una secondaria e click su nuova lingua → ricomincia (nuova primaria)
+    if (secondary && l !== primary && l !== secondary) {
+      setPrimary(l);
+      setSecondary(null);
+      persist(l, null);
+      return;
+    }
+    // Click su secondaria attuale → diventa la nuova primaria, swap
+    if (l === secondary) {
+      setPrimary(l);
+      setSecondary(primary);
+      persist(l, primary);
+      return;
+    }
+    // Click su primaria senza secondaria → no-op
+  };
+
   const t = React.useCallback(
-    (key: keyof typeof dict) => (dict[key] as Entry)?.[lang] ?? String(key),
-    [lang],
+    (key: keyof typeof dict) => {
+      const entry = dict[key] as Entry | undefined;
+      if (!entry) return String(key);
+      const p = entry[primary];
+      if (!secondary) return p;
+      const s = entry[secondary];
+      if (p === s) return p;
+      return `${p} / ${s}`;
+    },
+    [primary, secondary],
   );
 
-  const value = React.useMemo(() => ({ lang, setLang, t }), [lang, t]);
+  const value = React.useMemo(
+    () => ({ lang: primary, primary, secondary, setLang, cycleLang, t }),
+    [primary, secondary, t],
+  );
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
@@ -258,9 +316,7 @@ export function useI18n() {
 }
 
 export function LangSwitcher({ className }: { className?: string }) {
-  const { lang, setLang } = useI18n();
-  const btn =
-    "h-8 w-9 rounded-md border text-base leading-none transition-all hover:scale-110";
+  const { primary, secondary, cycleLang } = useI18n();
   const opts: { code: Lang; flag: string; label: string }[] = [
     { code: "it", flag: "🇮🇹", label: "Italiano" },
     { code: "en", flag: "🇬🇧", label: "English" },
@@ -269,23 +325,40 @@ export function LangSwitcher({ className }: { className?: string }) {
   ];
   return (
     <div className={"flex items-center gap-1 " + (className ?? "")}>
-      {opts.map((o) => (
-        <button
-          key={o.code}
-          type="button"
-          aria-label={o.label}
-          title={o.label}
-          onClick={() => setLang(o.code)}
-          className={
-            btn +
-            (lang === o.code
-              ? " border-primary ring-2 ring-primary/30"
-              : " border-border opacity-60 hover:opacity-100")
-          }
-        >
-          {o.flag}
-        </button>
-      ))}
+      {opts.map((o) => {
+        const isPrimary = primary === o.code;
+        const isSecondary = secondary === o.code;
+        const order = isPrimary ? 1 : isSecondary ? 2 : null;
+        const base =
+          "relative h-8 w-9 rounded-md border text-base leading-none transition-all hover:scale-110";
+        const style = isPrimary
+          ? " border-primary bg-primary/10 ring-2 ring-primary/40"
+          : isSecondary
+            ? " border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/40"
+            : " border-border opacity-60 hover:opacity-100";
+        return (
+          <button
+            key={o.code}
+            type="button"
+            aria-label={o.label}
+            title={`${o.label}${order ? ` (${order})` : ""}`}
+            onClick={() => cycleLang(o.code)}
+            className={base + style}
+          >
+            {o.flag}
+            {order && (
+              <span
+                className={
+                  "absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white " +
+                  (isPrimary ? "bg-primary" : "bg-emerald-500")
+                }
+              >
+                {order}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }

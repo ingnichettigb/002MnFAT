@@ -32,7 +32,7 @@ export const Route = createFileRoute("/report")({
 function ReportPage() {
   const navigate = useNavigate();
   const { state, reset } = useFat();
-  const { t, lang } = useI18n();
+  const { t, lang, secondary } = useI18n();
   const { general } = state;
   const selected = state.controls.filter((c) => c.selected);
 
@@ -44,7 +44,7 @@ function ReportPage() {
       : d.toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
   };
 
-  const handleGenerate = () => generateFatPdf(state, lang);
+  const handleGenerate = () => generateFatPdf(state, lang, secondary);
 
   const handleReset = () => {
     if (confirm(t("restartConfirm"))) {

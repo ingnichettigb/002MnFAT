@@ -318,7 +318,12 @@ function IndexPage() {
         {/* Conclusioni / Final results */}
         <ConclusioniSection form={form} />
 
-        <div className="flex justify-end">
+        <div className="flex flex-col items-end gap-2">
+          {Object.keys(form.formState.errors).length > 0 && (
+            <p className="text-sm text-destructive">
+              {t("required")}: completa i campi obbligatori contrassegnati con *
+            </p>
+          )}
           <Button type="submit" size="lg">
             <Lbl id={LABELS.next.id}>{t("next")}</Lbl>
           </Button>

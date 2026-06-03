@@ -37,7 +37,7 @@ function ControlliPage() {
   const navigate = useNavigate();
   const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls } =
     useFat();
-  const { t, lang } = useI18n();
+  const { t, lang, secondary } = useI18n();
   const [newLabel, setNewLabel] = useState("");
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
@@ -51,7 +51,7 @@ function ControlliPage() {
 
   const handleNext = () => {
     if (selectedCount === 0) return;
-    generateFatPdf(state, lang);
+    generateFatPdf(state, lang, secondary);
     markDone();
     navigate({ to: "/report" });
   };
