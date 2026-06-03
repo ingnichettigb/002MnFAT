@@ -85,7 +85,11 @@ const fmtDate = (iso: string, lang: Lang) => {
   return d.toLocaleDateString(loc);
 };
 
-export function generateFatPdf(state: FatState, lang: Lang = "it") {
+export function generateFatPdf(
+  state: FatState,
+  lang: Lang = "it",
+  secondary: Lang | null = null,
+) {
   const { general, controls } = state;
   const selected = controls.filter((c) => c.selected);
 
