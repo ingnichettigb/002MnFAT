@@ -412,7 +412,7 @@ export function generateFatPdf(
     doc.text(bl("deviazioni", lang), margin + 3, titleY + 4);
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+    doc.setFontSize(12);
     doc.text(bl("deviazioniDesc", lang), margin, titleY + 14, {
       maxWidth: pageW - margin * 2,
     });
@@ -430,7 +430,7 @@ export function generateFatPdf(
       head: [headerRow],
       body: Array.from({ length: NUM_ROWS }, (_, i) => [String(i + 1), "", "", ""]),
       styles: { font: "helvetica", fontSize: 12, cellPadding: 2.5, minCellHeight: 14, valign: "top" },
-      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 11, fillColor: [120, 30, 30], textColor: 255 },
+      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 12, fillColor: [120, 30, 30], textColor: 255 },
       columnStyles: {
         0: { cellWidth: 14, halign: "center" },
         1: { cellWidth: 80 },
@@ -466,7 +466,7 @@ export function generateFatPdf(
     doc.text(bl("azioniCorrettive", lang), margin + 3, titleY + 4);
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+    doc.setFontSize(12);
     doc.text(bl("azioniCorrettiveDesc", lang), margin, titleY + 14, {
       maxWidth: pageW - margin * 2,
     });
@@ -485,7 +485,7 @@ export function generateFatPdf(
       head: [headerRow],
       body: Array.from({ length: NUM_ROWS }, (_, i) => [String(i + 1), "", "", "", ""]),
       styles: { font: "helvetica", fontSize: 12, cellPadding: 2.5, minCellHeight: 14, valign: "top" },
-      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 11, fillColor: [30, 80, 30], textColor: 255 },
+      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 12, fillColor: [30, 80, 30], textColor: 255 },
       columnStyles: {
         0: { cellWidth: 14, halign: "center" },
         1: { cellWidth: "auto" },
