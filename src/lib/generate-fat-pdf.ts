@@ -1,7 +1,8 @@
-import { jsPDF, AcroFormTextField } from "jspdf";
+import { jsPDF, AcroFormTextField, AcroFormCheckBox } from "jspdf";
 import autoTable from "jspdf-autotable";
-// AcroFormTextField è il costruttore corretto per i campi editabili.
+// AcroForm constructors per campi editabili.
 const TextField: any = AcroFormTextField;
+const CheckBox: any = AcroFormCheckBox;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
@@ -54,6 +55,13 @@ const D = {
   status: { it: "Stato", en: "Status", de: "Status", es: "Estado" },
   signature: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma" },
   date: { it: "Data", en: "Date", de: "Datum", es: "Fecha" },
+  accettato: { it: "ACCETTATO", en: "ACCEPTED", de: "AKZEPTIERT", es: "ACEPTADO" },
+  nonAccettato: { it: "NON ACCETTATO", en: "NOT ACCEPTED", de: "NICHT AKZEPTIERT", es: "NO ACEPTADO" },
+  nonApplicabile: { it: "NON APPLICABILE", en: "NOT APPLICABLE", de: "NICHT ANWENDBAR", es: "NO APLICABLE" },
+  daCompletare: { it: "DA COMPLETARE", en: "TO BE COMPLETED", de: "ZU VERVOLLSTÄNDIGEN", es: "POR COMPLETAR" },
+  definitivo: { it: "DEFINITIVO", en: "FINAL", de: "ENDGÜLTIG", es: "DEFINITIVO" },
+  provvisorio: { it: "PROVVISORIO", en: "PROVISIONAL", de: "VORLÄUFIG", es: "PROVISIONAL" },
+  daDefinire: { it: "DA DEFINIRE", en: "TO BE DEFINED", de: "ZU DEFINIEREN", es: "POR DEFINIR" },
 } as const;
 
 type DKey = keyof typeof D;
@@ -162,14 +170,85 @@ export function generateFatPdf(
   // Lascia spazio sufficiente tra l'header e il titolo del documento
   const TOP = HEADER_H + 14;
 
-  // ── PAGINA 1: dati generali ─────────────────────────────
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text(bl("title", lang), pageW / 2, TOP, { align: "center" });
-  doc.setFontSize(12);
-  doc.text(bl("subtitle", lang), pageW / 2, TOP + 7, { align: "center" });
+  /** Crea un CheckBox AcroForm posizionato in mm. */
+  const addCheckbox = (opts: { x: number; y: number; size: number; name: string }) => {
+    const c = new CheckBox();
+    c.Rect = [opts.x, opts.y, opts.size, opts.size];
+    c.T = uid(opts.name);
+    c.fontName = "helvetica";
+    c.fontSize = 10;
+    c.value = "Off";
+    c.AS = "/Off";
+    doc.addField(c);
+  };
 
-  let cursorY = TOP + 14;
+  // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
+  // Titolo centrato, posizionato più in basso
+  const titleY = TOP + 30;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text(bl("title", lang), pageW / 2, titleY, { align: "center" });
+  doc.setFontSize(14);
+  doc.text("F.A.T. — " + bl("subtitle", lang), pageW / 2, titleY + 10, { align: "center" });
+
+  let cursorY = titleY + 25;
+
+  // ── Test data (sulla prima pagina) ──
+  {
+    const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
+      { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
+      { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
+      { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
+      { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
+      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
+      { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
+      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 30 },
+    ];
+    autoTable(doc, {
+      startY: cursorY,
+      margin: { left: margin, right: margin, top: TOP },
+      head: [[bl("testData", lang), ""]],
+      body: rows.map((r) => [r.label, ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2 },
+      headStyles: {
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 12,
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "left",
+      },
+      columnStyles: {
+        0: { fontStyle: "bold", cellWidth: 70 },
+        1: { cellWidth: "auto" },
+      },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 1) {
+          const r = rows[data.row.index];
+          if (r?.minH) data.cell.styles.minCellHeight = r.minH;
+        }
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index !== 1) return;
+        const r = rows[data.row.index];
+        if (!r) return;
+        const { x, y, width, height } = data.cell;
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          value: r.value || "",
+          name: `td_${r.key}`,
+          multiline: r.multi,
+        });
+      },
+    });
+  }
+
+  // ── PAGINA 2: Produttore / Cliente / Presenti ───────────
+  doc.addPage();
+  cursorY = TOP;
 
   /** Tabella con cella-valore editabile (campo AcroForm). */
   const partyTable = (title: string, p: Party, namePrefix: string) => {
@@ -220,63 +299,8 @@ export function generateFatPdf(
   partyTable(bl("manufacturer", lang), general.produttore, "mfg");
   partyTable(bl("customer", lang), general.cliente, "cli");
 
-  // ── Test data ──
-  {
-    const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
-      { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
-      { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
-      { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
-      { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
-      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
-      { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
-      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 18 },
-    ];
-    autoTable(doc, {
-      startY: cursorY,
-      margin: { left: margin, right: margin, top: TOP },
-      head: [[bl("testData", lang), ""]],
-      body: rows.map((r) => [r.label, ""]),
-      styles: { font: "helvetica", fontSize: 12, cellPadding: 2 },
-      headStyles: {
-        font: "helvetica",
-        fontStyle: "bold",
-        fontSize: 12,
-        fillColor: [40, 40, 40],
-        textColor: 255,
-        halign: "left",
-      },
-      columnStyles: {
-        0: { fontStyle: "bold", cellWidth: 70 },
-        1: { cellWidth: "auto" },
-      },
-      didParseCell: (data) => {
-        if (data.section === "body" && data.column.index === 1) {
-          const r = rows[data.row.index];
-          if (r?.minH) data.cell.styles.minCellHeight = r.minH;
-        }
-      },
-      didDrawCell: (data) => {
-        if (data.section !== "body" || data.column.index !== 1) return;
-        const r = rows[data.row.index];
-        if (!r) return;
-        const { x, y, width, height } = data.cell;
-        addField({
-          x: x + 0.5,
-          y: y + 0.5,
-          w: width - 1,
-          h: height - 1,
-          value: r.value || "",
-          name: `td_${r.key}`,
-          multiline: r.multi,
-        });
-      },
-    });
-    cursorY = (doc as any).lastAutoTable.finalY + 3;
-  }
-
   // ── Attendees ──
   {
-    // Sempre almeno 5 righe per scrivere a mano altri presenti
     const baseRows = general.presenti.map((a) => ({
       nome: a.nome || "",
       ruolo: a.ruolo || "",
@@ -312,7 +336,7 @@ export function generateFatPdf(
       },
       didDrawCell: (data) => {
         if (data.section !== "body" || data.row.index === 0) return;
-        const dataRowIdx = data.row.index - 1; // riga 0 è l'header bilingue
+        const dataRowIdx = data.row.index - 1;
         const row = baseRows[dataRowIdx];
         if (!row) return;
         const fields = ["nome", "ruolo", "azienda"] as const;
@@ -330,22 +354,27 @@ export function generateFatPdf(
     });
   }
 
+
   // ── Pagina per ogni controllo selezionato ───────────────
   selected.forEach((ctrl, idx) => {
     doc.addPage();
 
+    // Intestazione capitolo: spazio per 3 righe
     const titleY = TOP;
+    const titleH = 24; // ~3 righe a 12pt
     doc.setFillColor(30, 41, 59);
-    doc.rect(margin, titleY - 4, pageW - margin * 2, 12, "F");
+    doc.rect(margin, titleY - 4, pageW - margin * 2, titleH, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
     const title = `${bl("chapter", lang)} ${idx + 1} — ${ctrl.label}`;
-    doc.text(title, margin + 3, titleY + 4, { maxWidth: pageW - margin * 2 - 6 });
+    doc.text(title, margin + 3, titleY + 4, {
+      maxWidth: pageW - margin * 2 - 6,
+    });
     doc.setTextColor(0);
 
     autoTable(doc, {
-      startY: titleY + 14,
+      startY: titleY + titleH + 2,
       margin: { left: margin, right: margin, top: TOP },
       body: [
         [bl("outcome", lang), ""],
@@ -359,8 +388,8 @@ export function generateFatPdf(
       },
       didParseCell: (data) => {
         if (data.section === "body") {
-          if (data.row.index === 0) data.cell.styles.minCellHeight = 14;
-          if (data.row.index === 1) data.cell.styles.minCellHeight = 150;
+          if (data.row.index === 0) data.cell.styles.minCellHeight = 30;
+          if (data.row.index === 1) data.cell.styles.minCellHeight = 140;
           if (data.row.index === 2) data.cell.styles.minCellHeight = 30;
         }
       },
@@ -368,14 +397,25 @@ export function generateFatPdf(
         if (data.section !== "body" || data.column.index !== 1) return;
         const { x, y, width, height } = data.cell;
         if (data.row.index === 0) {
-          addField({
-            x: x + 0.5,
-            y: y + 0.5,
-            w: width - 1,
-            h: height - 1,
-            name: `ctrl_${idx}_outcome`,
-            value: "",
-          });
+          // Riga 1: ACCETTATO / NON ACCETTATO / NON APPLICABILE / DA COMPLETARE
+          // Riga 2: DEFINITIVO / PROVVISORIO / DA DEFINIRE
+          const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
+          const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
+          const cbSize = 4;
+          const drawRow = (opts: DKey[], rowY: number, prefix: string) => {
+            const cellW = (width - 4) / opts.length;
+            opts.forEach((k, i) => {
+              const cx = x + 2 + cellW * i;
+              addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(9);
+              doc.text(bl(k, lang), cx + cbSize + 1.5, rowY + cbSize - 0.5, {
+                maxWidth: cellW - cbSize - 2,
+              });
+            });
+          };
+          drawRow(optsTop, y + 4, "esito");
+          drawRow(optsBot, y + 4 + cbSize + 6, "stato");
         } else if (data.row.index === 1) {
           addField({
             x: x + 0.5,
@@ -399,6 +439,8 @@ export function generateFatPdf(
       },
     });
   });
+
+
 
   // ── Pagina DEVIAZIONI ───────────────────────────────────
   doc.addPage();
