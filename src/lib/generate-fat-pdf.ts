@@ -574,6 +574,12 @@ export function generateFatPdf(
     });
   }
 
+  const safe = (s: string) =>
+    (s || "report").replace(/[^a-z0-9-_]+/gi, "_").slice(0, 40);
+  const filename = `mini-fat_${safe(general.numeroMatricola)}_${
+    general.dataCollaudo || new Date().toISOString().slice(0, 10)
+  }.pdf`;
+
   // ── Header + footer su OGNI pagina ──────────────────────
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
@@ -583,6 +589,11 @@ export function generateFatPdf(
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(120);
+    // Sinistra: nome del file
+    doc.text(filename, margin, pageH - 8, {
+      maxWidth: pageW - margin * 2 - 40,
+    });
+    // Destra: numero pagina
     doc.text(
       `${bl("page", lang)} ${i} ${bl("of", lang)} ${pageCount}`,
       pageW - margin,
@@ -591,12 +602,6 @@ export function generateFatPdf(
     );
     doc.setTextColor(0);
   }
-
-  const safe = (s: string) =>
-    (s || "report").replace(/[^a-z0-9-_]+/gi, "_").slice(0, 40);
-  const filename = `mini-fat_${safe(general.numeroMatricola)}_${
-    general.dataCollaudo || new Date().toISOString().slice(0, 10)
-  }.pdf`;
 
   doc.save(filename);
 }
