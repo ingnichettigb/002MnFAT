@@ -110,7 +110,7 @@ export function generateFatPdf(
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
-  const HEADER_H = 26;
+  const HEADER_H = 38;
 
   // Counter per nomi univoci di field
   let fieldSeq = 0;
@@ -137,32 +137,29 @@ export function generateFatPdf(
     doc.addField(f);
   };
 
-  // ── Intestazione comune (senza nome cliente) ────────────
+  // ── Intestazione comune (senza data, testo più grande) ──
   const drawPageHeader = () => {
     const y = 8;
     doc.setDrawColor(180);
     doc.setLineWidth(0.3);
     doc.line(margin, y + HEADER_H - 4, pageW - margin, y + HEADER_H - 4);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
     doc.setTextColor(60);
     const items: [string, string][] = [
       [bl("commessa", lang), general.commessa || ""],
       [bl("drawingNo", lang), general.numeroDisegno || ""],
       [bl("serialNo", lang), general.numeroMatricola || ""],
       [bl("tagNo", lang), general.tagNumber || ""],
-      [bl("testDate", lang), fmtDate(general.dataCollaudo, lang)],
     ];
     const colW = (pageW - margin * 2) / items.length;
     items.forEach(([k, v], i) => {
       const x = margin + colW * i;
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(8);
-      doc.text(k + ":", x, y + 6, { maxWidth: colW - 2 });
+      doc.setFontSize(12);
+      doc.text(k + ":", x, y + 8, { maxWidth: colW - 2 });
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text(String(v), x, y + 16, { maxWidth: colW - 2 });
+      doc.setFontSize(15);
+      doc.text(String(v), x, y + 22, { maxWidth: colW - 2 });
     });
     doc.setTextColor(0);
   };
@@ -196,13 +193,13 @@ export function generateFatPdf(
   // ── Test data (sulla prima pagina) ──
   {
     const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
+      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 30 },
       { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
       { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
       { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
       { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
-      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
       { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
-      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 30 },
+      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
     ];
     autoTable(doc, {
       startY: cursorY,
@@ -388,7 +385,7 @@ export function generateFatPdf(
       },
       didParseCell: (data) => {
         if (data.section === "body") {
-          if (data.row.index === 0) data.cell.styles.minCellHeight = 30;
+          if (data.row.index === 0) data.cell.styles.minCellHeight = 46;
           if (data.row.index === 1) data.cell.styles.minCellHeight = 140;
           if (data.row.index === 2) data.cell.styles.minCellHeight = 30;
         }
@@ -401,21 +398,23 @@ export function generateFatPdf(
           // Riga 2: DEFINITIVO / PROVVISORIO / DA DEFINIRE
           const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
           const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
-          const cbSize = 4;
+          const cbSize = 4.5;
           const drawRow = (opts: DKey[], rowY: number, prefix: string) => {
             const cellW = (width - 4) / opts.length;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
             opts.forEach((k, i) => {
               const cx = x + 2 + cellW * i;
               addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
-              doc.setFont("helvetica", "normal");
-              doc.setFontSize(9);
-              doc.text(bl(k, lang), cx + cbSize + 1.5, rowY + cbSize - 0.5, {
-                maxWidth: cellW - cbSize - 2,
+              // Label su singola riga abbreviata se serve
+              const label = bl(k, lang);
+              doc.text(label, cx + cbSize + 2, rowY + cbSize - 0.5, {
+                maxWidth: cellW - cbSize - 3,
               });
             });
           };
-          drawRow(optsTop, y + 4, "esito");
-          drawRow(optsBot, y + 4 + cbSize + 6, "stato");
+          drawRow(optsTop, y + 6, "esito");
+          drawRow(optsBot, y + 28, "stato");
         } else if (data.row.index === 1) {
           addField({
             x: x + 0.5,
@@ -575,6 +574,12 @@ export function generateFatPdf(
     });
   }
 
+  const safe = (s: string) =>
+    (s || "report").replace(/[^a-z0-9-_]+/gi, "_").slice(0, 40);
+  const filename = `mini-fat_${safe(general.numeroMatricola)}_${
+    general.dataCollaudo || new Date().toISOString().slice(0, 10)
+  }.pdf`;
+
   // ── Header + footer su OGNI pagina ──────────────────────
   const pageCount = doc.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
@@ -584,6 +589,11 @@ export function generateFatPdf(
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(120);
+    // Sinistra: nome del file
+    doc.text(filename, margin, pageH - 8, {
+      maxWidth: pageW - margin * 2 - 40,
+    });
+    // Destra: numero pagina
     doc.text(
       `${bl("page", lang)} ${i} ${bl("of", lang)} ${pageCount}`,
       pageW - margin,
@@ -592,12 +602,6 @@ export function generateFatPdf(
     );
     doc.setTextColor(0);
   }
-
-  const safe = (s: string) =>
-    (s || "report").replace(/[^a-z0-9-_]+/gi, "_").slice(0, 40);
-  const filename = `mini-fat_${safe(general.numeroMatricola)}_${
-    general.dataCollaudo || new Date().toISOString().slice(0, 10)
-  }.pdf`;
 
   doc.save(filename);
 }
