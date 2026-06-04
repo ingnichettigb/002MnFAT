@@ -110,7 +110,7 @@ export function generateFatPdf(
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
-  const HEADER_H = 26;
+  const HEADER_H = 38;
 
   // Counter per nomi univoci di field
   let fieldSeq = 0;
@@ -137,32 +137,29 @@ export function generateFatPdf(
     doc.addField(f);
   };
 
-  // ── Intestazione comune (senza nome cliente) ────────────
+  // ── Intestazione comune (senza data, testo più grande) ──
   const drawPageHeader = () => {
     const y = 8;
     doc.setDrawColor(180);
     doc.setLineWidth(0.3);
     doc.line(margin, y + HEADER_H - 4, pageW - margin, y + HEADER_H - 4);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
     doc.setTextColor(60);
     const items: [string, string][] = [
       [bl("commessa", lang), general.commessa || ""],
       [bl("drawingNo", lang), general.numeroDisegno || ""],
       [bl("serialNo", lang), general.numeroMatricola || ""],
       [bl("tagNo", lang), general.tagNumber || ""],
-      [bl("testDate", lang), fmtDate(general.dataCollaudo, lang)],
     ];
     const colW = (pageW - margin * 2) / items.length;
     items.forEach(([k, v], i) => {
       const x = margin + colW * i;
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(8);
-      doc.text(k + ":", x, y + 6, { maxWidth: colW - 2 });
+      doc.setFontSize(12);
+      doc.text(k + ":", x, y + 8, { maxWidth: colW - 2 });
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text(String(v), x, y + 16, { maxWidth: colW - 2 });
+      doc.setFontSize(15);
+      doc.text(String(v), x, y + 22, { maxWidth: colW - 2 });
     });
     doc.setTextColor(0);
   };
