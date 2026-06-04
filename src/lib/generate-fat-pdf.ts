@@ -55,7 +55,13 @@ const D = {
   status: { it: "Stato", en: "Status", de: "Status", es: "Estado" },
   signature: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma" },
   date: { it: "Data", en: "Date", de: "Datum", es: "Fecha" },
-} as const;
+  accettato: { it: "ACCETTATO", en: "ACCEPTED", de: "AKZEPTIERT", es: "ACEPTADO" },
+  nonAccettato: { it: "NON ACCETTATO", en: "NOT ACCEPTED", de: "NICHT AKZEPTIERT", es: "NO ACEPTADO" },
+  nonApplicabile: { it: "NON APPLICABILE", en: "NOT APPLICABLE", de: "NICHT ANWENDBAR", es: "NO APLICABLE" },
+  daCompletare: { it: "DA COMPLETARE", en: "TO BE COMPLETED", de: "ZU VERVOLLSTÄNDIGEN", es: "POR COMPLETAR" },
+  definitivo: { it: "DEFINITIVO", en: "FINAL", de: "ENDGÜLTIG", es: "DEFINITIVO" },
+  provvisorio: { it: "PROVVISORIO", en: "PROVISIONAL", de: "VORLÄUFIG", es: "PROVISIONAL" },
+  daDefinire: { it: "DA DEFINIRE", en: "TO BE DEFINED", de: "ZU DEFINIEREN", es: "POR DEFINIR" },
 
 type DKey = keyof typeof D;
 
