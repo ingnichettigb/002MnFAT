@@ -359,18 +359,22 @@ export function generateFatPdf(
   selected.forEach((ctrl, idx) => {
     doc.addPage();
 
+    // Intestazione capitolo: spazio per 3 righe
     const titleY = TOP;
+    const titleH = 24; // ~3 righe a 12pt
     doc.setFillColor(30, 41, 59);
-    doc.rect(margin, titleY - 4, pageW - margin * 2, 12, "F");
+    doc.rect(margin, titleY - 4, pageW - margin * 2, titleH, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
     const title = `${bl("chapter", lang)} ${idx + 1} — ${ctrl.label}`;
-    doc.text(title, margin + 3, titleY + 4, { maxWidth: pageW - margin * 2 - 6 });
+    doc.text(title, margin + 3, titleY + 4, {
+      maxWidth: pageW - margin * 2 - 6,
+    });
     doc.setTextColor(0);
 
     autoTable(doc, {
-      startY: titleY + 14,
+      startY: titleY + titleH + 2,
       margin: { left: margin, right: margin, top: TOP },
       body: [
         [bl("outcome", lang), ""],
@@ -384,8 +388,8 @@ export function generateFatPdf(
       },
       didParseCell: (data) => {
         if (data.section === "body") {
-          if (data.row.index === 0) data.cell.styles.minCellHeight = 14;
-          if (data.row.index === 1) data.cell.styles.minCellHeight = 150;
+          if (data.row.index === 0) data.cell.styles.minCellHeight = 30;
+          if (data.row.index === 1) data.cell.styles.minCellHeight = 140;
           if (data.row.index === 2) data.cell.styles.minCellHeight = 30;
         }
       },
@@ -393,14 +397,25 @@ export function generateFatPdf(
         if (data.section !== "body" || data.column.index !== 1) return;
         const { x, y, width, height } = data.cell;
         if (data.row.index === 0) {
-          addField({
-            x: x + 0.5,
-            y: y + 0.5,
-            w: width - 1,
-            h: height - 1,
-            name: `ctrl_${idx}_outcome`,
-            value: "",
-          });
+          // Riga 1: ACCETTATO / NON ACCETTATO / NON APPLICABILE / DA COMPLETARE
+          // Riga 2: DEFINITIVO / PROVVISORIO / DA DEFINIRE
+          const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
+          const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
+          const cbSize = 4;
+          const drawRow = (opts: DKey[], rowY: number, prefix: string) => {
+            const cellW = (width - 4) / opts.length;
+            opts.forEach((k, i) => {
+              const cx = x + 2 + cellW * i;
+              addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(9);
+              doc.text(bl(k, lang), cx + cbSize + 1.5, rowY + cbSize - 0.5, {
+                maxWidth: cellW - cbSize - 2,
+              });
+            });
+          };
+          drawRow(optsTop, y + 4, "esito");
+          drawRow(optsBot, y + 4 + cbSize + 6, "stato");
         } else if (data.row.index === 1) {
           addField({
             x: x + 0.5,
@@ -424,6 +439,8 @@ export function generateFatPdf(
       },
     });
   });
+
+
 
   // ── Pagina DEVIAZIONI ───────────────────────────────────
   doc.addPage();
