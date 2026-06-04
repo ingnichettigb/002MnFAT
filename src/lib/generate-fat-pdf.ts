@@ -193,13 +193,13 @@ export function generateFatPdf(
   // ── Test data (sulla prima pagina) ──
   {
     const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
+      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 30 },
       { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
       { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
       { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
       { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
-      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
       { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
-      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 30 },
+      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
     ];
     autoTable(doc, {
       startY: cursorY,
