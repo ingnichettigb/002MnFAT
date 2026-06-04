@@ -1,7 +1,8 @@
-import { jsPDF, AcroFormTextField } from "jspdf";
+import { jsPDF, AcroFormTextField, AcroFormCheckBox } from "jspdf";
 import autoTable from "jspdf-autotable";
-// AcroFormTextField è il costruttore corretto per i campi editabili.
+// AcroForm constructors per campi editabili.
 const TextField: any = AcroFormTextField;
+const CheckBox: any = AcroFormCheckBox;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
