@@ -170,14 +170,85 @@ export function generateFatPdf(
   // Lascia spazio sufficiente tra l'header e il titolo del documento
   const TOP = HEADER_H + 14;
 
-  // ── PAGINA 1: dati generali ─────────────────────────────
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text(bl("title", lang), pageW / 2, TOP, { align: "center" });
-  doc.setFontSize(12);
-  doc.text(bl("subtitle", lang), pageW / 2, TOP + 7, { align: "center" });
+  /** Crea un CheckBox AcroForm posizionato in mm. */
+  const addCheckbox = (opts: { x: number; y: number; size: number; name: string }) => {
+    const c = new CheckBox();
+    c.Rect = [opts.x, opts.y, opts.size, opts.size];
+    c.T = uid(opts.name);
+    c.fontName = "helvetica";
+    c.fontSize = 10;
+    c.value = "Off";
+    c.AS = "/Off";
+    doc.addField(c);
+  };
 
-  let cursorY = TOP + 14;
+  // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
+  // Titolo centrato, posizionato più in basso
+  const titleY = TOP + 30;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text(bl("title", lang), pageW / 2, titleY, { align: "center" });
+  doc.setFontSize(14);
+  doc.text("F.A.T. — " + bl("subtitle", lang), pageW / 2, titleY + 10, { align: "center" });
+
+  let cursorY = titleY + 25;
+
+  // ── Test data (sulla prima pagina) ──
+  {
+    const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
+      { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
+      { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
+      { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
+      { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
+      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
+      { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
+      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 30 },
+    ];
+    autoTable(doc, {
+      startY: cursorY,
+      margin: { left: margin, right: margin, top: TOP },
+      head: [[bl("testData", lang), ""]],
+      body: rows.map((r) => [r.label, ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2 },
+      headStyles: {
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 12,
+        fillColor: [40, 40, 40],
+        textColor: 255,
+        halign: "left",
+      },
+      columnStyles: {
+        0: { fontStyle: "bold", cellWidth: 70 },
+        1: { cellWidth: "auto" },
+      },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index === 1) {
+          const r = rows[data.row.index];
+          if (r?.minH) data.cell.styles.minCellHeight = r.minH;
+        }
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index !== 1) return;
+        const r = rows[data.row.index];
+        if (!r) return;
+        const { x, y, width, height } = data.cell;
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          value: r.value || "",
+          name: `td_${r.key}`,
+          multiline: r.multi,
+        });
+      },
+    });
+  }
+
+  // ── PAGINA 2: Produttore / Cliente / Presenti ───────────
+  doc.addPage();
+  cursorY = TOP;
 
   /** Tabella con cella-valore editabile (campo AcroForm). */
   const partyTable = (title: string, p: Party, namePrefix: string) => {
@@ -228,63 +299,8 @@ export function generateFatPdf(
   partyTable(bl("manufacturer", lang), general.produttore, "mfg");
   partyTable(bl("customer", lang), general.cliente, "cli");
 
-  // ── Test data ──
-  {
-    const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
-      { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
-      { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
-      { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
-      { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
-      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
-      { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
-      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 18 },
-    ];
-    autoTable(doc, {
-      startY: cursorY,
-      margin: { left: margin, right: margin, top: TOP },
-      head: [[bl("testData", lang), ""]],
-      body: rows.map((r) => [r.label, ""]),
-      styles: { font: "helvetica", fontSize: 12, cellPadding: 2 },
-      headStyles: {
-        font: "helvetica",
-        fontStyle: "bold",
-        fontSize: 12,
-        fillColor: [40, 40, 40],
-        textColor: 255,
-        halign: "left",
-      },
-      columnStyles: {
-        0: { fontStyle: "bold", cellWidth: 70 },
-        1: { cellWidth: "auto" },
-      },
-      didParseCell: (data) => {
-        if (data.section === "body" && data.column.index === 1) {
-          const r = rows[data.row.index];
-          if (r?.minH) data.cell.styles.minCellHeight = r.minH;
-        }
-      },
-      didDrawCell: (data) => {
-        if (data.section !== "body" || data.column.index !== 1) return;
-        const r = rows[data.row.index];
-        if (!r) return;
-        const { x, y, width, height } = data.cell;
-        addField({
-          x: x + 0.5,
-          y: y + 0.5,
-          w: width - 1,
-          h: height - 1,
-          value: r.value || "",
-          name: `td_${r.key}`,
-          multiline: r.multi,
-        });
-      },
-    });
-    cursorY = (doc as any).lastAutoTable.finalY + 3;
-  }
-
   // ── Attendees ──
   {
-    // Sempre almeno 5 righe per scrivere a mano altri presenti
     const baseRows = general.presenti.map((a) => ({
       nome: a.nome || "",
       ruolo: a.ruolo || "",
@@ -320,7 +336,7 @@ export function generateFatPdf(
       },
       didDrawCell: (data) => {
         if (data.section !== "body" || data.row.index === 0) return;
-        const dataRowIdx = data.row.index - 1; // riga 0 è l'header bilingue
+        const dataRowIdx = data.row.index - 1;
         const row = baseRows[dataRowIdx];
         if (!row) return;
         const fields = ["nome", "ruolo", "azienda"] as const;
@@ -337,6 +353,7 @@ export function generateFatPdf(
       },
     });
   }
+
 
   // ── Pagina per ogni controllo selezionato ───────────────
   selected.forEach((ctrl, idx) => {
