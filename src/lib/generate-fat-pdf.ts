@@ -416,7 +416,6 @@ export function generateFatPdf(
           drawRow(optsTop, y + 6, "esito");
           drawRow(optsBot, y + 28, "stato");
         } else if (data.row.index === 1) {
-        } else if (data.row.index === 1) {
           addField({
             x: x + 0.5,
             y: y + 0.5,
