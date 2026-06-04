@@ -385,7 +385,7 @@ export function generateFatPdf(
       },
       didParseCell: (data) => {
         if (data.section === "body") {
-          if (data.row.index === 0) data.cell.styles.minCellHeight = 30;
+          if (data.row.index === 0) data.cell.styles.minCellHeight = 46;
           if (data.row.index === 1) data.cell.styles.minCellHeight = 140;
           if (data.row.index === 2) data.cell.styles.minCellHeight = 30;
         }
@@ -398,21 +398,24 @@ export function generateFatPdf(
           // Riga 2: DEFINITIVO / PROVVISORIO / DA DEFINIRE
           const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
           const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
-          const cbSize = 4;
+          const cbSize = 4.5;
           const drawRow = (opts: DKey[], rowY: number, prefix: string) => {
             const cellW = (width - 4) / opts.length;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
             opts.forEach((k, i) => {
               const cx = x + 2 + cellW * i;
               addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
-              doc.setFont("helvetica", "normal");
-              doc.setFontSize(9);
-              doc.text(bl(k, lang), cx + cbSize + 1.5, rowY + cbSize - 0.5, {
-                maxWidth: cellW - cbSize - 2,
+              // Label su singola riga abbreviata se serve
+              const label = bl(k, lang);
+              doc.text(label, cx + cbSize + 2, rowY + cbSize - 0.5, {
+                maxWidth: cellW - cbSize - 3,
               });
             });
           };
-          drawRow(optsTop, y + 4, "esito");
-          drawRow(optsBot, y + 4 + cbSize + 6, "stato");
+          drawRow(optsTop, y + 6, "esito");
+          drawRow(optsBot, y + 28, "stato");
+        } else if (data.row.index === 1) {
         } else if (data.row.index === 1) {
           addField({
             x: x + 0.5,
