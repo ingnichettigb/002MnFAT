@@ -72,15 +72,23 @@ type DKey = keyof typeof D;
  *  - altrimenti     → "<lang> / EN"
  * Se le due stringhe coincidono mostra una sola volta.
  */
-const blGlobal = (key: DKey, lang: Lang, secondary?: Lang | null): string => {
+const blParts = (
+  key: DKey,
+  lang: Lang,
+  secondary?: Lang | null,
+): { p: string; s: string | null } => {
   const p = D[key][lang];
   const s = secondary
     ? D[key][secondary]
     : lang === "en"
       ? D[key].it
       : D[key].en;
-  if (p === s) return p;
-  return `${p} / ${s}`;
+  return { p, s: p === s ? null : s };
+};
+
+const blGlobal = (key: DKey, lang: Lang, secondary?: Lang | null): string => {
+  const { p, s } = blParts(key, lang, secondary);
+  return s ? `${p} / ${s}` : p;
 };
 
 const fmtDate = (iso: string, lang: Lang) => {
