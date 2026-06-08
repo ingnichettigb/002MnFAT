@@ -109,6 +109,7 @@ export function generateFatPdf(
   const selected = controls.filter((c) => c.selected);
   // Shadow del bl() globale per includere la secondaria scelta dall'utente
   const bl = (key: DKey, _l?: Lang) => blGlobal(key, lang, secondary);
+  const blP = (key: DKey) => blParts(key, lang, secondary);
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Helvetica nei PDF è metricamente equivalente ad Arial e viene
