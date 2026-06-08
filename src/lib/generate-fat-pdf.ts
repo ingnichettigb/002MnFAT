@@ -72,15 +72,23 @@ type DKey = keyof typeof D;
  *  - altrimenti     → "<lang> / EN"
  * Se le due stringhe coincidono mostra una sola volta.
  */
-const blGlobal = (key: DKey, lang: Lang, secondary?: Lang | null): string => {
+const blParts = (
+  key: DKey,
+  lang: Lang,
+  secondary?: Lang | null,
+): { p: string; s: string | null } => {
   const p = D[key][lang];
   const s = secondary
     ? D[key][secondary]
     : lang === "en"
       ? D[key].it
       : D[key].en;
-  if (p === s) return p;
-  return `${p} / ${s}`;
+  return { p, s: p === s ? null : s };
+};
+
+const blGlobal = (key: DKey, lang: Lang, secondary?: Lang | null): string => {
+  const { p, s } = blParts(key, lang, secondary);
+  return s ? `${p} / ${s}` : p;
 };
 
 const fmtDate = (iso: string, lang: Lang) => {
@@ -101,6 +109,7 @@ export function generateFatPdf(
   const selected = controls.filter((c) => c.selected);
   // Shadow del bl() globale per includere la secondaria scelta dall'utente
   const bl = (key: DKey, _l?: Lang) => blGlobal(key, lang, secondary);
+  const blP = (key: DKey) => blParts(key, lang, secondary);
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Helvetica nei PDF è metricamente equivalente ad Arial e viene
@@ -110,7 +119,7 @@ export function generateFatPdf(
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
-  const HEADER_H = 38;
+  const HEADER_H = 46;
 
   // Counter per nomi univoci di field
   let fieldSeq = 0;
@@ -145,21 +154,30 @@ export function generateFatPdf(
     doc.line(margin, y + HEADER_H - 4, pageW - margin, y + HEADER_H - 4);
 
     doc.setTextColor(60);
-    const items: [string, string][] = [
-      [bl("commessa", lang), general.commessa || ""],
-      [bl("drawingNo", lang), general.numeroDisegno || ""],
-      [bl("serialNo", lang), general.numeroMatricola || ""],
-      [bl("tagNo", lang), general.tagNumber || ""],
+    const items: Array<{ key: DKey; value: string }> = [
+      { key: "commessa", value: general.commessa || "" },
+      { key: "drawingNo", value: general.numeroDisegno || "" },
+      { key: "serialNo", value: general.numeroMatricola || "" },
+      { key: "tagNo", value: general.tagNumber || "" },
     ];
     const colW = (pageW - margin * 2) / items.length;
-    items.forEach(([k, v], i) => {
+    items.forEach((it, i) => {
       const x = margin + colW * i;
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text(k + ":", x, y + 8, { maxWidth: colW - 2 });
+      const { p, s } = blP(it.key);
+      // Prima lingua: tondo (non grassetto)
       doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.text(p + ":", x, y + 7, { maxWidth: colW - 2 });
+      // Seconda lingua: corsivo
+      if (s) {
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(10);
+        doc.text(s, x, y + 14, { maxWidth: colW - 2 });
+      }
+      // Valore: grassetto
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(15);
-      doc.text(String(v), x, y + 22, { maxWidth: colW - 2 });
+      doc.text(String(it.value), x, y + 27, { maxWidth: colW - 2 });
     });
     doc.setTextColor(0);
   };
@@ -356,66 +374,92 @@ export function generateFatPdf(
   selected.forEach((ctrl, idx) => {
     doc.addPage();
 
-    // Intestazione capitolo: spazio per 3 righe
+    // Intestazione capitolo: blu, "Controllo N" sulla prima riga in alto a sinistra,
+    // poi la descrizione a capo dall'inizio.
     const titleY = TOP;
-    const titleH = 24; // ~3 righe a 12pt
-    doc.setFillColor(30, 41, 59);
+    const titleH = 26;
+    doc.setFillColor(30, 64, 175); // blu
     doc.rect(margin, titleY - 4, pageW - margin * 2, titleH, "F");
+    doc.setTextColor(255);
+    // Prima riga: "Controllo N"
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text(`${bl("chapter", lang)} ${idx + 1}`, margin + 3, titleY + 2);
+    // Seconda riga: descrizione del controllo, a capo dall'inizio
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
-    doc.setTextColor(255);
-    const title = `${bl("chapter", lang)} ${idx + 1} — ${ctrl.label}`;
-    doc.text(title, margin + 3, titleY + 4, {
+    doc.text(String(ctrl.label || ""), margin + 3, titleY + 11, {
       maxWidth: pageW - margin * 2 - 6,
     });
     doc.setTextColor(0);
+
+    // Etichette bilingui (primaria + secondaria in corsivo) per le righe della tabella
+    const labelCell = (key: DKey) => {
+      const { p, s } = blP(key);
+      return s ? `${p}\n${s}` : p;
+    };
 
     autoTable(doc, {
       startY: titleY + titleH + 2,
       margin: { left: margin, right: margin, top: TOP },
       body: [
-        [bl("outcome", lang), ""],
-        [bl("notes", lang), ""],
-        [bl("inspectorSign", lang), ""],
+        // Esito occupa tutta la larghezza (titolo + checkbox)
+        [{ content: bl("outcome", lang), colSpan: 2, styles: { fontStyle: "bold", fillColor: [240, 240, 240] } } as any],
+        [labelCell("notes"), ""],
+        [labelCell("inspectorSign"), ""],
       ],
       styles: { font: "helvetica", fontSize: 12, cellPadding: 3, valign: "top" },
+      rowPageBreak: "avoid",
       columnStyles: {
         0: { fontStyle: "bold", cellWidth: 55, fillColor: [240, 240, 240] },
         1: { cellWidth: "auto" },
       },
       didParseCell: (data) => {
         if (data.section === "body") {
-          if (data.row.index === 0) data.cell.styles.minCellHeight = 46;
-          if (data.row.index === 1) data.cell.styles.minCellHeight = 140;
-          if (data.row.index === 2) data.cell.styles.minCellHeight = 30;
+          if (data.row.index === 0) data.cell.styles.minCellHeight = 60;
+          if (data.row.index === 1) data.cell.styles.minCellHeight = 130;
+          if (data.row.index === 2) data.cell.styles.minCellHeight = 28;
         }
+        // Etichette label in corsivo per la seconda lingua: tutta riga in tondo,
+        // jspdf-autotable non supporta stile per linea singola, lasciamo come è.
       },
       didDrawCell: (data) => {
-        if (data.section !== "body" || data.column.index !== 1) return;
+        if (data.section !== "body") return;
         const { x, y, width, height } = data.cell;
-        if (data.row.index === 0) {
-          // Riga 1: ACCETTATO / NON ACCETTATO / NON APPLICABILE / DA COMPLETARE
-          // Riga 2: DEFINITIVO / PROVVISORIO / DA DEFINIRE
+
+        if (data.row.index === 0 && data.column.index === 0) {
+          // Cella esito (colSpan 2): l'etichetta "Esito" è già disegnata in alto.
+          // Aggiungiamo i checkbox sotto, occupando tutta la larghezza.
           const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
           const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
-          const cbSize = 4.5;
+          const cbSize = 5;
           const drawRow = (opts: DKey[], rowY: number, prefix: string) => {
-            const cellW = (width - 4) / opts.length;
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
+            const cellW = (width - 6) / opts.length;
             opts.forEach((k, i) => {
-              const cx = x + 2 + cellW * i;
+              const cx = x + 3 + cellW * i;
               addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
-              // Label su singola riga abbreviata se serve
-              const label = bl(k, lang);
-              doc.text(label, cx + cbSize + 2, rowY + cbSize - 0.5, {
+              const { p, s } = blP(k);
+              // Prima lingua
+              doc.setFont("helvetica", "normal");
+              doc.setFontSize(9);
+              doc.text(p, cx + cbSize + 2, rowY + cbSize - 1, {
                 maxWidth: cellW - cbSize - 3,
               });
+              // Seconda lingua in corsivo, più piccola, sotto
+              if (s) {
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(7);
+                doc.text(s, cx + cbSize + 2, rowY + cbSize + 4, {
+                  maxWidth: cellW - cbSize - 3,
+                });
+              }
             });
           };
-          drawRow(optsTop, y + 6, "esito");
-          drawRow(optsBot, y + 28, "stato");
-        } else if (data.row.index === 1) {
+          // Riga superiore: ~y + 18 (sotto l'etichetta "Esito")
+          drawRow(optsTop, y + 20, "esito");
+          // Riga inferiore: ~y + 40
+          drawRow(optsBot, y + 42, "stato");
+        } else if (data.row.index === 1 && data.column.index === 1) {
           addField({
             x: x + 0.5,
             y: y + 0.5,
@@ -425,7 +469,7 @@ export function generateFatPdf(
             value: "",
             multiline: true,
           });
-        } else if (data.row.index === 2) {
+        } else if (data.row.index === 2 && data.column.index === 1) {
           addField({
             x: x + 0.5,
             y: y + 0.5,
