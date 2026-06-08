@@ -154,21 +154,30 @@ export function generateFatPdf(
     doc.line(margin, y + HEADER_H - 4, pageW - margin, y + HEADER_H - 4);
 
     doc.setTextColor(60);
-    const items: [string, string][] = [
-      [bl("commessa", lang), general.commessa || ""],
-      [bl("drawingNo", lang), general.numeroDisegno || ""],
-      [bl("serialNo", lang), general.numeroMatricola || ""],
-      [bl("tagNo", lang), general.tagNumber || ""],
+    const items: Array<{ key: DKey; value: string }> = [
+      { key: "commessa", value: general.commessa || "" },
+      { key: "drawingNo", value: general.numeroDisegno || "" },
+      { key: "serialNo", value: general.numeroMatricola || "" },
+      { key: "tagNo", value: general.tagNumber || "" },
     ];
     const colW = (pageW - margin * 2) / items.length;
-    items.forEach(([k, v], i) => {
+    items.forEach((it, i) => {
       const x = margin + colW * i;
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text(k + ":", x, y + 8, { maxWidth: colW - 2 });
+      const { p, s } = blP(it.key);
+      // Prima lingua: tondo (non grassetto)
       doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.text(p + ":", x, y + 7, { maxWidth: colW - 2 });
+      // Seconda lingua: corsivo
+      if (s) {
+        doc.setFont("helvetica", "italic");
+        doc.setFontSize(10);
+        doc.text(s, x, y + 14, { maxWidth: colW - 2 });
+      }
+      // Valore: grassetto
+      doc.setFont("helvetica", "bold");
       doc.setFontSize(15);
-      doc.text(String(v), x, y + 22, { maxWidth: colW - 2 });
+      doc.text(String(it.value), x, y + 27, { maxWidth: colW - 2 });
     });
     doc.setTextColor(0);
   };
