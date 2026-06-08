@@ -31,7 +31,7 @@ const D = {
   chapter: { it: "Controllo", en: "Check", de: "Prüfung", es: "Control" },
   outcome: { it: "Esito", en: "Outcome", de: "Ergebnis", es: "Resultado" },
   notes: { it: "Note / Rilievi", en: "Notes / Findings", de: "Anmerkungen", es: "Notas / Observaciones" },
-  inspectorSign: { it: "Firma Ispettore", en: "Inspector Signature", de: "Unterschrift Prüfer", es: "Firma Inspector" },
+  inspectorSign: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma" },
   page: { it: "Pagina", en: "Page", de: "Seite", es: "Página" },
   of: { it: "di", en: "of", de: "von", es: "de" },
   deviazioni: { it: "DEVIAZIONI", en: "DEVIATIONS", de: "ABWEICHUNGEN", es: "DESVIACIONES" },
@@ -229,7 +229,7 @@ export function generateFatPdf(
         font: "helvetica",
         fontStyle: "bold",
         fontSize: 12,
-        fillColor: [40, 40, 40],
+        fillColor: [30, 64, 175],
         textColor: 255,
         halign: "left",
       },
@@ -285,7 +285,7 @@ export function generateFatPdf(
         font: "helvetica",
         fontStyle: "bold",
         fontSize: 12,
-        fillColor: [40, 40, 40],
+        fillColor: [30, 64, 175],
         textColor: 255,
         halign: "left",
       },
@@ -340,7 +340,7 @@ export function generateFatPdf(
         font: "helvetica",
         fontStyle: "bold",
         fontSize: 12,
-        fillColor: [40, 40, 40],
+        fillColor: [30, 64, 175],
         textColor: 255,
         halign: "left",
       },
@@ -416,20 +416,16 @@ export function generateFatPdf(
       },
       didParseCell: (data) => {
         if (data.section === "body") {
-          if (data.row.index === 0) data.cell.styles.minCellHeight = 60;
-          if (data.row.index === 1) data.cell.styles.minCellHeight = 130;
-          if (data.row.index === 2) data.cell.styles.minCellHeight = 28;
+          if (data.row.index === 0) data.cell.styles.minCellHeight = 44;
+          if (data.row.index === 1) data.cell.styles.minCellHeight = 95;
+          if (data.row.index === 2) data.cell.styles.minCellHeight = 22;
         }
-        // Etichette label in corsivo per la seconda lingua: tutta riga in tondo,
-        // jspdf-autotable non supporta stile per linea singola, lasciamo come è.
       },
       didDrawCell: (data) => {
         if (data.section !== "body") return;
         const { x, y, width, height } = data.cell;
 
         if (data.row.index === 0 && data.column.index === 0) {
-          // Cella esito (colSpan 2): l'etichetta "Esito" è già disegnata in alto.
-          // Aggiungiamo i checkbox sotto, occupando tutta la larghezza.
           const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
           const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
           const cbSize = 5;
@@ -439,13 +435,11 @@ export function generateFatPdf(
               const cx = x + 3 + cellW * i;
               addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
               const { p, s } = blP(k);
-              // Prima lingua
               doc.setFont("helvetica", "normal");
               doc.setFontSize(9);
               doc.text(p, cx + cbSize + 2, rowY + cbSize - 1, {
                 maxWidth: cellW - cbSize - 3,
               });
-              // Seconda lingua in corsivo, più piccola, sotto
               if (s) {
                 doc.setFont("helvetica", "italic");
                 doc.setFontSize(7);
@@ -455,10 +449,8 @@ export function generateFatPdf(
               }
             });
           };
-          // Riga superiore: ~y + 18 (sotto l'etichetta "Esito")
-          drawRow(optsTop, y + 20, "esito");
-          // Riga inferiore: ~y + 40
-          drawRow(optsBot, y + 42, "stato");
+          drawRow(optsTop, y + 14, "esito");
+          drawRow(optsBot, y + 30, "stato");
         } else if (data.row.index === 1 && data.column.index === 1) {
           addField({
             x: x + 0.5,
