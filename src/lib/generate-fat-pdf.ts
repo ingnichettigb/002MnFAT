@@ -340,7 +340,7 @@ export function generateFatPdf(
         font: "helvetica",
         fontStyle: "bold",
         fontSize: 12,
-        fillColor: [40, 40, 40],
+        fillColor: [30, 64, 175],
         textColor: 255,
         halign: "left",
       },
