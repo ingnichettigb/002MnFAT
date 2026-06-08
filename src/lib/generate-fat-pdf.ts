@@ -31,7 +31,7 @@ const D = {
   chapter: { it: "Controllo", en: "Check", de: "Prüfung", es: "Control" },
   outcome: { it: "Esito", en: "Outcome", de: "Ergebnis", es: "Resultado" },
   notes: { it: "Note / Rilievi", en: "Notes / Findings", de: "Anmerkungen", es: "Notas / Observaciones" },
-  inspectorSign: { it: "Firma Ispettore", en: "Inspector Signature", de: "Unterschrift Prüfer", es: "Firma Inspector" },
+  inspectorSign: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma" },
   page: { it: "Pagina", en: "Page", de: "Seite", es: "Página" },
   of: { it: "di", en: "of", de: "von", es: "de" },
   deviazioni: { it: "DEVIAZIONI", en: "DEVIATIONS", de: "ABWEICHUNGEN", es: "DESVIACIONES" },
