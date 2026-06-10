@@ -1,38 +1,23 @@
-# Gestione archivio FAT
+Il problema nello screenshot è che i tre campi che dovrebbero essere “uno solo alla volta” stanno ancora apparendo come quadratini con pallino nero già dentro. Quindi il PDF non sta usando correttamente campi esclusivi visivamente vuoti.
 
-Aggiungo la possibilità di salvare un FAT (sia in lavorazione che completato), riaprirlo, modificarlo, duplicarlo o eliminarlo, tramite una nuova sezione "Archivio FAT".
+Piano di intervento:
 
-## Cosa vedrà l'utente
+1. Sostituire i radio button attuali per:
+   - ACCETTATO
+   - NON ACCETTATO
+   - NON APPLICABILE
+   con un unico gruppo esclusivo: scegliendone uno, l'altro si spegne automaticamente.
 
-1. **Nuova voce nello stepper / home**: bottone "Archivio FAT" (con il suo numero etichetta) che apre la pagina elenco.
-2. **Pagina `/archivio`** con tabella dei FAT salvati e tre filtri/tab:
-   - **Da lavorare** (creato, nessun dato compilato significativo)
-   - **In lavorazione** (parzialmente compilato, non ancora generato PDF)
-   - **Completati** (PDF generato / contrassegnato come chiuso)
-3. Ogni riga mostra: Commessa, Cliente, N° Disegno, Matricola, Tag, Data collaudo, Stato, Ultima modifica.
-4. Azioni per riga: **Apri/Modifica**, **Duplica**, **Elimina**, **Genera PDF** (per i completati o pronti).
-5. Bottoni nella pagina principale:
-   - **Salva bozza** (in qualunque momento) → torna in archivio come "In lavorazione".
-   - **Salva e chiudi** alla fine del flusso controlli → marcato "Completato".
-   - **Nuovo FAT** → resetta il form e crea un nuovo record.
+2. Fare la stessa cosa per:
+   - DEFINITIVO
+   - PROVVISORIO
+   - DA DEFINIRE
+   anche loro come unico gruppo esclusivo.
 
-## Come funziona dietro le quinte (parte tecnica)
+3. Lasciare invece DA COMPLETARE come checkbox separata e indipendente, quindi può essere spuntata insieme a una delle tre scelte dell'esito.
 
-- Estendo `src/lib/fat-context.tsx`:
-  - Nuovo tipo `SavedFat = { id, createdAt, updatedAt, status: "todo" | "in_progress" | "done", state: FatState }`.
-  - Lo storage in `localStorage` diventa una lista (`mini-fat:archive:v1`) + un puntatore al FAT corrente (`mini-fat:current:v1`).
-  - Nuove azioni del context: `saveDraft()`, `saveAsDone()`, `loadFat(id)`, `duplicateFat(id)`, `deleteFat(id)`, `newFat()`, `setStatus(id, status)`.
-  - Lo stato corrente viene auto-salvato (debounced) nel record attivo, così non si perde nulla.
-- Nuovo file `src/routes/archivio.tsx` con la tabella e i filtri (componenti shadcn `Table`, `Tabs`, `Button`, `AlertDialog` per conferma eliminazione).
-- Nuove etichette numerate aggiunte a `src/lib/fat-numbering.ts` e tradotte in `src/lib/i18n.tsx` (IT/EN): "Archivio FAT", "Salva bozza", "Salva e chiudi", "Nuovo FAT", "Apri", "Duplica", "Elimina", "Stato", "Ultima modifica", "Da lavorare", "In lavorazione", "Completato".
-- Aggiorno `src/components/fat-stepper.tsx` / `src/routes/index.tsx` / `src/routes/controlli.tsx`:
-  - In alto: link ad **Archivio FAT** + **Nuovo FAT** + **Salva bozza**.
-  - In `controlli.tsx` il bottone Avanti continua a generare il PDF e in più marca il FAT come "Completato".
-- Lo stato "todo" viene assegnato automaticamente quando si crea un nuovo FAT vuoto; passa a "in_progress" appena un campo significativo viene compilato; diventa "done" quando si salva e chiude o si genera il PDF dall'archivio.
+4. Togliere il pallino nero iniziale: i campi devono partire vuoti. Il bordo blu deve restare disegnato sulla pagina, così si vede anche in stampa.
 
-## File toccati
+5. Se il componente radio di jsPDF continua a renderizzare male i quadratini, cambio approccio: userò checkbox PDF normali ma collegate con azione JavaScript interna al PDF. In pratica, quando clicchi ACCETTATO, il PDF spegne automaticamente NON ACCETTATO e NON APPLICABILE. Questo mantiene l'aspetto a quadratino che vuoi e ottiene il comportamento corretto.
 
-- modificati: `src/lib/fat-context.tsx`, `src/lib/fat-numbering.ts`, `src/lib/i18n.tsx`, `src/routes/index.tsx`, `src/routes/controlli.tsx`, `src/components/fat-stepper.tsx`
-- creato: `src/routes/archivio.tsx`
-
-Nessuna dipendenza backend: tutto resta in `localStorage` (coerente con l'impostazione attuale dell'app). Posso in seguito spostare l'archivio su Lovable Cloud se vorrai accedervi da più dispositivi.
+6. Dopo la modifica genero/verifico il PDF visivamente: controllo che i quadratini siano vuoti all'apertura, abbiano bordo blu, e che la selezione sia esclusiva nei due gruppi mentre DA COMPLETARE resti indipendente.
