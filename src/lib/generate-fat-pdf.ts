@@ -152,35 +152,47 @@ export function generateFatPdf(
   // ── Intestazione comune (senza data, testo più grande) ──
   const drawPageHeader = () => {
     const y = 8;
-    doc.setDrawColor(180);
+    // Cornice blu a doppia riga sottile attorno all'intestazione
+    const frameX = margin;
+    const frameY = y;
+    const frameW = pageW - margin * 2;
+    const frameH = HEADER_H - 2;
+    doc.setDrawColor(30, 64, 175);
     doc.setLineWidth(0.3);
-    doc.line(margin, y + HEADER_H - 4, pageW - margin, y + HEADER_H - 4);
-
-    doc.setTextColor(60);
+    doc.rect(frameX, frameY, frameW, frameH);
+    doc.rect(frameX + 1, frameY + 1, frameW - 2, frameH - 2);
+    // Separatori verticali tra i campi
     const items: Array<{ key: DKey; value: string }> = [
       { key: "commessa", value: general.commessa || "" },
       { key: "drawingNo", value: general.numeroDisegno || "" },
       { key: "serialNo", value: general.numeroMatricola || "" },
       { key: "tagNo", value: general.tagNumber || "" },
     ];
-    const colW = (pageW - margin * 2) / items.length;
+    const colW = frameW / items.length;
+    for (let i = 1; i < items.length; i++) {
+      const xs = frameX + colW * i;
+      doc.line(xs, frameY + 1, xs, frameY + frameH - 1);
+    }
+    doc.setDrawColor(0);
+
+    doc.setTextColor(60);
     items.forEach((it, i) => {
-      const x = margin + colW * i;
+      const x = frameX + colW * i + 2;
       const { p, s } = blP(it.key);
       // Prima lingua: tondo (non grassetto)
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
-      doc.text(p + ":", x, y + 7, { maxWidth: colW - 2 });
+      doc.text(p + ":", x, y + 7, { maxWidth: colW - 4 });
       // Seconda lingua: corsivo
       if (s) {
         doc.setFont("helvetica", "italic");
         doc.setFontSize(10);
-        doc.text(s, x, y + 14, { maxWidth: colW - 2 });
+        doc.text(s, x, y + 14, { maxWidth: colW - 4 });
       }
       // Valore: grassetto
       doc.setFont("helvetica", "bold");
       doc.setFontSize(15);
-      doc.text(String(it.value), x, y + 27, { maxWidth: colW - 2 });
+      doc.text(String(it.value), x, y + 27, { maxWidth: colW - 4 });
     });
     doc.setTextColor(0);
   };
