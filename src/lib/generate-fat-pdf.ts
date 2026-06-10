@@ -8,6 +8,7 @@ const RadioButton: any = AcroFormRadioButton;
 const Appearance: any = (JsPDFmod as any).AcroFormAppearance;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
+import { translateControl } from "./fat-defaults";
 
 const D = {
   title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA" },
