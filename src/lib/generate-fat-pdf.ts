@@ -462,11 +462,12 @@ export function generateFatPdf(
           const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
           const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
           const cbSize = 5;
-          const drawRow = (opts: DKey[], rowY: number, prefix: string) => {
+
+          // Disegna etichette (primaria + secondaria) per ogni opzione.
+          const drawLabels = (opts: DKey[], rowY: number) => {
             const cellW = (width - 6) / opts.length;
             opts.forEach((k, i) => {
               const cx = x + 3 + cellW * i;
-              addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
               const { p, s } = blP(k);
               doc.setFont("helvetica", "normal");
               doc.setFontSize(9);
@@ -482,8 +483,44 @@ export function generateFatPdf(
               }
             });
           };
-          drawRow(optsTop, y + 14, "esito");
-          drawRow(optsBot, y + 30, "stato");
+
+          // Esito: radio per accettato/nonAccettato/nonApplicabile,
+          // checkbox indipendente per daCompletare.
+          {
+            const rowY = y + 14;
+            const cellW = (width - 6) / optsTop.length;
+            const radioKeys: DKey[] = ["accettato", "nonAccettato", "nonApplicabile"];
+            const radioItems = radioKeys.map((k, i) => ({
+              x: x + 3 + cellW * i,
+              y: rowY,
+              size: cbSize,
+              value: k,
+            }));
+            addRadioGroup({ name: `ctrl_${idx}_esito`, items: radioItems });
+            // daCompletare resta un checkbox sempre spuntabile.
+            const dcIdx = optsTop.indexOf("daCompletare");
+            addCheckbox({
+              x: x + 3 + cellW * dcIdx,
+              y: rowY,
+              size: cbSize,
+              name: `ctrl_${idx}_daCompletare`,
+            });
+            drawLabels(optsTop, rowY);
+          }
+
+          // Stato: radio (definitivo/provvisorio/daDefinire).
+          {
+            const rowY = y + 30;
+            const cellW = (width - 6) / optsBot.length;
+            const radioItems = optsBot.map((k, i) => ({
+              x: x + 3 + cellW * i,
+              y: rowY,
+              size: cbSize,
+              value: k,
+            }));
+            addRadioGroup({ name: `ctrl_${idx}_stato`, items: radioItems });
+            drawLabels(optsBot, rowY);
+          }
         } else if (data.row.index === 1 && data.column.index === 1) {
           addField({
             x: x + 0.5,
