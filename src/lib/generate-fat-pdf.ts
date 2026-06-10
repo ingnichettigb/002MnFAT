@@ -1,9 +1,11 @@
+import * as JsPDFmod from "jspdf";
 import { jsPDF, AcroFormTextField, AcroFormCheckBox, AcroFormRadioButton } from "jspdf";
 import autoTable from "jspdf-autotable";
 // AcroForm constructors per campi editabili.
 const TextField: any = AcroFormTextField;
 const CheckBox: any = AcroFormCheckBox;
 const RadioButton: any = AcroFormRadioButton;
+const Appearance: any = (JsPDFmod as any).AcroFormAppearance;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
@@ -228,6 +230,16 @@ export function generateFatPdf(
       child.Rect = [it.x, it.y, it.size, it.size];
       child.AS = "/Off";
     });
+    // Usa apparenza a "X" (come un check) invece del pallino,
+    // così quando NON è selezionato il quadratino resta vuoto
+    // e quando lo selezioni compare una X visibile anche in stampa.
+    try {
+      if (Appearance?.RadioButton?.Cross) {
+        rg.setAppearance(Appearance.RadioButton.Cross);
+      }
+    } catch {
+      /* fallback al cerchio di default */
+    }
   };
 
 
