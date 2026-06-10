@@ -8,6 +8,7 @@ const RadioButton: any = AcroFormRadioButton;
 const Appearance: any = (JsPDFmod as any).AcroFormAppearance;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
+import { translateControl } from "./fat-defaults";
 
 const D = {
   title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA" },
@@ -475,23 +476,40 @@ export function generateFatPdf(
   selected.forEach((ctrl, idx) => {
     doc.addPage();
 
-    // Intestazione capitolo: blu, "Controllo N" sulla prima riga in alto a sinistra,
-    // poi la descrizione a capo dall'inizio.
+    // Intestazione capitolo: blu, "Controllo N / Check N" sulla prima riga,
+    // poi la descrizione IT (primaria) e la traduzione (secondaria) a seguire.
+    const labelIt = String(ctrl.label || "");
+    const secLang: Lang | null =
+      secondary ?? (lang === "en" ? "it" : "en");
+    const labelPrimary = lang === "it" ? labelIt : translateControl(labelIt, lang);
+    const labelSecondary = secLang
+      ? (secLang === "it" ? labelIt : translateControl(labelIt, secLang))
+      : null;
+    const showSecondary = !!labelSecondary && labelSecondary !== labelPrimary;
+
     const titleY = TOP;
-    const titleH = 26;
+    const titleH = showSecondary ? 34 : 26;
     doc.setFillColor(30, 64, 175); // blu
     doc.rect(margin, titleY - 4, pageW - margin * 2, titleH, "F");
     doc.setTextColor(255);
-    // Prima riga: "Controllo N"
+    // Prima riga: "Controllo N / Check N"
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
     doc.text(`${bl("chapter", lang)} ${idx + 1}`, margin + 3, titleY + 2);
-    // Seconda riga: descrizione del controllo, a capo dall'inizio
+    // Seconda riga: descrizione del controllo (lingua primaria)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
-    doc.text(String(ctrl.label || ""), margin + 3, titleY + 11, {
+    doc.text(labelPrimary, margin + 3, titleY + 11, {
       maxWidth: pageW - margin * 2 - 6,
     });
+    // Terza riga (opzionale): traduzione in corsivo
+    if (showSecondary) {
+      doc.setFont("helvetica", "bolditalic");
+      doc.setFontSize(11);
+      doc.text(labelSecondary!, margin + 3, titleY + 19, {
+        maxWidth: pageW - margin * 2 - 6,
+      });
+    }
     doc.setTextColor(0);
 
     // Etichette bilingui (primaria + secondaria in corsivo) per le righe della tabella
