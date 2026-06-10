@@ -186,8 +186,21 @@ export function generateFatPdf(
   // Lascia spazio sufficiente tra l'header e il titolo del documento
   const TOP = HEADER_H + 14;
 
-  /** Crea un CheckBox AcroForm posizionato in mm. */
+  /** Disegna un bordo blu visibile in stampa attorno al quadratino. */
+  const drawCbBorder = (x: number, y: number, size: number) => {
+    const prevDraw = (doc as any).getDrawColor?.() ?? "#000000";
+    const prevLw = (doc as any).getLineWidth?.() ?? 0.2;
+    doc.setDrawColor(30, 64, 175);
+    doc.setLineWidth(0.35);
+    doc.rect(x, y, size, size);
+    // ripristina
+    try { doc.setDrawColor(prevDraw as any); } catch { doc.setDrawColor(0); }
+    doc.setLineWidth(prevLw as number);
+  };
+
+  /** Crea un CheckBox AcroForm posizionato in mm (con bordo blu stampabile). */
   const addCheckbox = (opts: { x: number; y: number; size: number; name: string }) => {
+    drawCbBorder(opts.x, opts.y, opts.size);
     const c = new CheckBox();
     c.Rect = [opts.x, opts.y, opts.size, opts.size];
     c.T = uid(opts.name);
@@ -197,6 +210,25 @@ export function generateFatPdf(
     c.AS = "/Off";
     doc.addField(c);
   };
+
+  /** Crea un gruppo di radio AcroForm: una sola opzione selezionabile. */
+  const addRadioGroup = (opts: {
+    name: string;
+    items: Array<{ x: number; y: number; size: number; value: string }>;
+  }) => {
+    const rg = new RadioButton();
+    rg.value = "Off";
+    rg.T = uid(opts.name);
+    try { rg.setAppearance("check"); } catch { /* fallback */ }
+    doc.addField(rg);
+    opts.items.forEach((it) => {
+      drawCbBorder(it.x, it.y, it.size);
+      const child = rg.createOption(it.value);
+      child.Rect = [it.x, it.y, it.size, it.size];
+      child.appearanceState = "Off";
+    });
+  };
+
 
   // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
   // Titolo centrato, posizionato più in basso
