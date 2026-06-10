@@ -122,7 +122,7 @@ export function generateFatPdf(
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
-  const HEADER_H = 46;
+  const HEADER_H = 34;
 
   // Counter per nomi univoci di field
   let fieldSeq = 0;
