@@ -1,8 +1,9 @@
-import { jsPDF, AcroFormTextField, AcroFormCheckBox } from "jspdf";
+import { jsPDF, AcroFormTextField, AcroFormCheckBox, AcroFormRadioButton } from "jspdf";
 import autoTable from "jspdf-autotable";
 // AcroForm constructors per campi editabili.
 const TextField: any = AcroFormTextField;
 const CheckBox: any = AcroFormCheckBox;
+const RadioButton: any = AcroFormRadioButton;
 import type { FatState, Party } from "./fat-context";
 import type { Lang } from "./i18n";
 
@@ -185,8 +186,21 @@ export function generateFatPdf(
   // Lascia spazio sufficiente tra l'header e il titolo del documento
   const TOP = HEADER_H + 14;
 
-  /** Crea un CheckBox AcroForm posizionato in mm. */
+  /** Disegna un bordo blu visibile in stampa attorno al quadratino. */
+  const drawCbBorder = (x: number, y: number, size: number) => {
+    const prevDraw = (doc as any).getDrawColor?.() ?? "#000000";
+    const prevLw = (doc as any).getLineWidth?.() ?? 0.2;
+    doc.setDrawColor(30, 64, 175);
+    doc.setLineWidth(0.35);
+    doc.rect(x, y, size, size);
+    // ripristina
+    try { doc.setDrawColor(prevDraw as any); } catch { doc.setDrawColor(0); }
+    doc.setLineWidth(prevLw as number);
+  };
+
+  /** Crea un CheckBox AcroForm posizionato in mm (con bordo blu stampabile). */
   const addCheckbox = (opts: { x: number; y: number; size: number; name: string }) => {
+    drawCbBorder(opts.x, opts.y, opts.size);
     const c = new CheckBox();
     c.Rect = [opts.x, opts.y, opts.size, opts.size];
     c.T = uid(opts.name);
@@ -196,6 +210,25 @@ export function generateFatPdf(
     c.AS = "/Off";
     doc.addField(c);
   };
+
+  /** Crea un gruppo di radio AcroForm: una sola opzione selezionabile. */
+  const addRadioGroup = (opts: {
+    name: string;
+    items: Array<{ x: number; y: number; size: number; value: string }>;
+  }) => {
+    const rg = new RadioButton();
+    rg.value = "Off";
+    rg.T = uid(opts.name);
+    try { rg.setAppearance("check"); } catch { /* fallback */ }
+    doc.addField(rg);
+    opts.items.forEach((it) => {
+      drawCbBorder(it.x, it.y, it.size);
+      const child = rg.createOption(it.value);
+      child.Rect = [it.x, it.y, it.size, it.size];
+      child.appearanceState = "Off";
+    });
+  };
+
 
   // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
   // Titolo centrato, posizionato più in basso
@@ -429,11 +462,12 @@ export function generateFatPdf(
           const optsTop: DKey[] = ["accettato", "nonAccettato", "nonApplicabile", "daCompletare"];
           const optsBot: DKey[] = ["definitivo", "provvisorio", "daDefinire"];
           const cbSize = 5;
-          const drawRow = (opts: DKey[], rowY: number, prefix: string) => {
+
+          // Disegna etichette (primaria + secondaria) per ogni opzione.
+          const drawLabels = (opts: DKey[], rowY: number) => {
             const cellW = (width - 6) / opts.length;
             opts.forEach((k, i) => {
               const cx = x + 3 + cellW * i;
-              addCheckbox({ x: cx, y: rowY, size: cbSize, name: `ctrl_${idx}_${prefix}_${k}` });
               const { p, s } = blP(k);
               doc.setFont("helvetica", "normal");
               doc.setFontSize(9);
@@ -449,8 +483,44 @@ export function generateFatPdf(
               }
             });
           };
-          drawRow(optsTop, y + 14, "esito");
-          drawRow(optsBot, y + 30, "stato");
+
+          // Esito: radio per accettato/nonAccettato/nonApplicabile,
+          // checkbox indipendente per daCompletare.
+          {
+            const rowY = y + 14;
+            const cellW = (width - 6) / optsTop.length;
+            const radioKeys: DKey[] = ["accettato", "nonAccettato", "nonApplicabile"];
+            const radioItems = radioKeys.map((k, i) => ({
+              x: x + 3 + cellW * i,
+              y: rowY,
+              size: cbSize,
+              value: k,
+            }));
+            addRadioGroup({ name: `ctrl_${idx}_esito`, items: radioItems });
+            // daCompletare resta un checkbox sempre spuntabile.
+            const dcIdx = optsTop.indexOf("daCompletare");
+            addCheckbox({
+              x: x + 3 + cellW * dcIdx,
+              y: rowY,
+              size: cbSize,
+              name: `ctrl_${idx}_daCompletare`,
+            });
+            drawLabels(optsTop, rowY);
+          }
+
+          // Stato: radio (definitivo/provvisorio/daDefinire).
+          {
+            const rowY = y + 30;
+            const cellW = (width - 6) / optsBot.length;
+            const radioItems = optsBot.map((k, i) => ({
+              x: x + 3 + cellW * i,
+              y: rowY,
+              size: cbSize,
+              value: k,
+            }));
+            addRadioGroup({ name: `ctrl_${idx}_stato`, items: radioItems });
+            drawLabels(optsBot, rowY);
+          }
         } else if (data.row.index === 1 && data.column.index === 1) {
           addField({
             x: x + 0.5,
