@@ -181,18 +181,18 @@ export function generateFatPdf(
       const { p, s } = blP(it.key);
       // Prima lingua: tondo (non grassetto)
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(11);
-      doc.text(p + ":", x, y + 7, { maxWidth: colW - 4 });
-      // Seconda lingua: corsivo
+      doc.setFontSize(9);
+      doc.text(p + ":", x, y + 4.5, { maxWidth: colW - 4 });
+      // Seconda lingua: corsivo, subito sotto
       if (s) {
         doc.setFont("helvetica", "italic");
-        doc.setFontSize(10);
-        doc.text(s, x, y + 14, { maxWidth: colW - 4 });
+        doc.setFontSize(8);
+        doc.text(s, x, y + 8.5, { maxWidth: colW - 4 });
       }
       // Valore: grassetto
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(15);
-      doc.text(String(it.value), x, y + 27, { maxWidth: colW - 4 });
+      doc.setFontSize(14);
+      doc.text(String(it.value), x, y + 19, { maxWidth: colW - 4 });
     });
     doc.setTextColor(0);
   };
