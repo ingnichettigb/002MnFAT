@@ -425,7 +425,50 @@ export function generateFatPdf(
         });
       },
     });
+    cursorY = (doc as any).lastAutoTable.finalY + 3;
   }
+
+  // ── Luogo e Data FAT (subito dopo i presenti) ──
+  {
+    const rows: Array<{ label: string; value: string; key: string }> = [
+      { label: bl("testPlace", lang), value: general.luogoCollaudo || "", key: "place" },
+      { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
+    ];
+    autoTable(doc, {
+      startY: cursorY,
+      margin: { left: margin, right: margin, top: TOP },
+      head: [[`${bl("testPlace", lang)} / ${bl("testDate", lang)}`, ""]],
+      body: rows.map((r) => [r.label, ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2 },
+      headStyles: {
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 12,
+        fillColor: [30, 64, 175],
+        textColor: 255,
+        halign: "left",
+      },
+      columnStyles: {
+        0: { fontStyle: "bold", cellWidth: 70 },
+        1: { cellWidth: "auto" },
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index !== 1) return;
+        const r = rows[data.row.index];
+        if (!r) return;
+        const { x, y, width, height } = data.cell;
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          value: r.value || "",
+          name: `fat_${r.key}`,
+        });
+      },
+    });
+  }
+
 
 
   // ── Pagina per ogni controllo selezionato ───────────────
