@@ -44,6 +44,10 @@ export const DEFAULT_CONTROLS: string[] = [
   "Targhetta identificativa – dati obbligatori (verifica)",
   "Presenza accessori – check list",
   "Dichiarazione di installazione a regola d'arte",
+  "Imballo e pulizia / Packing and cleaning",
+  "Mezzi di sollevamento e carico/scarico / Lifting and loading/unloading equipment",
+  "Requisiti di trasporto, mezzi e personale per lo scarico / Transport requirements, vehicles and unloading personnel",
+  "Pianificazione spedizione / Shipping planning",
   // ── Ultime righe fisse (sempre selezionate, non disattivabili) ──────────
   "Varie – allegati tecnici",
   "Elenco deviazioni / non conformità",
