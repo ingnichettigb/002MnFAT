@@ -217,15 +217,16 @@ export function generateFatPdf(
     items: Array<{ x: number; y: number; size: number; value: string }>;
   }) => {
     const rg = new RadioButton();
-    rg.value = "Off";
     rg.T = uid(opts.name);
-    try { rg.setAppearance("check"); } catch { /* fallback */ }
+    // Nessuna opzione preselezionata.
+    rg.value = "Off";
+    rg.AS = "/Off";
     doc.addField(rg);
     opts.items.forEach((it) => {
       drawCbBorder(it.x, it.y, it.size);
       const child = rg.createOption(it.value);
       child.Rect = [it.x, it.y, it.size, it.size];
-      child.appearanceState = "Off";
+      child.AS = "/Off";
     });
   };
 
