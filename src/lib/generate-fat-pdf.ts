@@ -110,7 +110,21 @@ export function generateFatPdf(
   secondary: Lang | null = null,
 ) {
   const { general, controls } = state;
-  const selected = controls.filter((c) => c.selected);
+  // Escludo dalle pagine "controllo" le voci che hanno una pagina fissa dedicata
+  // in fondo al report (Varie / Deviazioni / Azioni correttive), così non vengono
+  // duplicate.
+  const isFixedSection = (label: string) => {
+    const s = (label || "").toLowerCase();
+    return (
+      /\bvarie\b/.test(s) ||
+      /allegat[io]\s+tecnic/.test(s) ||
+      /deviazion/.test(s) ||
+      /deviation/.test(s) ||
+      /azioni?\s+corretti/.test(s) ||
+      /corrective\s+action/.test(s)
+    );
+  };
+  const selected = controls.filter((c) => c.selected && !isFixedSection(c.label));
   // Shadow del bl() globale per includere la secondaria scelta dall'utente
   const bl = (key: DKey, _l?: Lang) => blGlobal(key, lang, secondary);
   const blP = (key: DKey) => blParts(key, lang, secondary);
@@ -632,6 +646,80 @@ export function generateFatPdf(
   });
 
 
+
+  // ── Pagina DEVIAZIONI ───────────────────────────────────
+  // ── Pagina VARIE — Allegati tecnici ─────────────────────
+  doc.addPage();
+  {
+    const titleY = TOP;
+    doc.setFillColor(80, 80, 80);
+    doc.rect(margin, titleY - 4, pageW - margin * 2, 12, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(255);
+    const varieTitle =
+      lang === "en"
+        ? "MISCELLANEOUS — Technical attachments"
+        : lang === "de"
+          ? "VERSCHIEDENES — Technische Anlagen"
+          : lang === "es"
+            ? "VARIOS — Anexos técnicos"
+            : "VARIE — Allegati tecnici";
+    const varieSec =
+      secondary === "it"
+        ? "VARIE — Allegati tecnici"
+        : secondary === "en"
+          ? "MISCELLANEOUS — Technical attachments"
+          : secondary === "de"
+            ? "VERSCHIEDENES — Technische Anlagen"
+            : secondary === "es"
+              ? "VARIOS — Anexos técnicos"
+              : lang === "it"
+                ? "MISCELLANEOUS — Technical attachments"
+                : "VARIE — Allegati tecnici";
+    doc.text(
+      varieSec && varieSec !== varieTitle ? `${varieTitle} / ${varieSec}` : varieTitle,
+      margin + 3,
+      titleY + 4,
+    );
+    doc.setTextColor(0);
+
+    const NUM_ROWS = 12;
+    const headerRow = [
+      bl("num", lang),
+      lang === "en" ? "Attachment description" : "Descrizione allegato",
+      "Rev.",
+      bl("notes", lang),
+    ];
+    autoTable(doc, {
+      startY: titleY + 14,
+      margin: { left: margin, right: margin, top: TOP },
+      head: [headerRow],
+      body: Array.from({ length: NUM_ROWS }, (_, i) => [String(i + 1), "", "", ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2.5, minCellHeight: 12, valign: "top" },
+      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 12, fillColor: [80, 80, 80], textColor: 255 },
+      columnStyles: {
+        0: { cellWidth: 14, halign: "center" },
+        1: { cellWidth: 80 },
+        2: { cellWidth: 22, halign: "center" },
+        3: { cellWidth: "auto" },
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index === 0) return;
+        const { x, y, width, height } = data.cell;
+        const cols = ["num", "desc", "rev", "notes"];
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          name: `var_${data.row.index}_${cols[data.column.index]}`,
+          value: "",
+          multiline: data.column.index === 1 || data.column.index === 3,
+        });
+      },
+    });
+  }
 
   // ── Pagina DEVIAZIONI ───────────────────────────────────
   doc.addPage();
