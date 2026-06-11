@@ -800,6 +800,14 @@ export function generateFatPdf(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
+    {
+      const { p, s } = blP("azioniCorrettive");
+      ctrlPages.push({
+        primary: p,
+        secondary: s,
+        page: (doc as any).getCurrentPageInfo().pageNumber,
+      });
+    }
     doc.text(bl("azioniCorrettive", lang), margin + 3, titleY + 4);
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
