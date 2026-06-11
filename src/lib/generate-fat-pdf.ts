@@ -487,6 +487,8 @@ export function generateFatPdf(
 
 
   // ── Pagina per ogni controllo selezionato ───────────────
+  // Tengo traccia del numero di pagina di ciascun controllo per l'indice finale.
+  const ctrlPages: Array<{ primary: string; secondary: string | null; page: number }> = [];
   selected.forEach((ctrl, idx) => {
     doc.addPage();
 
