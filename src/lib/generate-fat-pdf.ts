@@ -487,6 +487,8 @@ export function generateFatPdf(
 
 
   // ── Pagina per ogni controllo selezionato ───────────────
+  // Tengo traccia del numero di pagina di ciascun controllo per l'indice finale.
+  const ctrlPages: Array<{ primary: string; secondary: string | null; page: number }> = [];
   selected.forEach((ctrl, idx) => {
     doc.addPage();
 
@@ -500,6 +502,12 @@ export function generateFatPdf(
       ? (secLang === "it" ? labelIt : translateControl(labelIt, secLang))
       : null;
     const showSecondary = !!labelSecondary && labelSecondary !== labelPrimary;
+
+    ctrlPages.push({
+      primary: labelPrimary,
+      secondary: showSecondary ? labelSecondary : null,
+      page: (doc as any).getCurrentPageInfo().pageNumber,
+    });
 
     const titleY = TOP;
     const titleH = showSecondary ? 34 : 26;
@@ -852,6 +860,66 @@ export function generateFatPdf(
       value: "",
     });
   }
+
+  // ── Pagina INDICE (in fondo) ────────────────────────────
+  {
+    doc.addPage();
+    const titleY = TOP;
+    doc.setFillColor(30, 64, 175);
+    doc.rect(margin, titleY - 4, pageW - margin * 2, 12, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(255);
+    const idxTitle =
+      lang === "en" ? "INDEX" : lang === "de" ? "INHALT" : lang === "es" ? "ÍNDICE" : "INDICE";
+    const idxSec =
+      secondary === "it"
+        ? "INDICE"
+        : secondary === "en"
+          ? "INDEX"
+          : secondary === "de"
+            ? "INHALT"
+            : secondary === "es"
+              ? "ÍNDICE"
+              : lang === "it"
+                ? "INDEX"
+                : "INDICE";
+    doc.text(
+      idxSec && idxSec !== idxTitle ? `${idxTitle} / ${idxSec}` : idxTitle,
+      margin + 3,
+      titleY + 4,
+    );
+    doc.setTextColor(0);
+
+    autoTable(doc, {
+      startY: titleY + 14,
+      margin: { left: margin, right: margin, top: TOP },
+      head: [[
+        bl("num", lang),
+        bl("chapter", lang) + (blP("chapter").s ? " / " + blP("chapter").s : ""),
+        bl("page", lang),
+      ]],
+      body: ctrlPages.map((c, i) => [
+        String(i + 1),
+        c.secondary ? `${c.primary}\n${c.secondary}` : c.primary,
+        String(c.page),
+      ]),
+      styles: { font: "helvetica", fontSize: 11, cellPadding: 2.5, valign: "top" },
+      headStyles: {
+        font: "helvetica",
+        fontStyle: "bold",
+        fontSize: 11,
+        fillColor: [30, 64, 175],
+        textColor: 255,
+      },
+      columnStyles: {
+        0: { cellWidth: 14, halign: "center" },
+        1: { cellWidth: "auto" },
+        2: { cellWidth: 22, halign: "center" },
+      },
+    });
+  }
+
 
   const safe = (s: string) =>
     (s || "report").replace(/[^a-z0-9-_]+/gi, "_").slice(0, 40);
