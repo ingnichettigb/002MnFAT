@@ -647,7 +647,6 @@ export function generateFatPdf(
 
 
 
-  // ── Pagina DEVIAZIONI ───────────────────────────────────
   // ── Pagina VARIE — Allegati tecnici ─────────────────────
   doc.addPage();
   {
