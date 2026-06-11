@@ -503,6 +503,12 @@ export function generateFatPdf(
       : null;
     const showSecondary = !!labelSecondary && labelSecondary !== labelPrimary;
 
+    ctrlPages.push({
+      primary: labelPrimary,
+      secondary: showSecondary ? labelSecondary : null,
+      page: (doc as any).getCurrentPageInfo().pageNumber,
+    });
+
     const titleY = TOP;
     const titleH = showSecondary ? 34 : 26;
     doc.setFillColor(30, 64, 175); // blu
