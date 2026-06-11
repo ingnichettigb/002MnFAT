@@ -346,6 +346,127 @@ export function generateFatPdf(
     });
   }
 
+  // ── Riquadro di accettazione in fondo alla prima pagina ──
+  {
+    const blockW = pageW - margin * 2;
+    const rowH = 14;
+    const blockH = rowH * 4;
+    const y0 = pageH - margin - blockH;
+    const x0 = margin;
+
+    // cornice esterna + righe orizzontali
+    doc.setDrawColor(30, 64, 175);
+    doc.setLineWidth(0.4);
+    doc.rect(x0, y0, blockW, blockH);
+    for (let i = 1; i < 4; i++) {
+      doc.line(x0, y0 + rowH * i, x0 + blockW, y0 + rowH * i);
+    }
+    // separatore verticale al centro per riga 1
+    doc.line(x0 + blockW / 2, y0, x0 + blockW / 2, y0 + rowH);
+    // separatore verticale al centro per riga 4
+    const dataColW = 55;
+    const accW = (blockW - dataColW) / 2;
+    doc.line(x0 + accW, y0 + rowH * 3, x0 + accW, y0 + rowH * 4);
+    doc.line(x0 + accW * 2, y0 + rowH * 3, x0 + accW * 2, y0 + rowH * 4);
+    // colonna DATA su riga 2
+    doc.line(x0 + blockW - dataColW, y0 + rowH, x0 + blockW - dataColW, y0 + rowH * 2);
+    // separatore DATA-valore su riga 2
+    const dataLblW = 18;
+    doc.line(
+      x0 + blockW - dataColW + dataLblW,
+      y0 + rowH,
+      x0 + blockW - dataColW + dataLblW,
+      y0 + rowH * 2,
+    );
+
+    // helper testo bilingue (primaria sopra, secondaria sotto più piccola)
+    const drawBl = (
+      key: DKey,
+      x: number,
+      y: number,
+      opts?: { align?: "left" | "center"; fontSize?: number },
+    ) => {
+      const { p, s } = blP(key);
+      const fs = opts?.fontSize ?? 9;
+      const align = opts?.align ?? "left";
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(fs);
+      doc.setTextColor(0);
+      doc.text(p, x, y, { align });
+      if (s) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(fs - 2);
+        doc.setTextColor(80);
+        doc.text(s, x, y + fs * 0.38, { align });
+      }
+      doc.setTextColor(0);
+    };
+
+    const cbSize = 4;
+    const textPadX = 3;
+    const textY = (rowIdx: number) => y0 + rowH * rowIdx + 6;
+
+    // RIGA 1: Accettato / Non accettato (radio esclusivo)
+    addRadioGroup({
+      name: "esito_iniziale",
+      items: [
+        { x: x0 + textPadX, y: y0 + (rowH - cbSize) / 2, size: cbSize, value: "accettato" },
+        {
+          x: x0 + blockW / 2 + textPadX,
+          y: y0 + (rowH - cbSize) / 2,
+          size: cbSize,
+          value: "non_accettato",
+        },
+      ],
+    });
+    drawBl("accettato", x0 + textPadX + cbSize + 2, textY(0));
+    drawBl("nonAccettato", x0 + blockW / 2 + textPadX + cbSize + 2, textY(0));
+
+    // RIGA 2: pending CA + DATA (campo editabile)
+    addCheckbox({
+      x: x0 + textPadX,
+      y: y0 + rowH + (rowH - cbSize) / 2,
+      size: cbSize,
+      name: "in_attesa_ca",
+    });
+    drawBl("pendingCA", x0 + textPadX + cbSize + 2, textY(1), { fontSize: 8 });
+    drawBl("date", x0 + blockW - dataColW + 2, textY(1), { fontSize: 9 });
+    addField({
+      x: x0 + blockW - dataColW + dataLblW + 0.5,
+      y: y0 + rowH + 1,
+      w: dataColW - dataLblW - 1,
+      h: rowH - 2,
+      name: "data_attesa_ca",
+    });
+
+    // RIGA 3: titolo "completate le azioni correttive"
+    drawBl("caCompleted", x0 + blockW / 2, textY(2), { align: "center", fontSize: 9 });
+
+    // RIGA 4: accettato / non accettato finale + DATA
+    addRadioGroup({
+      name: "esito_finale",
+      items: [
+        { x: x0 + textPadX, y: y0 + rowH * 3 + (rowH - cbSize) / 2, size: cbSize, value: "accettato" },
+        {
+          x: x0 + accW + textPadX,
+          y: y0 + rowH * 3 + (rowH - cbSize) / 2,
+          size: cbSize,
+          value: "non_accettato",
+        },
+      ],
+    });
+    drawBl("accettato", x0 + textPadX + cbSize + 2, textY(3));
+    drawBl("nonAccettato", x0 + accW + textPadX + cbSize + 2, textY(3));
+    drawBl("date", x0 + accW * 2 + 2, textY(3), { fontSize: 9 });
+    addField({
+      x: x0 + accW * 2 + dataLblW + 0.5,
+      y: y0 + rowH * 3 + 1,
+      w: blockW - accW * 2 - dataLblW - 1,
+      h: rowH - 2,
+      name: "data_esito_finale",
+    });
+  }
+
   // ── PAGINA 2: Produttore / Cliente / Presenti ───────────
   doc.addPage();
   cursorY = TOP;
