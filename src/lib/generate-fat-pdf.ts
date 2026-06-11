@@ -262,6 +262,8 @@ export function generateFatPdf(
     // Nessuna opzione preselezionata.
     rg.value = "Off";
     rg.AS = "/Off";
+    // Permetti di deselezionare cliccando di nuovo sull'opzione attiva.
+    try { (rg as any).noToggleToOff = false; } catch { /* ignore */ }
     doc.addField(rg);
     opts.items.forEach((it) => {
       drawCbBorder(it.x, it.y, it.size);
@@ -406,7 +408,8 @@ export function generateFatPdf(
     const textPadX = 3;
     const textY = (rowIdx: number) => y0 + rowH * rowIdx + 6;
 
-    // RIGA 1: Accettato / Non accettato (radio esclusivo)
+    // RIGHE 1-2: gruppo radio unico a 3 opzioni
+    // (Accettato / Non accettato / In attesa) — esclusivo, deselezionabile.
     addRadioGroup({
       name: "esito_iniziale",
       items: [
@@ -417,19 +420,19 @@ export function generateFatPdf(
           size: cbSize,
           value: "non_accettato",
         },
+        {
+          x: x0 + textPadX,
+          y: y0 + rowH + (rowH - cbSize) / 2,
+          size: cbSize,
+          value: "in_attesa",
+        },
       ],
     });
     drawBl("accettato", x0 + textPadX + cbSize + 2, textY(0));
     drawBl("nonAccettato", x0 + blockW / 2 + textPadX + cbSize + 2, textY(0));
-
-    // RIGA 2: pending CA + DATA (campo editabile)
-    addCheckbox({
-      x: x0 + textPadX,
-      y: y0 + rowH + (rowH - cbSize) / 2,
-      size: cbSize,
-      name: "in_attesa_ca",
-    });
     drawBl("pendingCA", x0 + textPadX + cbSize + 2, textY(1), { fontSize: 8 });
+
+    // DATA "in attesa" (campo editabile)
     drawBl("date", x0 + blockW - dataColW + 2, textY(1), { fontSize: 9 });
     addField({
       x: x0 + blockW - dataColW + dataLblW + 0.5,
@@ -437,6 +440,7 @@ export function generateFatPdf(
       w: dataColW - dataLblW - 1,
       h: rowH - 2,
       name: "data_attesa_ca",
+      fontSize: 6,
     });
 
     // RIGA 3: titolo "completate le azioni correttive"
@@ -464,6 +468,7 @@ export function generateFatPdf(
       w: blockW - accW * 2 - dataLblW - 1,
       h: rowH - 2,
       name: "data_esito_finale",
+      fontSize: 6,
     });
   }
 
