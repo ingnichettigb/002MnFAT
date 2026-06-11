@@ -909,8 +909,9 @@ export function generateFatPdf(
               : lang === "it"
                 ? "INDEX"
                 : "INDICE";
+    const idxNo = ctrlPages.length + 1;
     doc.text(
-      idxSec && idxSec !== idxTitle ? `${idxTitle} / ${idxSec}` : idxTitle,
+      `${idxNo} ${idxSec && idxSec !== idxTitle ? `${idxTitle} / ${idxSec}` : idxTitle}`,
       margin + 3,
       titleY + 4,
     );
