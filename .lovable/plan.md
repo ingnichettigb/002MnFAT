@@ -1,23 +1,44 @@
-Il problema nello screenshot è che i tre campi che dovrebbero essere “uno solo alla volta” stanno ancora apparendo come quadratini con pallino nero già dentro. Quindi il PDF non sta usando correttamente campi esclusivi visivamente vuoti.
 
-Piano di intervento:
+## Cosa cambio in `src/lib/generate-fat-pdf.ts`
 
-1. Sostituire i radio button attuali per:
-   - ACCETTATO
-   - NON ACCETTATO
-   - NON APPLICABILE
-   con un unico gruppo esclusivo: scegliendone uno, l'altro si spegne automaticamente.
+### 1) Intestazione di pagina più compatta
+Nella cornice blu in alto (Commessa / N° Disegno / N° Matricola / Tag) oggi:
+- etichetta primaria a y+4.5
+- etichetta secondaria a y+8.5
+- valore a y+19  → c'è un vuoto grande tra etichetta e valore
 
-2. Fare la stessa cosa per:
-   - DEFINITIVO
-   - PROVVISORIO
-   - DA DEFINIRE
-   anche loro come unico gruppo esclusivo.
+Modifica:
+- etichetta primaria a y+3.5
+- etichetta secondaria a y+7
+- **valore subito sotto a y+11.5** (font 14, grassetto)
+- altezza totale `HEADER_H` ridotta da 34 a ~22 mm
+- `TOP` (margine sotto header) ridotto di conseguenza, così guadagniamo ~12 mm utili su ogni pagina
 
-3. Lasciare invece DA COMPLETARE come checkbox separata e indipendente, quindi può essere spuntata insieme a una delle tre scelte dell'esito.
+Risultato: appena sotto l'etichetta si legge subito il valore; se è lungo continua sulla stessa riga (maxWidth = larghezza colonna).
 
-4. Togliere il pallino nero iniziale: i campi devono partire vuoti. Il bordo blu deve restare disegnato sulla pagina, così si vede anche in stampa.
+### 2) Ultime 3 pagine sempre fisse, in fondo, con colore proprio
+Le ultime tre pagine devono essere, in ordine:
+1. **VARIE — Allegati tecnici** (nuova pagina dedicata, header colore diverso dal blu — propongo grigio scuro `[80,80,80]`)
+2. **DEVIAZIONI** (header rosso scuro, già esistente)
+3. **AZIONI CORRETTIVE** (header verde scuro, già esistente)
 
-5. Se il componente radio di jsPDF continua a renderizzare male i quadratini, cambio approccio: userò checkbox PDF normali ma collegate con azione JavaScript interna al PDF. In pratica, quando clicchi ACCETTATO, il PDF spegne automaticamente NON ACCETTATO e NON APPLICABILE. Questo mantiene l'aspetto a quadratino che vuoi e ottiene il comportamento corretto.
+Garantisco che:
+- siano sempre le ultime tre, **dopo** tutte le pagine dei controlli selezionati
+- non vengano duplicate: rimuovo eventuali voci "Varie / Deviazioni / Azioni correttive" dalla lista dei controlli prima di iterare (filter su label), così non generano una pagina blu in più che le ripeteva
+- la pagina "Varie — Allegati tecnici" avrà una tabella con righe vuote editabili (N° / Descrizione allegato / Rev. / Note) — confermami se i campi vanno bene così o vuoi colonne diverse
 
-6. Dopo la modifica genero/verifico il PDF visivamente: controllo che i quadratini siano vuoti all'apertura, abbiano bordo blu, e che la selezione sia esclusiva nei due gruppi mentre DA COMPLETARE resti indipendente.
+### 3) Numerazione pagine corretta
+La numerazione `Pagina i di N` viene già fatta in un loop finale su tutte le pagine, quindi una volta che l'ordine fisico è giusto (controlli → Varie → Deviazioni → Azioni Correttive) anche le pagine 9 e 10 risulteranno numerate in coda automaticamente. Verifico che `pageCount` includa tutte e che non rimanga nessuna `addPage()` orfana.
+
+### 4) Verifica
+Dopo le modifiche genero un PDF di prova e controllo:
+- intestazione compatta con valore subito sotto l'etichetta
+- nessuna pagina ripetuta
+- ordine finale: …controlli… → Varie → Deviazioni → Azioni Correttive
+- numerazione progressiva corretta fino all'ultima
+
+---
+
+**Conferma due cose prima che proceda:**
+1. La pagina "Varie — Allegati tecnici" va creata come **pagina fissa** (come Deviazioni/Azioni Correttive), giusto? E va rimossa dalla lista dei controlli per evitare duplicati.
+2. Il colore dell'header della pagina "Varie" va bene grigio scuro, o ne preferisci un altro (es. arancio, viola)?

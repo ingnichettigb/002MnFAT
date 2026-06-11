@@ -123,7 +123,7 @@ export function generateFatPdf(
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
-  const HEADER_H = 34;
+  const HEADER_H = 22;
 
   // Counter per nomi univoci di field
   let fieldSeq = 0;
@@ -182,18 +182,18 @@ export function generateFatPdf(
       const { p, s } = blP(it.key);
       // Prima lingua: tondo (non grassetto)
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text(p + ":", x, y + 4.5, { maxWidth: colW - 4 });
-      // Seconda lingua: corsivo, subito sotto
+      doc.setFontSize(8);
+      doc.text(p + (s ? " /" : ":"), x, y + 3.2, { maxWidth: colW - 4 });
+      // Seconda lingua: corsivo, sulla riga successiva ravvicinata
       if (s) {
         doc.setFont("helvetica", "italic");
-        doc.setFontSize(8);
-        doc.text(s, x, y + 8.5, { maxWidth: colW - 4 });
+        doc.setFontSize(7);
+        doc.text(s + ":", x, y + 6.4, { maxWidth: colW - 4 });
       }
-      // Valore: grassetto
+      // Valore: grassetto, subito sotto l'etichetta
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text(String(it.value), x, y + 19, { maxWidth: colW - 4 });
+      doc.setFontSize(13);
+      doc.text(String(it.value), x, y + (s ? 12 : 9), { maxWidth: colW - 4 });
     });
     doc.setTextColor(0);
   };
