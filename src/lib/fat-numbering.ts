@@ -64,6 +64,7 @@ export const LABELS = {
   drawingNo:       { id: 32, i18nKey: "drawingNo",   desc: "N° Disegno / Specifica" },
   serialNo:        { id: 33, i18nKey: "serialNo",    desc: "N° Fabbrica / Matricola" },
   tagNo:           { id: 34, i18nKey: "tagNo",       desc: "Tag Number Cliente" },
+  orderNo:         { id: 39, i18nKey: "orderNo",     desc: "Nr Ordine Cliente" },
   testDate:        { id: 35, i18nKey: "testDate",    desc: "Data del Collaudo" },
   testPlace:       { id: 36, i18nKey: "testPlace",   desc: "Luogo del Collaudo" },
   descrizione:     { id: 37, i18nKey: "descrizione", desc: "Descrizione (oggetto del collaudo)" },

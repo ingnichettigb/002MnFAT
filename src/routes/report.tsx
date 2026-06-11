@@ -94,6 +94,7 @@ function ReportPage() {
               <Field label={t("drawingNo")} value={general.numeroDisegno} />
               <Field label={t("serialNo")} value={general.numeroMatricola} />
               <Field label={t("tagNo")} value={general.tagNumber} />
+              <Field label={t("orderNo")} value={general.numeroOrdineCliente} />
               <Field label={t("testDate")} value={fmtDate(general.dataCollaudo)} />
               <Field label={t("testPlace")} value={general.luogoCollaudo} />
             </dl>

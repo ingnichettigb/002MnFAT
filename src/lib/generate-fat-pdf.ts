@@ -25,6 +25,7 @@ const D = {
   drawingNo: { it: "N° Disegno", en: "Drawing No.", de: "Zeichnungsnr.", es: "N.º Plano" },
   serialNo: { it: "N° Matricola", en: "Serial No.", de: "Seriennr.", es: "N.º de serie" },
   tagNo: { it: "Tag Cliente", en: "Customer Tag", de: "Kunden-Tag", es: "Tag Cliente" },
+  orderNo: { it: "Nr Ordine Cliente", en: "Customer Order No.", de: "Kunden-Bestellnummer", es: "N.º Pedido Cliente" },
   commessa: { it: "Commessa", en: "Job No.", de: "Auftragsnr.", es: "N.º Pedido" },
   testDate: { it: "Data Collaudo", en: "Test Date", de: "Prüfdatum", es: "Fecha Prueba" },
   testPlace: { it: "Luogo Collaudo", en: "Test Location", de: "Prüfort", es: "Lugar Prueba" },
@@ -336,6 +337,7 @@ export function generateFatPdf(
       { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
       { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
       { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
+      { label: bl("orderNo", lang), value: general.numeroOrdineCliente, key: "order" },
       { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
       { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
     ];
