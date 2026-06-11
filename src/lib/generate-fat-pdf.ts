@@ -393,43 +393,29 @@ export function generateFatPdf(
   {
     const blockW = pageW - margin * 2;
     const rowH = 14;
-    const blockH = rowH * 4;
-    const signRows = (customerAttendees.length
-      ? customerAttendees
-      : [{ id: "blank-client-1", nome: "", ruolo: "", azienda: "" }, { id: "blank-client-2", nome: "", ruolo: "", azienda: "" }]
-    ).slice(0, 4);
-    const sigTitleH = 6;
-    const sigHeadH = 6;
+    const sigHeadH = 7;
     const sigRowH = 8;
-    const sigH = sigTitleH + sigHeadH + sigRowH * signRows.length;
-    const gapToSign = 3;
-    const y0 = pageH - margin - blockH - gapToSign - sigH;
-    const x0 = margin;
-
-    // cornice esterna + righe orizzontali
-    doc.setDrawColor(30, 64, 175);
-    doc.setLineWidth(0.4);
-    doc.rect(x0, y0, blockW, blockH);
-    for (let i = 1; i < 4; i++) {
-      doc.line(x0, y0 + rowH * i, x0 + blockW, y0 + rowH * i);
-    }
-    // separatore verticale al centro per riga 1
-    doc.line(x0 + blockW / 2, y0, x0 + blockW / 2, y0 + rowH);
-    // separatore verticale al centro per riga 4
+    const gap = 2;
     const dataColW = 55;
-    const accW = (blockW - dataColW) / 2;
-    doc.line(x0 + accW, y0 + rowH * 3, x0 + accW, y0 + rowH * 4);
-    doc.line(x0 + accW * 2, y0 + rowH * 3, x0 + accW * 2, y0 + rowH * 4);
-    // colonna DATA su riga 2
-    doc.line(x0 + blockW - dataColW, y0 + rowH, x0 + blockW - dataColW, y0 + rowH * 2);
-    // separatore DATA-valore su riga 2
     const dataLblW = 18;
-    doc.line(
-      x0 + blockW - dataColW + dataLblW,
-      y0 + rowH,
-      x0 + blockW - dataColW + dataLblW,
-      y0 + rowH * 2,
-    );
+
+    // Presenti ditta cliente (massimo 3 per stare in pagina)
+    const sigRowsRaw = customerAttendees.length
+      ? customerAttendees
+      : [
+          { id: "blank-client-1", nome: "", ruolo: "", azienda: "" },
+          { id: "blank-client-2", nome: "", ruolo: "", azienda: "" },
+        ];
+    const signRows = sigRowsRaw.slice(0, 3);
+    const sigH = sigHeadH + sigRowH * signRows.length;
+
+    const blockAH = rowH * 2;     // accettato/non + in_attesa+data
+    const caH = rowH;             // completate + firma costruttore
+    const blockBH = rowH;         // accettato/non + data finale
+
+    const totalH = blockAH + gap + sigH + gap + caH + blockBH + gap + sigH;
+    const x0 = margin;
+    const y0 = pageH - margin - totalH;
 
     // helper testo bilingue (primaria sopra, secondaria sotto più piccola)
     const drawBl = (
@@ -456,110 +442,159 @@ export function generateFatPdf(
 
     const cbSize = 4;
     const textPadX = 3;
-    const textY = (rowIdx: number) => y0 + rowH * rowIdx + 6;
 
-    // RIGHE 1-2: gruppo radio unico a 3 opzioni
-    // (Accettato / Non accettato / In attesa) — esclusivo, deselezionabile.
+    doc.setDrawColor(30, 64, 175);
+    doc.setLineWidth(0.4);
+
+    // ===== BLOCK A: esito iniziale (2 righe) =====
+    const aY = y0;
+    doc.rect(x0, aY, blockW, blockAH);
+    doc.line(x0, aY + rowH, x0 + blockW, aY + rowH);
+    // separatore verticale riga 1 (accettato | non accettato)
+    doc.line(x0 + blockW / 2, aY, x0 + blockW / 2, aY + rowH);
+    // colonna DATA su riga 2
+    doc.line(x0 + blockW - dataColW, aY + rowH, x0 + blockW - dataColW, aY + rowH * 2);
+    doc.line(
+      x0 + blockW - dataColW + dataLblW,
+      aY + rowH,
+      x0 + blockW - dataColW + dataLblW,
+      aY + rowH * 2,
+    );
+
+    const aTextY = (r: number) => aY + rowH * r + 6;
     addRadioGroup({
       name: "esito_iniziale",
       items: [
-        { x: x0 + textPadX, y: y0 + (rowH - cbSize) / 2, size: cbSize, value: "accettato" },
+        { x: x0 + textPadX, y: aY + (rowH - cbSize) / 2, size: cbSize, value: "accettato" },
         {
           x: x0 + blockW / 2 + textPadX,
-          y: y0 + (rowH - cbSize) / 2,
+          y: aY + (rowH - cbSize) / 2,
           size: cbSize,
           value: "non_accettato",
         },
         {
           x: x0 + textPadX,
-          y: y0 + rowH + (rowH - cbSize) / 2,
+          y: aY + rowH + (rowH - cbSize) / 2,
           size: cbSize,
           value: "in_attesa",
         },
       ],
     });
-    drawBl("accettato", x0 + textPadX + cbSize + 2, textY(0));
-    drawBl("nonAccettato", x0 + blockW / 2 + textPadX + cbSize + 2, textY(0));
-    drawBl("pendingCA", x0 + textPadX + cbSize + 2, textY(1), { fontSize: 8 });
-
-    // DATA "in attesa" (campo editabile)
-    drawBl("date", x0 + blockW - dataColW + 2, textY(1), { fontSize: 9 });
+    drawBl("accettato", x0 + textPadX + cbSize + 2, aTextY(0));
+    drawBl("nonAccettato", x0 + blockW / 2 + textPadX + cbSize + 2, aTextY(0));
+    drawBl("pendingCA", x0 + textPadX + cbSize + 2, aTextY(1), { fontSize: 8 });
+    drawBl("date", x0 + blockW - dataColW + 2, aTextY(1), { fontSize: 9 });
     addField({
       x: x0 + blockW - dataColW + dataLblW + 0.5,
-      y: y0 + rowH + 1,
+      y: aY + rowH + 1,
       w: dataColW - dataLblW - 1,
       h: rowH - 2,
       name: "data_attesa_ca",
-      fontSize: 6,
+      fontSize: 12,
     });
 
-    // RIGA 3: titolo "completate le azioni correttive"
-    drawBl("caCompleted", x0 + blockW / 2, textY(2), { align: "center", fontSize: 9 });
+    // ===== SIG TABLE A (compatta: header + righe) =====
+    const sigAY = aY + blockAH + gap;
+    const sigNameW = 68;
+    const sigRoleW = 42;
+    const sigSignW = blockW - sigNameW - sigRoleW;
+    const drawSigTable = (sy: number, fieldPrefix: string) => {
+      doc.setDrawColor(30, 64, 175);
+      doc.setLineWidth(0.35);
+      doc.rect(x0, sy, blockW, sigH);
+      doc.line(x0, sy + sigHeadH, x0 + blockW, sy + sigHeadH);
+      doc.line(x0 + sigNameW, sy, x0 + sigNameW, sy + sigH);
+      doc.line(x0 + sigNameW + sigRoleW, sy, x0 + sigNameW + sigRoleW, sy + sigH);
+      for (let i = 1; i < signRows.length; i++) {
+        doc.line(x0, sy + sigHeadH + sigRowH * i, x0 + blockW, sy + sigHeadH + sigRowH * i);
+      }
+      // header row: "— Ditta Cliente — Nome e Cognome" | "Ruolo" | "Firma"
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.setTextColor(0);
+      const clientLbl = bl("clientFatAttendees", lang);
+      const nameLbl = bl("attName", lang);
+      doc.text(`${clientLbl}  ·  ${nameLbl}`, x0 + 2, sy + 4.6, { maxWidth: sigNameW - 4 });
+      doc.text(bl("attRole", lang), x0 + sigNameW + 2, sy + 4.6, { maxWidth: sigRoleW - 4 });
+      doc.text(bl("signature", lang), x0 + sigNameW + sigRoleW + 2, sy + 4.6, {
+        maxWidth: sigSignW - 4,
+      });
+      signRows.forEach((a, i) => {
+        const ry = sy + sigHeadH + sigRowH * i;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.text(a.nome || "", x0 + 2, ry + 5.2, { maxWidth: sigNameW - 4 });
+        doc.text(a.ruolo || "", x0 + sigNameW + 2, ry + 5.2, { maxWidth: sigRoleW - 4 });
+        addField({
+          x: x0 + sigNameW + sigRoleW + 0.5,
+          y: ry + 0.5,
+          w: sigSignW - 1,
+          h: sigRowH - 1,
+          name: `${fieldPrefix}_${i}`,
+          fontSize: 8,
+        });
+      });
+    };
+    drawSigTable(sigAY, "client_signature_initial");
 
-    // RIGA 4: accettato / non accettato finale + DATA
+    // ===== CA HEADER: "COMPLETATE LE AZIONI CORRETTIVE" + Firma costruttore =====
+    const caY = sigAY + sigH + gap;
+    doc.setDrawColor(30, 64, 175);
+    doc.setLineWidth(0.4);
+    doc.rect(x0, caY, blockW, caH);
+    const caTitleW = blockW * 0.45;
+    doc.line(x0 + caTitleW, caY, x0 + caTitleW, caY + caH);
+    drawBl("caCompleted", x0 + 3, caY + 6, { fontSize: 9 });
+    // etichetta "Firma costruttore" + campo editabile
+    const caSignLblW = 38;
+    doc.line(x0 + caTitleW + caSignLblW, caY, x0 + caTitleW + caSignLblW, caY + caH);
+    drawBl("constructorSign", x0 + caTitleW + 2, caY + 6, { fontSize: 8 });
+    addField({
+      x: x0 + caTitleW + caSignLblW + 0.5,
+      y: caY + 1,
+      w: blockW - caTitleW - caSignLblW - 1,
+      h: caH - 2,
+      name: "firma_costruttore",
+      fontSize: 10,
+    });
+
+    // ===== BLOCK B: esito finale (1 riga) =====
+    const bY = caY + caH;
+    const accW = (blockW - dataColW) / 2;
+    doc.rect(x0, bY, blockW, blockBH);
+    doc.line(x0 + accW, bY, x0 + accW, bY + blockBH);
+    doc.line(x0 + accW * 2, bY, x0 + accW * 2, bY + blockBH);
+    doc.line(x0 + accW * 2 + dataLblW, bY, x0 + accW * 2 + dataLblW, bY + blockBH);
+
     addRadioGroup({
       name: "esito_finale",
       items: [
-        { x: x0 + textPadX, y: y0 + rowH * 3 + (rowH - cbSize) / 2, size: cbSize, value: "accettato" },
+        { x: x0 + textPadX, y: bY + (rowH - cbSize) / 2, size: cbSize, value: "accettato" },
         {
           x: x0 + accW + textPadX,
-          y: y0 + rowH * 3 + (rowH - cbSize) / 2,
+          y: bY + (rowH - cbSize) / 2,
           size: cbSize,
           value: "non_accettato",
         },
       ],
     });
-    drawBl("accettato", x0 + textPadX + cbSize + 2, textY(3));
-    drawBl("nonAccettato", x0 + accW + textPadX + cbSize + 2, textY(3));
-    drawBl("date", x0 + accW * 2 + 2, textY(3), { fontSize: 9 });
+    drawBl("accettato", x0 + textPadX + cbSize + 2, bY + 6);
+    drawBl("nonAccettato", x0 + accW + textPadX + cbSize + 2, bY + 6);
+    drawBl("date", x0 + accW * 2 + 2, bY + 6, { fontSize: 9 });
     addField({
       x: x0 + accW * 2 + dataLblW + 0.5,
-      y: y0 + rowH * 3 + 1,
+      y: bY + 1,
       w: blockW - accW * 2 - dataLblW - 1,
-      h: rowH - 2,
+      h: blockBH - 2,
       name: "data_esito_finale",
-      fontSize: 6,
+      fontSize: 12,
     });
 
-    // ZONA FIRMA: solo presenti FAT della ditta cliente, non del costruttore.
-    const sigY = y0 + blockH + gapToSign;
-    const sigNameW = 68;
-    const sigRoleW = 42;
-    const sigSignW = blockW - sigNameW - sigRoleW;
-    doc.setDrawColor(30, 64, 175);
-    doc.setLineWidth(0.35);
-    doc.rect(x0, sigY, blockW, sigH);
-    doc.line(x0, sigY + sigTitleH, x0 + blockW, sigY + sigTitleH);
-    doc.line(x0, sigY + sigTitleH + sigHeadH, x0 + blockW, sigY + sigTitleH + sigHeadH);
-    doc.line(x0 + sigNameW, sigY + sigTitleH, x0 + sigNameW, sigY + sigH);
-    doc.line(x0 + sigNameW + sigRoleW, sigY + sigTitleH, x0 + sigNameW + sigRoleW, sigY + sigH);
-    for (let i = 1; i < signRows.length; i++) {
-      doc.line(x0, sigY + sigTitleH + sigHeadH + sigRowH * i, x0 + blockW, sigY + sigTitleH + sigHeadH + sigRowH * i);
-    }
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(0);
-    doc.text(bl("clientFatAttendees", lang), x0 + 2, sigY + 4.5, { maxWidth: blockW - 4 });
-    doc.setFontSize(7);
-    doc.text(bl("attName", lang), x0 + 2, sigY + sigTitleH + 4.2, { maxWidth: sigNameW - 4 });
-    doc.text(bl("attRole", lang), x0 + sigNameW + 2, sigY + sigTitleH + 4.2, { maxWidth: sigRoleW - 4 });
-    doc.text(bl("signature", lang), x0 + sigNameW + sigRoleW + 2, sigY + sigTitleH + 4.2, { maxWidth: sigSignW - 4 });
-    signRows.forEach((a, i) => {
-      const ry = sigY + sigTitleH + sigHeadH + sigRowH * i;
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text(a.nome || "", x0 + 2, ry + 5.2, { maxWidth: sigNameW - 4 });
-      doc.text(a.ruolo || "", x0 + sigNameW + 2, ry + 5.2, { maxWidth: sigRoleW - 4 });
-      addField({
-        x: x0 + sigNameW + sigRoleW + 0.5,
-        y: ry + 0.5,
-        w: sigSignW - 1,
-        h: sigRowH - 1,
-        name: `client_signature_${i}`,
-        fontSize: 8,
-      });
-    });
+    // ===== SIG TABLE B =====
+    const sigBY = bY + blockBH + gap;
+    drawSigTable(sigBY, "client_signature_final");
   }
+
 
   // ── PAGINA 2: Produttore / Cliente / Presenti ───────────
   doc.addPage();
