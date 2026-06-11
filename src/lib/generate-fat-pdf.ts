@@ -85,6 +85,12 @@ const D = {
     de: "— Kunde",
     es: "— Cliente",
   },
+  constructorSign: {
+    it: "Firma costruttore",
+    en: "Manufacturer signature",
+    de: "Unterschrift Hersteller",
+    es: "Firma fabricante",
+  },
 } as const;
 
 type DKey = keyof typeof D;
