@@ -63,6 +63,7 @@ export const dict = {
   },
   serialNo: { it: "N° Fabbrica / Matricola", en: "Serial No.", de: "Seriennummer", es: "N.º de serie" },
   tagNo: { it: "Tag Number Cliente", en: "Customer Tag Number", de: "Kunden-Tag-Nummer", es: "N.º de Tag cliente" },
+  orderNo: { it: "Nr Ordine Cliente", en: "Customer Order No.", de: "Kunden-Bestellnummer", es: "N.º Pedido Cliente" },
   testDate: { it: "Data del Collaudo", en: "Test Date", de: "Prüfdatum", es: "Fecha de la prueba" },
   testPlace: { it: "Luogo del Collaudo", en: "Test Location", de: "Prüfort", es: "Lugar de la prueba" },
   commessa: { it: "Commessa", en: "Job Number", de: "Auftragsnummer", es: "Número de pedido" },

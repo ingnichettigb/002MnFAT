@@ -35,6 +35,7 @@ export type GeneralData = {
   numeroDisegno: string;
   numeroMatricola: string;
   tagNumber: string;
+  numeroOrdineCliente: string;
   commessa: string;
   dataCollaudo: string;
   luogoCollaudo: string;
@@ -104,6 +105,7 @@ const emptyGeneral = (): GeneralData => ({
   numeroDisegno: "",
   numeroMatricola: "",
   tagNumber: "",
+  numeroOrdineCliente: "",
   commessa: "",
   dataCollaudo: "",
   luogoCollaudo: "",
@@ -160,6 +162,7 @@ function hasMeaningfulData(s: FatState): boolean {
     g.numeroDisegno ||
     g.numeroMatricola ||
     g.tagNumber ||
+    g.numeroOrdineCliente ||
     g.commessa ||
     g.dataCollaudo ||
     g.luogoCollaudo ||

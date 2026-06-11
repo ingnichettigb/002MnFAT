@@ -72,6 +72,7 @@ const schema = z.object({
   numeroDisegno: z.string().trim().min(1).max(120),
   numeroMatricola: z.string().trim().min(1).max(120),
   tagNumber: z.string().trim().max(120).default(""),
+  numeroOrdineCliente: z.string().trim().max(120).default(""),
   commessa: z.string().trim().max(120).default(""),
   dataCollaudo: z.string().min(1),
   luogoCollaudo: z.string().trim().min(1).max(200),
@@ -210,6 +211,12 @@ function IndexPage() {
               label={t("tagNo")}
               {...form.register("tagNumber")}
               placeholder="TAG-001"
+            />
+            <NumberedField
+              n={LABELS.orderNo.id}
+              label={t("orderNo")}
+              {...form.register("numeroOrdineCliente")}
+              placeholder="ORD-2025-001"
             />
             <NumberedField
               n={LABELS.commessa.id}
