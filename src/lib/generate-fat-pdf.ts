@@ -680,15 +680,17 @@ export function generateFatPdf(
               : lang === "it"
                 ? "MISCELLANEOUS — Technical attachments"
                 : "VARIE — Allegati tecnici";
+    const varieNo = ctrlPages.length + 1;
     ctrlPages.push({
       primary: varieTitle,
       secondary: varieSec && varieSec !== varieTitle ? varieSec : null,
       page: (doc as any).getCurrentPageInfo().pageNumber,
     });
     doc.text(
-      varieSec && varieSec !== varieTitle ? `${varieTitle} / ${varieSec}` : varieTitle,
+      varieSec && varieSec !== varieTitle ? `${varieNo} ${varieTitle} / ${varieSec}` : `${varieNo} ${varieTitle}`,
       margin + 3,
       titleY + 4,
+      { maxWidth: pageW - margin * 2 - 6 },
     );
     doc.setTextColor(0);
 
@@ -738,6 +740,7 @@ export function generateFatPdf(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
+    let deviazioniNo = ctrlPages.length + 1;
     {
       const { p, s } = blP("deviazioni");
       ctrlPages.push({
@@ -746,7 +749,9 @@ export function generateFatPdf(
         page: (doc as any).getCurrentPageInfo().pageNumber,
       });
     }
-    doc.text(bl("deviazioni", lang), margin + 3, titleY + 4);
+    doc.text(`${deviazioniNo} ${bl("deviazioni", lang)}`, margin + 3, titleY + 4, {
+      maxWidth: pageW - margin * 2 - 6,
+    });
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
@@ -800,6 +805,7 @@ export function generateFatPdf(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
+    let azioniNo = ctrlPages.length + 1;
     {
       const { p, s } = blP("azioniCorrettive");
       ctrlPages.push({
@@ -808,7 +814,9 @@ export function generateFatPdf(
         page: (doc as any).getCurrentPageInfo().pageNumber,
       });
     }
-    doc.text(bl("azioniCorrettive", lang), margin + 3, titleY + 4);
+    doc.text(`${azioniNo} ${bl("azioniCorrettive", lang)}`, margin + 3, titleY + 4, {
+      maxWidth: pageW - margin * 2 - 6,
+    });
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
