@@ -78,6 +78,12 @@ const D = {
     de: "KORREKTURMASSNAHMEN ABGESCHLOSSEN",
     es: "ACCIONES CORRECTIVAS COMPLETADAS",
   },
+  clientFatAttendees: {
+    it: "Presenti al FAT — Ditta Cliente",
+    en: "FAT Attendees — Customer",
+    de: "FAT-Teilnehmer — Kunde",
+    es: "Asistentes al FAT — Cliente",
+  },
 } as const;
 
 type DKey = keyof typeof D;
@@ -140,6 +146,17 @@ export function generateFatPdf(
   // Shadow del bl() globale per includere la secondaria scelta dall'utente
   const bl = (key: DKey, _l?: Lang) => blGlobal(key, lang, secondary);
   const blP = (key: DKey) => blParts(key, lang, secondary);
+  const normCompany = (value: string) => value.trim().toLocaleLowerCase();
+  const sameCompany = (candidate: string, target: string) => {
+    const c = normCompany(candidate);
+    const t = normCompany(target);
+    return !!c && !!t && (c === t || c.includes(t) || t.includes(c));
+  };
+  const customerAttendees = general.presenti.filter((a) => {
+    if (!a.nome && !a.ruolo && !a.azienda) return false;
+    if (sameCompany(a.azienda, general.produttore.ragioneSociale)) return false;
+    return true;
+  });
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Helvetica nei PDF è metricamente equivalente ad Arial e viene
@@ -171,6 +188,18 @@ export function generateFatPdf(
     f.value = opts.value ?? "";
     f.fontName = "helvetica";
     f.fontSize = opts.fontSize ?? 12;
+    if (opts.fontSize) {
+      f.maxFontSize = opts.fontSize;
+      const baseKeyValues = f.getKeyValueListForStream?.bind(f);
+      f.getKeyValueListForStream = function (this: any) {
+        const list = baseKeyValues ? baseKeyValues() : [];
+        const fontKey = this.scope?.internal?.getFont(this.fontName, this.fontStyle).id || "F1";
+        return [
+          ...list.filter((entry: { key: string }) => entry.key !== "DA"),
+          { key: "DA", value: `(/${fontKey} ${opts.fontSize} Tf 0 g)` },
+        ];
+      };
+    }
     f.T = uid(opts.name);
     if (opts.multiline) f.multiline = true;
     doc.addField(f);
@@ -252,13 +281,17 @@ export function generateFatPdf(
     doc.addField(c);
   };
 
-  /** Crea un gruppo di radio AcroForm: una sola opzione selezionabile. */
+  /** Crea un gruppo esclusivo di quadratini: una sola opzione, ricliccabile per tornare vuoto. */
   const addRadioGroup = (opts: {
     name: string;
     items: Array<{ x: number; y: number; size: number; value: string }>;
   }) => {
     const rg = new RadioButton();
     rg.T = uid(opts.name);
+    // Campo Button multi-widget SENZA flag Radio: resta esclusivo per valore,
+    // ma il quadratino già selezionato può tornare Off anche nei viewer che
+    // ignorano il flag PDF noToggleToOff dei radio button.
+    rg.radio = false;
     // Nessuna opzione preselezionata.
     rg.value = "Off";
     rg.AS = "/Off";
@@ -286,7 +319,7 @@ export function generateFatPdf(
 
   // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
   // Titolo centrato, posizionato più in basso
-  const titleY = TOP + 30;
+  const titleY = TOP + 20;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.text(bl("title", lang), pageW / 2, titleY, { align: "center" });
@@ -353,7 +386,16 @@ export function generateFatPdf(
     const blockW = pageW - margin * 2;
     const rowH = 14;
     const blockH = rowH * 4;
-    const y0 = pageH - margin - blockH;
+    const signRows = (customerAttendees.length
+      ? customerAttendees
+      : [{ id: "blank-client-1", nome: "", ruolo: "", azienda: "" }, { id: "blank-client-2", nome: "", ruolo: "", azienda: "" }]
+    ).slice(0, 4);
+    const sigTitleH = 6;
+    const sigHeadH = 6;
+    const sigRowH = 8;
+    const sigH = sigTitleH + sigHeadH + sigRowH * signRows.length;
+    const gapToSign = 3;
+    const y0 = pageH - margin - blockH - gapToSign - sigH;
     const x0 = margin;
 
     // cornice esterna + righe orizzontali
@@ -469,6 +511,45 @@ export function generateFatPdf(
       h: rowH - 2,
       name: "data_esito_finale",
       fontSize: 6,
+    });
+
+    // ZONA FIRMA: solo presenti FAT della ditta cliente, non del costruttore.
+    const sigY = y0 + blockH + gapToSign;
+    const sigNameW = 68;
+    const sigRoleW = 42;
+    const sigSignW = blockW - sigNameW - sigRoleW;
+    doc.setDrawColor(30, 64, 175);
+    doc.setLineWidth(0.35);
+    doc.rect(x0, sigY, blockW, sigH);
+    doc.line(x0, sigY + sigTitleH, x0 + blockW, sigY + sigTitleH);
+    doc.line(x0, sigY + sigTitleH + sigHeadH, x0 + blockW, sigY + sigTitleH + sigHeadH);
+    doc.line(x0 + sigNameW, sigY + sigTitleH, x0 + sigNameW, sigY + sigH);
+    doc.line(x0 + sigNameW + sigRoleW, sigY + sigTitleH, x0 + sigNameW + sigRoleW, sigY + sigH);
+    for (let i = 1; i < signRows.length; i++) {
+      doc.line(x0, sigY + sigTitleH + sigHeadH + sigRowH * i, x0 + blockW, sigY + sigTitleH + sigHeadH + sigRowH * i);
+    }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(0);
+    doc.text(bl("clientFatAttendees", lang), x0 + 2, sigY + 4.5, { maxWidth: blockW - 4 });
+    doc.setFontSize(7);
+    doc.text(bl("attName", lang), x0 + 2, sigY + sigTitleH + 4.2, { maxWidth: sigNameW - 4 });
+    doc.text(bl("attRole", lang), x0 + sigNameW + 2, sigY + sigTitleH + 4.2, { maxWidth: sigRoleW - 4 });
+    doc.text(bl("signature", lang), x0 + sigNameW + sigRoleW + 2, sigY + sigTitleH + 4.2, { maxWidth: sigSignW - 4 });
+    signRows.forEach((a, i) => {
+      const ry = sigY + sigTitleH + sigHeadH + sigRowH * i;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.text(a.nome || "", x0 + 2, ry + 5.2, { maxWidth: sigNameW - 4 });
+      doc.text(a.ruolo || "", x0 + sigNameW + 2, ry + 5.2, { maxWidth: sigRoleW - 4 });
+      addField({
+        x: x0 + sigNameW + sigRoleW + 0.5,
+        y: ry + 0.5,
+        w: sigSignW - 1,
+        h: sigRowH - 1,
+        name: `client_signature_${i}`,
+        fontSize: 8,
+      });
     });
   }
 
