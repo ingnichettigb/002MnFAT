@@ -262,6 +262,8 @@ export function generateFatPdf(
     // Nessuna opzione preselezionata.
     rg.value = "Off";
     rg.AS = "/Off";
+    // Permetti di deselezionare cliccando di nuovo sull'opzione attiva.
+    try { (rg as any).noToggleToOff = false; } catch { /* ignore */ }
     doc.addField(rg);
     opts.items.forEach((it) => {
       drawCbBorder(it.x, it.y, it.size);
