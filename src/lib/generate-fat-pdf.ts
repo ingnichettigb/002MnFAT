@@ -110,7 +110,21 @@ export function generateFatPdf(
   secondary: Lang | null = null,
 ) {
   const { general, controls } = state;
-  const selected = controls.filter((c) => c.selected);
+  // Escludo dalle pagine "controllo" le voci che hanno una pagina fissa dedicata
+  // in fondo al report (Varie / Deviazioni / Azioni correttive), così non vengono
+  // duplicate.
+  const isFixedSection = (label: string) => {
+    const s = (label || "").toLowerCase();
+    return (
+      /\bvarie\b/.test(s) ||
+      /allegat[io]\s+tecnic/.test(s) ||
+      /deviazion/.test(s) ||
+      /deviation/.test(s) ||
+      /azioni?\s+corretti/.test(s) ||
+      /corrective\s+action/.test(s)
+    );
+  };
+  const selected = controls.filter((c) => c.selected && !isFixedSection(c.label));
   // Shadow del bl() globale per includere la secondaria scelta dall'utente
   const bl = (key: DKey, _l?: Lang) => blGlobal(key, lang, secondary);
   const blP = (key: DKey) => blParts(key, lang, secondary);
@@ -123,7 +137,7 @@ export function generateFatPdf(
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 15;
-  const HEADER_H = 34;
+  const HEADER_H = 22;
 
   // Counter per nomi univoci di field
   let fieldSeq = 0;
@@ -182,18 +196,18 @@ export function generateFatPdf(
       const { p, s } = blP(it.key);
       // Prima lingua: tondo (non grassetto)
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(9);
-      doc.text(p + ":", x, y + 4.5, { maxWidth: colW - 4 });
-      // Seconda lingua: corsivo, subito sotto
+      doc.setFontSize(8);
+      doc.text(p + (s ? " /" : ":"), x, y + 3.2, { maxWidth: colW - 4 });
+      // Seconda lingua: corsivo, sulla riga successiva ravvicinata
       if (s) {
         doc.setFont("helvetica", "italic");
-        doc.setFontSize(8);
-        doc.text(s, x, y + 8.5, { maxWidth: colW - 4 });
+        doc.setFontSize(7);
+        doc.text(s + ":", x, y + 6.4, { maxWidth: colW - 4 });
       }
-      // Valore: grassetto
+      // Valore: grassetto, subito sotto l'etichetta
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text(String(it.value), x, y + 19, { maxWidth: colW - 4 });
+      doc.setFontSize(13);
+      doc.text(String(it.value), x, y + (s ? 12 : 9), { maxWidth: colW - 4 });
     });
     doc.setTextColor(0);
   };
@@ -632,6 +646,79 @@ export function generateFatPdf(
   });
 
 
+
+  // ── Pagina VARIE — Allegati tecnici ─────────────────────
+  doc.addPage();
+  {
+    const titleY = TOP;
+    doc.setFillColor(80, 80, 80);
+    doc.rect(margin, titleY - 4, pageW - margin * 2, 12, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(255);
+    const varieTitle =
+      lang === "en"
+        ? "MISCELLANEOUS — Technical attachments"
+        : lang === "de"
+          ? "VERSCHIEDENES — Technische Anlagen"
+          : lang === "es"
+            ? "VARIOS — Anexos técnicos"
+            : "VARIE — Allegati tecnici";
+    const varieSec =
+      secondary === "it"
+        ? "VARIE — Allegati tecnici"
+        : secondary === "en"
+          ? "MISCELLANEOUS — Technical attachments"
+          : secondary === "de"
+            ? "VERSCHIEDENES — Technische Anlagen"
+            : secondary === "es"
+              ? "VARIOS — Anexos técnicos"
+              : lang === "it"
+                ? "MISCELLANEOUS — Technical attachments"
+                : "VARIE — Allegati tecnici";
+    doc.text(
+      varieSec && varieSec !== varieTitle ? `${varieTitle} / ${varieSec}` : varieTitle,
+      margin + 3,
+      titleY + 4,
+    );
+    doc.setTextColor(0);
+
+    const NUM_ROWS = 12;
+    const headerRow = [
+      bl("num", lang),
+      lang === "en" ? "Attachment description" : "Descrizione allegato",
+      "Rev.",
+      bl("notes", lang),
+    ];
+    autoTable(doc, {
+      startY: titleY + 14,
+      margin: { left: margin, right: margin, top: TOP },
+      head: [headerRow],
+      body: Array.from({ length: NUM_ROWS }, (_, i) => [String(i + 1), "", "", ""]),
+      styles: { font: "helvetica", fontSize: 12, cellPadding: 2.5, minCellHeight: 12, valign: "top" },
+      headStyles: { font: "helvetica", fontStyle: "bold", fontSize: 12, fillColor: [80, 80, 80], textColor: 255 },
+      columnStyles: {
+        0: { cellWidth: 14, halign: "center" },
+        1: { cellWidth: 80 },
+        2: { cellWidth: 22, halign: "center" },
+        3: { cellWidth: "auto" },
+      },
+      didDrawCell: (data) => {
+        if (data.section !== "body" || data.column.index === 0) return;
+        const { x, y, width, height } = data.cell;
+        const cols = ["num", "desc", "rev", "notes"];
+        addField({
+          x: x + 0.5,
+          y: y + 0.5,
+          w: width - 1,
+          h: height - 1,
+          name: `var_${data.row.index}_${cols[data.column.index]}`,
+          value: "",
+          multiline: data.column.index === 1 || data.column.index === 3,
+        });
+      },
+    });
+  }
 
   // ── Pagina DEVIAZIONI ───────────────────────────────────
   doc.addPage();
