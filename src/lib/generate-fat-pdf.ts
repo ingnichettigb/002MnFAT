@@ -80,10 +80,10 @@ const D = {
     es: "ACCIONES CORRECTIVAS COMPLETADAS",
   },
   clientFatAttendees: {
-    it: "Presenti al FAT — Ditta Cliente",
-    en: "FAT Attendees — Customer",
-    de: "FAT-Teilnehmer — Kunde",
-    es: "Asistentes al FAT — Cliente",
+    it: "— Ditta Cliente",
+    en: "— Customer",
+    de: "— Kunde",
+    es: "— Cliente",
   },
 } as const;
 
