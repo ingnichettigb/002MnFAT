@@ -680,6 +680,11 @@ export function generateFatPdf(
               : lang === "it"
                 ? "MISCELLANEOUS — Technical attachments"
                 : "VARIE — Allegati tecnici";
+    ctrlPages.push({
+      primary: `${selected.length + 1} ${varieTitle}`,
+      secondary: varieSec && varieSec !== varieTitle ? varieSec : null,
+      page: (doc as any).getCurrentPageInfo().pageNumber,
+    });
     doc.text(
       varieSec && varieSec !== varieTitle ? `${varieTitle} / ${varieSec}` : varieTitle,
       margin + 3,
