@@ -468,6 +468,7 @@ export function generateFatPdf(
       w: blockW - accW * 2 - dataLblW - 1,
       h: rowH - 2,
       name: "data_esito_finale",
+      fontSize: 6,
     });
   }
 
