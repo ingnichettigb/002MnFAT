@@ -908,6 +908,12 @@ export function generateFatPdf(
     );
     doc.setTextColor(0);
 
+    ctrlPages.push({
+      primary: idxTitle,
+      secondary: idxSec && idxSec !== idxTitle ? idxSec : null,
+      page: (doc as any).getCurrentPageInfo().pageNumber,
+    });
+
     autoTable(doc, {
       startY: titleY + 14,
       margin: { left: margin, right: margin, top: TOP },
