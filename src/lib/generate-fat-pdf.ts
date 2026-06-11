@@ -510,25 +510,21 @@ export function generateFatPdf(
     });
 
     const titleY = TOP;
-    const titleH = showSecondary ? 34 : 26;
+    const titleH = showSecondary ? 22 : 14;
     doc.setFillColor(30, 64, 175); // blu
     doc.rect(margin, titleY - 4, pageW - margin * 2, titleH, "F");
     doc.setTextColor(255);
-    // Prima riga: "Controllo N / Check N"
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text(`${bl("chapter", lang)} ${idx + 1}`, margin + 3, titleY + 2);
-    // Seconda riga: descrizione del controllo (lingua primaria)
+    // Riga unica: "N Titolo del controllo" (lingua primaria)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
-    doc.text(labelPrimary, margin + 3, titleY + 11, {
+    doc.text(`${idx + 1} ${labelPrimary}`, margin + 3, titleY + 3, {
       maxWidth: pageW - margin * 2 - 6,
     });
-    // Terza riga (opzionale): traduzione in corsivo
+    // Riga secondaria (opzionale): traduzione in corsivo
     if (showSecondary) {
       doc.setFont("helvetica", "bolditalic");
       doc.setFontSize(11);
-      doc.text(labelSecondary!, margin + 3, titleY + 19, {
+      doc.text(labelSecondary!, margin + 3, titleY + 11, {
         maxWidth: pageW - margin * 2 - 6,
       });
     }
@@ -684,6 +680,11 @@ export function generateFatPdf(
               : lang === "it"
                 ? "MISCELLANEOUS — Technical attachments"
                 : "VARIE — Allegati tecnici";
+    ctrlPages.push({
+      primary: varieTitle,
+      secondary: varieSec && varieSec !== varieTitle ? varieSec : null,
+      page: (doc as any).getCurrentPageInfo().pageNumber,
+    });
     doc.text(
       varieSec && varieSec !== varieTitle ? `${varieTitle} / ${varieSec}` : varieTitle,
       margin + 3,
@@ -737,6 +738,14 @@ export function generateFatPdf(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
+    {
+      const { p, s } = blP("deviazioni");
+      ctrlPages.push({
+        primary: p,
+        secondary: s,
+        page: (doc as any).getCurrentPageInfo().pageNumber,
+      });
+    }
     doc.text(bl("deviazioni", lang), margin + 3, titleY + 4);
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
@@ -791,6 +800,14 @@ export function generateFatPdf(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
+    {
+      const { p, s } = blP("azioniCorrettive");
+      ctrlPages.push({
+        primary: p,
+        secondary: s,
+        page: (doc as any).getCurrentPageInfo().pageNumber,
+      });
+    }
     doc.text(bl("azioniCorrettive", lang), margin + 3, titleY + 4);
     doc.setTextColor(0);
     doc.setFont("helvetica", "normal");
@@ -890,6 +907,12 @@ export function generateFatPdf(
       titleY + 4,
     );
     doc.setTextColor(0);
+
+    ctrlPages.push({
+      primary: idxTitle,
+      secondary: idxSec && idxSec !== idxTitle ? idxSec : null,
+      page: (doc as any).getCurrentPageInfo().pageNumber,
+    });
 
     autoTable(doc, {
       startY: titleY + 14,
