@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
+import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, controlNumber } from "@/lib/fat-numbering";
