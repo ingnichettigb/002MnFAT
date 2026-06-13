@@ -3,6 +3,7 @@ import { FileDown, RotateCcw } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
 import { Lbl } from "@/components/lbl";
+import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS } from "@/lib/fat-numbering";
