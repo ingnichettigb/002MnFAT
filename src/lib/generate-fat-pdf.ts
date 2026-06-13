@@ -80,10 +80,10 @@ const D = {
     es: "ACCIONES CORRECTIVAS COMPLETADAS",
   },
   clientFatAttendees: {
-    it: "— Ditta Cliente",
-    en: "— Customer",
-    de: "— Kunde",
-    es: "— Cliente",
+    it: "Ditta Cliente",
+    en: "Customer",
+    de: "Kunde",
+    es: "Cliente",
   },
   constructorSign: {
     it: "Firma costruttore",
