@@ -1,44 +1,55 @@
+## Obiettivo
 
-## Cosa cambio in `src/lib/generate-fat-pdf.ts`
+Permettere all'utente di riordinare i controlli tramite drag & drop sia nella pagina `/controlli` sia nella pagina `/report`. Gli ultimi 3 controlli — **Varie / allegati tecnici**, **Elenco deviazioni / non conformità**, **Azioni correttive** — restano fissi in fondo e non sono spostabili (nemmeno tra loro). L'ordine scelto viene rispettato anche nei capitoli del PDF.
 
-### 1) Intestazione di pagina più compatta
-Nella cornice blu in alto (Commessa / N° Disegno / N° Matricola / Tag) oggi:
-- etichetta primaria a y+4.5
-- etichetta secondaria a y+8.5
-- valore a y+19  → c'è un vuoto grande tra etichetta e valore
+## Modifiche
 
-Modifica:
-- etichetta primaria a y+3.5
-- etichetta secondaria a y+7
-- **valore subito sotto a y+11.5** (font 14, grassetto)
-- altezza totale `HEADER_H` ridotta da 34 a ~22 mm
-- `TOP` (margine sotto header) ridotto di conseguenza, così guadagniamo ~12 mm utili su ogni pagina
+### 1. `src/lib/fat-numbering.ts`
+- Esportare una costante `LOCKED_TAIL_IDS` con gli id dei 3 controlli fissi in fondo, nell'ordine richiesto: `varie` → `deviazioni` → `azioni_correttive` (id reali da verificare al momento dell'implementazione leggendo il file).
 
-Risultato: appena sotto l'etichetta si legge subito il valore; se è lungo continua sulla stessa riga (maxWidth = larghezza colonna).
+### 2. `src/lib/fat-context.tsx`
+- Aggiungere azione `reorderControls(orderedIds: string[])` che riordina l'array `controls` mantenendo:
+  - i controlli non presenti in `orderedIds` nella loro posizione relativa originale,
+  - i 3 id di `LOCKED_TAIL_IDS` sempre in coda nell'ordine fissato.
+- Garantire che ogni nuovo controllo aggiunto in futuro non finisca mai dopo i 3 fissi.
 
-### 2) Ultime 3 pagine sempre fisse, in fondo, con colore proprio
-Le ultime tre pagine devono essere, in ordine:
-1. **VARIE — Allegati tecnici** (nuova pagina dedicata, header colore diverso dal blu — propongo grigio scuro `[80,80,80]`)
-2. **DEVIAZIONI** (header rosso scuro, già esistente)
-3. **AZIONI CORRETTIVE** (header verde scuro, già esistente)
+### 3. Dipendenza
+- Installare `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` (accessibile, supporta tastiera, pattern standard con shadcn).
 
-Garantisco che:
-- siano sempre le ultime tre, **dopo** tutte le pagine dei controlli selezionati
-- non vengano duplicate: rimuovo eventuali voci "Varie / Deviazioni / Azioni correttive" dalla lista dei controlli prima di iterare (filter su label), così non generano una pagina blu in più che le ripeteva
-- la pagina "Varie — Allegati tecnici" avrà una tabella con righe vuote editabili (N° / Descrizione allegato / Rev. / Note) — confermami se i campi vanno bene così o vuoi colonne diverse
+### 4. Componente condiviso `src/components/sortable-controls-list.tsx`
+- Lista ordinabile generica che riceve:
+  - `items`: controlli ordinabili (tutti tranne i 3 fissi),
+  - `lockedTail`: i 3 controlli fissi,
+  - `onReorder(newOrderedIds)`,
+  - `renderItem(control)`: come renderizzare la riga (checkbox + label nella pagina controlli, solo numero + label nel report).
+- Maniglia di trascinamento ⠿ (icona `GripVertical` di lucide) a sinistra di ogni riga ordinabile.
+- Le righe `lockedTail` vengono rese sotto, senza maniglia, con un'icona lucchetto (`Lock`) e tooltip "Posizione fissa / Feste Position".
 
-### 3) Numerazione pagine corretta
-La numerazione `Pagina i di N` viene già fatta in un loop finale su tutte le pagine, quindi una volta che l'ordine fisico è giusto (controlli → Varie → Deviazioni → Azioni Correttive) anche le pagine 9 e 10 risulteranno numerate in coda automaticamente. Verifico che `pageCount` includa tutte e che non rimanga nessuna `addPage()` orfana.
+### 5. `src/routes/controlli.tsx`
+- Sostituire la lista attuale dei controlli con `SortableControlsList`.
+- Drag attivo su tutti i controlli (selezionati e non) tranne i 3 fissi.
+- Il toggle di selezione resta sulla riga/checkbox.
 
-### 4) Verifica
-Dopo le modifiche genero un PDF di prova e controllo:
-- intestazione compatta con valore subito sotto l'etichetta
-- nessuna pagina ripetuta
-- ordine finale: …controlli… → Varie → Deviazioni → Azioni Correttive
-- numerazione progressiva corretta fino all'ultima
+### 6. `src/routes/report.tsx`
+- Sostituire l'`<ol>` dei `selected` con `SortableControlsList` in modalità sola-lettura per la selezione (mostra solo i controlli selezionati, numerati nell'ordine corrente).
+- Drag attivo sui selezionati tranne i 3 fissi (se presenti in selezione).
 
----
+### 7. `src/lib/generate-fat-pdf.ts`
+- Nessuna modifica logica: già itera `state.controls.filter(c => c.selected)` nell'ordine dell'array. Verificare che tutti i punti di iterazione (indice capitolo, TOC, contenuto) usino lo stesso ordine.
 
-**Conferma due cose prima che proceda:**
-1. La pagina "Varie — Allegati tecnici" va creata come **pagina fissa** (come Deviazioni/Azioni Correttive), giusto? E va rimossa dalla lista dei controlli per evitare duplicati.
-2. Il colore dell'header della pagina "Varie" va bene grigio scuro, o ne preferisci un altro (es. arancio, viola)?
+### 8. i18n (`src/lib/i18n.tsx`)
+- Aggiungere chiavi: `dragToReorder` ("Trascina per riordinare" / "Zum Sortieren ziehen" / EN / ES) e `lockedPosition` ("Posizione fissa" / "Feste Position" / ...).
+
+## Comportamento UX
+
+- Cursor `grab` sulla maniglia, `grabbing` durante il drag.
+- Animazione di transizione standard `@dnd-kit/sortable`.
+- Supporto tastiera (Space per afferrare, frecce per spostare, Space per rilasciare).
+- I 3 fissi sono visivamente separati da un sottile divisore con etichetta "Sezioni finali / Endabschnitte".
+
+## Verifica
+
+- Riordinare in `/controlli`, navigare a `/report`: l'ordine è preservato.
+- Riordinare in `/report`, generare PDF: i capitoli del PDF seguono il nuovo ordine; i 3 fissi sono sempre gli ultimi 3 capitoli.
+- Drag su un controllo fisso: nessuna risposta (handle assente).
+- Drop di un controllo ordinabile in coda: non può superare la posizione del primo dei 3 fissi.
