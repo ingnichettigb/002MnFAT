@@ -321,6 +321,25 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
           ...s,
           controls: s.controls.filter((c) => c.id !== id || c.locked),
         })),
+      reorderControls: (orderedUnlockedIds) =>
+        updateActiveState((s) => {
+          const byId = new Map(s.controls.map((c) => [c.id, c]));
+          const lockedTail = s.controls.filter((c) => c.locked);
+          const reordered: ControlItem[] = [];
+          const seen = new Set<string>();
+          for (const id of orderedUnlockedIds) {
+            const c = byId.get(id);
+            if (c && !c.locked && !seen.has(id)) {
+              reordered.push(c);
+              seen.add(id);
+            }
+          }
+          // append any unlocked control that wasn't in the list (safety)
+          for (const c of s.controls) {
+            if (!c.locked && !seen.has(c.id)) reordered.push(c);
+          }
+          return { ...s, controls: [...reordered, ...lockedTail] };
+        }),
       refreshDefaultControls: () =>
         updateActiveState((s) => {
           const customs = s.controls.filter((c) => c.custom);
