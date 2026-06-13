@@ -3,6 +3,7 @@ import { FileDown, RotateCcw } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
 import { Lbl } from "@/components/lbl";
+import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS } from "@/lib/fat-numbering";
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/report")({
 
 function ReportPage() {
   const navigate = useNavigate();
-  const { state, reset } = useFat();
+  const { state, reset, reorderControls } = useFat();
   const { t, lang, secondary } = useI18n();
   const { general } = state;
   const selected = state.controls.filter((c) => c.selected);
@@ -140,11 +141,34 @@ function ReportPage() {
               .
             </p>
           ) : (
-            <ol className="list-inside list-decimal space-y-1.5 text-sm">
-              {selected.map((c) => (
-                <li key={c.id}>{c.label}</li>
-              ))}
-            </ol>
+            <SortableControlsList
+              controls={selected}
+              onReorder={(newSelectedOrder) => {
+                // Merge the new order of selected-unlocked items back into the
+                // full unlocked list, keeping unselected items where they are.
+                const unlocked = state.controls.filter((c) => !c.locked);
+                const selectedIdsSet = new Set(
+                  selected.filter((c) => !c.locked).map((c) => c.id),
+                );
+                let pickIdx = 0;
+                const mergedUnlockedIds = unlocked.map((c) => {
+                  if (selectedIdsSet.has(c.id)) {
+                    const nextId = newSelectedOrder[pickIdx++];
+                    return nextId ?? c.id;
+                  }
+                  return c.id;
+                });
+                reorderControls(mergedUnlockedIds);
+              }}
+              renderItem={({ control: c, index: idx }) => (
+                <div className="flex flex-1 items-start gap-2 text-sm">
+                  <span className="min-w-[1.5rem] text-muted-foreground">
+                    {idx + 1}.
+                  </span>
+                  <span>{c.label}</span>
+                </div>
+              )}
+            />
           )}
         </CardContent>
       </Card>

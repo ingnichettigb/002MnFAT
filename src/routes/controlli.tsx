@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
+import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, controlNumber } from "@/lib/fat-numbering";
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/controlli")({
 
 function ControlliPage() {
   const navigate = useNavigate();
-  const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls } =
+  const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls, reorderControls } =
     useFat();
   const { t, lang, secondary } = useI18n();
   const [newLabel, setNewLabel] = useState("");
@@ -84,12 +85,11 @@ function ControlliPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          <ul className="divide-y rounded-md border">
-            {state.controls.map((c, idx) => (
-              <li
-                key={c.id}
-                className="flex items-start gap-3 px-4 py-3 hover:bg-accent/30"
-              >
+          <SortableControlsList
+            controls={state.controls}
+            onReorder={reorderControls}
+            renderItem={({ control: c, index: idx }) => (
+              <>
                 <Checkbox
                   id={c.id}
                   checked={c.selected}
@@ -114,11 +114,6 @@ function ControlliPage() {
                         {t("customLabel")}
                       </span>
                     )}
-                    {c.locked && (
-                      <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                        🔒
-                      </span>
-                    )}
                   </span>
                 </label>
                 {c.custom && !c.locked && (
@@ -131,9 +126,9 @@ function ControlliPage() {
                     <Trash2 className="h-4 w-4" />
                   </button>
                 )}
-              </li>
-            ))}
-          </ul>
+              </>
+            )}
+          />
 
           <div className="space-y-2">
             <label className="text-sm font-medium">
