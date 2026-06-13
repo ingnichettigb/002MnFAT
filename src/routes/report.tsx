@@ -32,7 +32,7 @@ export const Route = createFileRoute("/report")({
 
 function ReportPage() {
   const navigate = useNavigate();
-  const { state, reset } = useFat();
+  const { state, reset, reorderControls } = useFat();
   const { t, lang, secondary } = useI18n();
   const { general } = state;
   const selected = state.controls.filter((c) => c.selected);
