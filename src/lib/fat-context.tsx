@@ -184,6 +184,7 @@ type Ctx = {
   toggleControl: (id: string) => void;
   addCustomControl: (label: string) => void;
   removeControl: (id: string) => void;
+  reorderControls: (orderedUnlockedIds: string[]) => void;
   refreshDefaultControls: () => void;
   reset: () => void;
   // Archivio
