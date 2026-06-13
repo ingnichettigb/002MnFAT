@@ -510,7 +510,7 @@ export function generateFatPdf(
       }
       // header row: "— Ditta Cliente — Nome e Cognome" | "Ruolo" | "Firma"
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(7);
+      doc.setFontSize(6);
       doc.setTextColor(0);
       const clientLbl = bl("clientFatAttendees", lang);
       const nameLbl = bl("attName", lang);
