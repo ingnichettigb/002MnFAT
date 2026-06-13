@@ -80,10 +80,10 @@ const D = {
     es: "ACCIONES CORRECTIVAS COMPLETADAS",
   },
   clientFatAttendees: {
-    it: "— Ditta Cliente",
-    en: "— Customer",
-    de: "— Kunde",
-    es: "— Cliente",
+    it: "Ditta Cliente",
+    en: "Customer",
+    de: "Kunde",
+    es: "Cliente",
   },
   constructorSign: {
     it: "Firma costruttore",
@@ -510,7 +510,7 @@ export function generateFatPdf(
       }
       // header row: "— Ditta Cliente — Nome e Cognome" | "Ruolo" | "Firma"
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(7);
+      doc.setFontSize(6);
       doc.setTextColor(0);
       const clientLbl = bl("clientFatAttendees", lang);
       const nameLbl = bl("attName", lang);
