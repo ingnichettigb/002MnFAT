@@ -36,7 +36,7 @@ export const Route = createFileRoute("/controlli")({
 
 function ControlliPage() {
   const navigate = useNavigate();
-  const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls } =
+  const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls, reorderControls } =
     useFat();
   const { t, lang, secondary } = useI18n();
   const [newLabel, setNewLabel] = useState("");
