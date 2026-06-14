@@ -338,15 +338,21 @@ export function generateFatPdf(
   // ── Test data (sulla prima pagina) ──
   {
     const rows: Array<{ label: string; value: string; key: string; multi?: boolean; minH?: number }> = [
-      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true, minH: 30 },
-      { label: bl("commessa", lang), value: general.commessa, key: "commessa" },
-      { label: bl("drawingNo", lang), value: general.numeroDisegno, key: "drawing" },
-      { label: bl("serialNo", lang), value: general.numeroMatricola, key: "serial" },
-      { label: bl("tagNo", lang), value: general.tagNumber, key: "tag" },
+      { label: bl("descrizione", lang), value: general.descrizione, key: "desc", multi: true },
       { label: bl("orderNo", lang), value: general.numeroOrdineCliente, key: "order" },
       { label: bl("testPlace", lang), value: general.luogoCollaudo, key: "place" },
       { label: bl("testDate", lang), value: fmtDate(general.dataCollaudo, lang), key: "date" },
     ];
+    // Descrizione: altezza dinamica in base al testo
+    const labelColW = 70;
+    const valueColW = pageW - margin * 2 - labelColW;
+    const lineH = 5; // mm per riga a fontSize 12
+    const padV = 4; // cellPadding 2 sopra + 2 sotto
+    const descText = general.descrizione || "";
+    const descLines = descText
+      ? doc.splitTextToSize(descText, valueColW - 2).length
+      : 1;
+    rows[0].minH = Math.max(lineH + padV, descLines * lineH + padV);
     autoTable(doc, {
       startY: cursorY,
       margin: { left: margin, right: margin, top: TOP },
@@ -362,7 +368,7 @@ export function generateFatPdf(
         halign: "left",
       },
       columnStyles: {
-        0: { fontStyle: "bold", cellWidth: 70 },
+        0: { fontStyle: "bold", cellWidth: labelColW },
         1: { cellWidth: "auto" },
       },
       didParseCell: (data) => {
