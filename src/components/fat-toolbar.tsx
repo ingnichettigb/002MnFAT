@@ -36,7 +36,10 @@ export function FatToolbar() {
           type="button"
           variant="secondary"
           size="sm"
-          onClick={() => saveDraft()}
+          onClick={() => {
+            saveDraft();
+            toast.success(t("draftSaved") || "Bozza salvata");
+          }}
         >
           <Save className="mr-1 h-4 w-4" />
           <Lbl id={LABELS.saveDraft.id}>{t("saveDraft")}</Lbl>
