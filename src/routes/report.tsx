@@ -113,22 +113,47 @@ function ReportPage() {
             <h3 className="mb-2 font-semibold">
               <Lbl id={LABELS.attendeesTitle.id}>{t("attendeesTitle")}</Lbl>
             </h3>
-            {general.presenti.filter((a) => a.nome || a.ruolo).length === 0 ? (
-              <p className="text-sm text-muted-foreground">—</p>
-            ) : (
-              <ul className="space-y-1 text-sm">
-                {general.presenti
-                  .filter((a) => a.nome || a.ruolo)
-                  .map((a) => (
-                    <li key={a.id}>
-                      <span className="font-medium">{a.nome || "—"}</span>
-                      {a.ruolo && (
-                        <span className="text-muted-foreground"> — {a.ruolo}</span>
-                      )}
-                    </li>
-                  ))}
-              </ul>
-            )}
+            {(() => {
+              const normCmp = (s: string) => (s || "").trim().toLocaleLowerCase();
+              const mfgName = normCmp(general.produttore.ragioneSociale);
+              const sameCompany = (az: string) => {
+                const a = normCmp(az);
+                return !!a && !!mfgName && (a === mfgName || a.includes(mfgName) || mfgName.includes(a));
+              };
+              const isMfg = (a: { side?: string; azienda: string }) =>
+                a.side === "mfg" || sameCompany(a.azienda);
+              const nonEmpty = general.presenti.filter(
+                (a) => a.nome || a.ruolo || a.azienda,
+              );
+              const ordered = [
+                ...nonEmpty.filter((a) => !isMfg(a)),
+                ...nonEmpty.filter((a) => isMfg(a)),
+              ];
+              if (ordered.length === 0) {
+                return <p className="text-sm text-muted-foreground">—</p>;
+              }
+              const UP = (s: string) => (s || "").toLocaleUpperCase();
+              return (
+                <ul className="space-y-1 text-sm">
+                  {ordered.map((a) => {
+                    const name = UP(a.nome);
+                    const ditta = UP(a.azienda);
+                    const ruolo = UP(a.ruolo);
+                    return (
+                      <li key={a.id}>
+                        <span className="font-medium">{name || "—"}</span>
+                        {ditta && (
+                          <span className="text-muted-foreground"> ({ditta})</span>
+                        )}
+                        {ruolo && (
+                          <span className="text-muted-foreground"> — {ruolo}</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })()}
           </div>
         </CardContent>
       </Card>
