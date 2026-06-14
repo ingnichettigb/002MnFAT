@@ -126,6 +126,7 @@ function RootComponent() {
       <I18nProvider>
         <FatProvider>
           <Outlet />
+          <Toaster position="top-center" richColors />
         </FatProvider>
       </I18nProvider>
     </QueryClientProvider>
