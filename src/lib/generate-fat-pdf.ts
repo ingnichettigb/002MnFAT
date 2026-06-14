@@ -544,11 +544,11 @@ export function generateFatPdf(
     doc.rect(x0, caY, blockW, caH);
     const caTitleW = blockW * 0.45;
     doc.line(x0 + caTitleW, caY, x0 + caTitleW, caY + caH);
-    addCheckbox({
-      x: x0 + textPadX,
-      y: caY + (caH - cbSize) / 2,
-      size: cbSize,
+    addRadioGroup({
       name: "ca_completed",
+      items: [
+        { x: x0 + textPadX, y: caY + (caH - cbSize) / 2, size: cbSize, value: "completato" },
+      ],
     });
     drawBl("caCompleted", x0 + textPadX + cbSize + 2, caY + 6, { fontSize: 9 });
     // etichetta "Firma costruttore" + campo editabile
