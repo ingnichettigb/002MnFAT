@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { FileDown, RotateCcw } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
+import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
 import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
