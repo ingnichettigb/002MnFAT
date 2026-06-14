@@ -159,11 +159,19 @@ export function generateFatPdf(
     const t = normCompany(target);
     return !!c && !!t && (c === t || c.includes(t) || t.includes(c));
   };
-  const customerAttendees = general.presenti.filter((a) => {
-    if (!a.nome && !a.ruolo && !a.azienda) return false;
-    if (sameCompany(a.azienda, general.produttore.ragioneSociale)) return false;
-    return true;
-  });
+  const UP = (s: string) => (s || "").toLocaleUpperCase();
+  const isMfgAttendee = (a: { azienda?: string; side?: string }) =>
+    (a as { side?: string }).side === "mfg" ||
+    sameCompany(a.azienda || "", general.produttore.ragioneSociale);
+  const nonEmptyAttendees = general.presenti.filter(
+    (a) => a.nome || a.ruolo || a.azienda,
+  );
+  // Ordine: prima firmatari cliente, poi firmatari produttore
+  const orderedAttendees = [
+    ...nonEmptyAttendees.filter((a) => !isMfgAttendee(a)),
+    ...nonEmptyAttendees.filter((a) => isMfgAttendee(a)),
+  ];
+  const customerAttendees = nonEmptyAttendees.filter((a) => !isMfgAttendee(a));
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Helvetica nei PDF è metricamente equivalente ad Arial e viene
