@@ -72,7 +72,10 @@ function ReportPage() {
         <LangSwitcher />
       </header>
 
+      <FatToolbar />
+
       <FatStepper current={3} />
+
 
       <Card className="mb-6">
         <CardHeader>
