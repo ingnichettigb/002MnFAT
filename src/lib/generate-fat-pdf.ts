@@ -544,7 +544,13 @@ export function generateFatPdf(
     doc.rect(x0, caY, blockW, caH);
     const caTitleW = blockW * 0.45;
     doc.line(x0 + caTitleW, caY, x0 + caTitleW, caY + caH);
-    drawBl("caCompleted", x0 + 3, caY + 6, { fontSize: 9 });
+    addCheckbox({
+      x: x0 + textPadX,
+      y: caY + (caH - cbSize) / 2,
+      size: cbSize,
+      name: "ca_completed",
+    });
+    drawBl("caCompleted", x0 + textPadX + cbSize + 2, caY + 6, { fontSize: 9 });
     // etichetta "Firma costruttore" + campo editabile
     const caSignLblW = 38;
     doc.line(x0 + caTitleW + caSignLblW, caY, x0 + caTitleW + caSignLblW, caY + caH);
