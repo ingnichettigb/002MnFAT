@@ -9,11 +9,14 @@ export type Party = {
   telefono: string;
 };
 
+export type AttendeeSide = "mfg" | "cli";
+
 export type Attendee = {
   id: string;
   nome: string;
   ruolo: string;
   azienda: string;
+  side: AttendeeSide;
 };
 
 export type Conclusioni = {
