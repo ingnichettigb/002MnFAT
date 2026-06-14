@@ -9,7 +9,7 @@ import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, controlNumber } from "@/lib/fat-numbering";
-import { generateFatPdf } from "@/lib/generate-fat-pdf";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,7 +38,7 @@ function ControlliPage() {
   const navigate = useNavigate();
   const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls, reorderControls } =
     useFat();
-  const { t, lang, secondary } = useI18n();
+  const { t } = useI18n();
   const [newLabel, setNewLabel] = useState("");
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
@@ -52,7 +52,6 @@ function ControlliPage() {
 
   const handleNext = () => {
     if (selectedCount === 0) return;
-    generateFatPdf(state, lang, secondary);
     markDone();
     navigate({ to: "/report" });
   };
