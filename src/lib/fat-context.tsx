@@ -9,11 +9,14 @@ export type Party = {
   telefono: string;
 };
 
+export type AttendeeSide = "mfg" | "cli";
+
 export type Attendee = {
   id: string;
   nome: string;
   ruolo: string;
   azienda: string;
+  side: AttendeeSide;
 };
 
 export type Conclusioni = {
@@ -79,11 +82,12 @@ const emptyParty: Party = {
   telefono: "",
 };
 
-const newAttendee = (): Attendee => ({
+const newAttendee = (side: AttendeeSide = "cli"): Attendee => ({
   id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
   nome: "",
   ruolo: "",
   azienda: "",
+  side,
 });
 
 const emptyConclusioni: Conclusioni = {
@@ -110,7 +114,7 @@ const emptyGeneral = (): GeneralData => ({
   dataCollaudo: "",
   luogoCollaudo: "",
   descrizione: "",
-  presenti: [newAttendee(), newAttendee()],
+  presenti: [newAttendee("mfg"), newAttendee("cli")],
   conclusioni: { ...emptyConclusioni },
 });
 
@@ -231,11 +235,25 @@ export function FatProvider({ children }: { children: React.ReactNode }) {
       if (arch.length === 0) {
         arch = [newSavedFat()];
       }
-      // Normalizza i controlli: ultime righe sempre selezionate/locked
-      arch = arch.map((f) => ({
-        ...f,
-        state: { ...f.state, controls: normalizeControls(f.state.controls) },
-      }));
+      // Normalizza i controlli + migra presenti senza side
+      const normCmp = (s: string) => (s || "").trim().toLocaleLowerCase();
+      arch = arch.map((f) => {
+        const mfgName = normCmp(f.state.general?.produttore?.ragioneSociale ?? "");
+        const presenti = (f.state.general?.presenti ?? []).map((a) => {
+          if (a.side === "mfg" || a.side === "cli") return a;
+          const az = normCmp(a.azienda);
+          const isMfg = !!mfgName && !!az && (az === mfgName || az.includes(mfgName) || mfgName.includes(az));
+          return { ...a, side: (isMfg ? "mfg" : "cli") as AttendeeSide };
+        });
+        return {
+          ...f,
+          state: {
+            ...f.state,
+            controls: normalizeControls(f.state.controls),
+            general: { ...f.state.general, presenti },
+          },
+        };
+      });
       let active = rawActive && arch.find((f) => f.id === rawActive)?.id;
       if (!active) active = arch[0].id;
       setArchive(arch);
