@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { FileDown, RotateCcw } from "lucide-react";
 
 import { FatStepper } from "@/components/fat-stepper";
+import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
 import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/report")({
 
 function ReportPage() {
   const navigate = useNavigate();
-  const { state, reset, reorderControls } = useFat();
+  const { state, reset, reorderControls, saveDraft } = useFat();
   const { t, lang, secondary } = useI18n();
   const { general } = state;
   const selected = state.controls.filter((c) => c.selected);
@@ -45,7 +46,10 @@ function ReportPage() {
       : d.toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
   };
 
-  const handleGenerate = () => generateFatPdf(state, lang, secondary);
+  const handleGenerate = () => {
+    saveDraft();
+    generateFatPdf(state, lang, secondary);
+  };
 
   const handleReset = () => {
     if (confirm(t("restartConfirm"))) {
@@ -68,7 +72,10 @@ function ReportPage() {
         <LangSwitcher />
       </header>
 
+      <FatToolbar />
+
       <FatStepper current={3} />
+
 
       <Card className="mb-6">
         <CardHeader>
