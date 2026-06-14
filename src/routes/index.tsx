@@ -246,82 +246,24 @@ function IndexPage() {
           </CardContent>
         </Card>
 
-        {/* Attendees */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <Lbl id={LABELS.attendeesTitle.id}>{t("attendeesTitle")}</Lbl>
-            </CardTitle>
-            <CardDescription>{t("attendeesDesc")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {fields.map((f, idx) => {
-              const an = attendeeNumbers(idx);
-              return (
-                <div
-                  key={f.id}
-                  className="grid grid-cols-1 items-end gap-3 rounded-md border p-3 sm:grid-cols-[1fr_1fr_1fr_auto]"
-                >
-                  <Controller
-                    control={form.control}
-                    name={`presenti.${idx}.nome`}
-                    render={({ field }) => (
-                      <NumberedField
-                        n={an.nome}
-                        label={t("attendeeName")}
-                        placeholder="Mario Rossi"
-                        {...field}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={form.control}
-                    name={`presenti.${idx}.ruolo`}
-                    render={({ field }) => (
-                      <NumberedField
-                        n={an.ruolo}
-                        label={t("attendeeRole")}
-                        placeholder="QA Manager"
-                        {...field}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={form.control}
-                    name={`presenti.${idx}.azienda`}
-                    render={({ field }) => (
-                      <AziendaField
-                        n={an.azienda}
-                        value={field.value}
-                        onChange={field.onChange}
-                        mfg={form.watch("produttore.ragioneSociale")}
-                        cli={form.watch("cliente.ragioneSociale")}
-                      />
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => remove(idx)}
-                    disabled={fields.length <= 1}
-                    aria-label={t("remove")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              );
-            })}
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => append(newAttendee())}
-            >
-              <Plus className="mr-1 h-4 w-4" />
-              <Lbl id={LABELS.addAttendee.id}>{t("addAttendee")}</Lbl>
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Attendees — Manufacturer side */}
+        <AttendeesBlock
+          form={form}
+          fields={fields}
+          append={append}
+          remove={remove}
+          side="mfg"
+        />
+
+        {/* Attendees — Customer side */}
+        <AttendeesBlock
+          form={form}
+          fields={fields}
+          append={append}
+          remove={remove}
+          side="cli"
+        />
+
 
         {/* Conclusioni / Final results */}
         <ConclusioniSection form={form} />
