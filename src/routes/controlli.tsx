@@ -52,7 +52,6 @@ function ControlliPage() {
 
   const handleNext = () => {
     if (selectedCount === 0) return;
-    generateFatPdf(state, lang, secondary);
     markDone();
     navigate({ to: "/report" });
   };
