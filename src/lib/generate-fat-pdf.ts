@@ -1281,5 +1281,16 @@ export function generateFatPdf(
     doc.setTextColor(0);
   }
 
+  // Apri il PDF in una nuova scheda del browser (così è leggibile anche
+  // senza Adobe Reader) e scarica il file in parallelo.
+  try {
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank", "noopener,noreferrer");
+    // Revoca l'URL dopo qualche minuto (la scheda l'ha già caricato).
+    setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
+  } catch {
+    // se l'apertura fallisce (popup bloccato), procedi comunque al download
+  }
   doc.save(filename);
 }

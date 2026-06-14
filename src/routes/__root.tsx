@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
 import { I18nProvider } from "@/lib/i18n";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -125,6 +126,7 @@ function RootComponent() {
       <I18nProvider>
         <FatProvider>
           <Outlet />
+          <Toaster position="top-center" richColors />
         </FatProvider>
       </I18nProvider>
     </QueryClientProvider>
