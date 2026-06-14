@@ -688,10 +688,10 @@ export function generateFatPdf(
 
   // ── Attendees ──
   {
-    const baseRows = general.presenti.map((a) => ({
-      nome: a.nome || "",
-      ruolo: a.ruolo || "",
-      azienda: a.azienda || "",
+    const baseRows = orderedAttendees.map((a) => ({
+      nome: UP(a.nome || ""),
+      ruolo: UP(a.ruolo || ""),
+      azienda: UP(a.azienda || ""),
     }));
     while (baseRows.length < 5) baseRows.push({ nome: "", ruolo: "", azienda: "" });
 
