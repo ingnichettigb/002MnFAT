@@ -114,7 +114,7 @@ const emptyGeneral = (): GeneralData => ({
   dataCollaudo: "",
   luogoCollaudo: "",
   descrizione: "",
-  presenti: [newAttendee(), newAttendee()],
+  presenti: [newAttendee("mfg"), newAttendee("cli")],
   conclusioni: { ...emptyConclusioni },
 });
 
