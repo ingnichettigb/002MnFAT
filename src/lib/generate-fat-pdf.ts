@@ -537,8 +537,25 @@ export function generateFatPdf(
         const ry = sy + sigHeadH + sigRowH * i;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
-        doc.text(a.nome || "", x0 + 2, ry + 5.2, { maxWidth: sigNameW - 4 });
-        doc.text(a.ruolo || "", x0 + sigNameW + 2, ry + 5.2, { maxWidth: sigRoleW - 4 });
+        const maxW = sigNameW - 4;
+        const nameUp = UP(a.nome || "");
+        const compUp = UP(a.azienda || "");
+        let display = nameUp;
+        if (compUp) {
+          const full = `${nameUp} (${compUp})`;
+          if (doc.getTextWidth(full) <= maxW) {
+            display = full;
+          } else {
+            // tronca la sola parte ditta con …
+            let cut = compUp;
+            while (cut.length > 0 && doc.getTextWidth(`${nameUp} (${cut}…)`) > maxW) {
+              cut = cut.slice(0, -1);
+            }
+            display = cut.length > 0 ? `${nameUp} (${cut}…)` : nameUp;
+          }
+        }
+        doc.text(display, x0 + 2, ry + 5.2, { maxWidth: maxW });
+        doc.text(UP(a.ruolo || ""), x0 + sigNameW + 2, ry + 5.2, { maxWidth: sigRoleW - 4 });
         addField({
           x: x0 + sigNameW + sigRoleW + 0.5,
           y: ry + 0.5,
