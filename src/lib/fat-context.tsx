@@ -82,11 +82,12 @@ const emptyParty: Party = {
   telefono: "",
 };
 
-const newAttendee = (): Attendee => ({
+const newAttendee = (side: AttendeeSide = "cli"): Attendee => ({
   id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
   nome: "",
   ruolo: "",
   azienda: "",
+  side,
 });
 
 const emptyConclusioni: Conclusioni = {
