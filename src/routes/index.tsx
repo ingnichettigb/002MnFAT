@@ -9,7 +9,7 @@ import { Trash2, Plus } from "lucide-react";
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
-import { useFat, newAttendee } from "@/lib/fat-context";
+import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
 import { Button } from "@/components/ui/button";
