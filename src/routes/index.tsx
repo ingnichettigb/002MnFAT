@@ -412,93 +412,134 @@ const NumberedTextarea = React.forwardRef<
   );
 });
 
-/* ───────── Attendee Azienda field (dropdown + free text) ───────── */
-function AziendaField({
-  n,
-  value,
-  onChange,
-  mfg,
-  cli,
+/* ───────── Attendees block (per side: mfg | cli) ───────── */
+type FieldArrayReturn = {
+  fields: Array<{ id: string } & FormValues["presenti"][number]>;
+  append: (v: FormValues["presenti"][number]) => void;
+  remove: (idx: number) => void;
+};
+
+function AttendeesBlock({
+  form,
+  fields,
+  append,
+  remove,
+  side,
 }: {
-  n: number;
-  value: string;
-  onChange: (v: string) => void;
-  mfg: string;
-  cli: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  form: any;
+  fields: FieldArrayReturn["fields"];
+  append: FieldArrayReturn["append"];
+  remove: FieldArrayReturn["remove"];
+  side: "mfg" | "cli";
 }) {
   const { t } = useI18n();
-  const autoId = useId();
-  const mfgName = (mfg || "").trim();
-  const cliName = (cli || "").trim();
+  const partyPath = side === "mfg" ? "produttore" : "cliente";
+  const companyName: string =
+    form.watch(`${partyPath}.ragioneSociale`) || "";
+  const titleBase =
+    side === "mfg" ? t("manufacturerTitle") : t("customerTitle");
+  const title = companyName ? `${titleBase} — ${companyName}` : titleBase;
 
-  const isMfg = !!mfgName && value === mfgName;
-  const isCli = !!cliName && value === cliName;
-  const isOther = !!value && !isMfg && !isCli;
-
-  const [mode, setMode] = React.useState<"mfg" | "cli" | "other" | "">(
-    isMfg ? "mfg" : isCli ? "cli" : isOther ? "other" : "",
-  );
-
+  // Keep azienda in sync with party.ragioneSociale for this side
   React.useEffect(() => {
-    if (isMfg) setMode("mfg");
-    else if (isCli) setMode("cli");
-    else if (isOther) setMode("other");
+    fields.forEach((f, idx) => {
+      if (f.side !== side) return;
+      const current = form.getValues(`presenti.${idx}.azienda`);
+      if (current !== companyName) {
+        form.setValue(`presenti.${idx}.azienda`, companyName, {
+          shouldDirty: false,
+        });
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, mfgName, cliName]);
+  }, [companyName, fields.length]);
 
-  const handleSelect = (v: string) => {
-    if (v === "__mfg__") {
-      setMode("mfg");
-      onChange(mfgName);
-    } else if (v === "__cli__") {
-      setMode("cli");
-      onChange(cliName);
-    } else if (v === "__other__") {
-      setMode("other");
-      onChange("");
-    }
+  // Indices of attendees belonging to this side, with local 1-based number
+  const rows = fields
+    .map((f, idx) => ({ f, idx }))
+    .filter(({ f }) => f.side === side);
+
+  const sideCount = rows.length;
+
+  const handleAdd = () => {
+    append({
+      id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      nome: "",
+      ruolo: "",
+      azienda: companyName,
+      side,
+    });
   };
 
-  const selectValue =
-    mode === "mfg"
-      ? "__mfg__"
-      : mode === "cli"
-        ? "__cli__"
-        : mode === "other"
-          ? "__other__"
-          : "";
+  const labelIdBase =
+    side === "mfg" ? LABELS.manufacturerTitle.id : LABELS.customerTitle.id;
 
   return (
-    <div className="space-y-1.5">
-      <Label htmlFor={autoId} className="flex items-start gap-1 leading-tight">
-        <sup className="mt-[1px] text-[8px] font-semibold leading-none text-muted-foreground">
-          {n}
-        </sup>
-        <span>{t("attendeeCompany")}</span>
-      </Label>
-      <select
-        id={autoId}
-        value={selectValue}
-        onChange={(e) => handleSelect(e.target.value)}
-        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-      >
-        <option value="" disabled>
-          —
-        </option>
-        {mfgName && <option value="__mfg__">{mfgName}</option>}
-        {cliName && <option value="__cli__">{cliName}</option>}
-        <option value="__other__">{t("companyOther")}</option>
-      </select>
-      {mode === "other" && (
-        <Input
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={t("companyOtherPlaceholder")}
-        />
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <Lbl id={labelIdBase}>{titleBase}</Lbl>
+          {companyName && (
+            <span className="text-muted-foreground"> — {companyName}</span>
+          )}
+        </CardTitle>
+        <CardDescription>{t("attendeesDesc")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {rows.map(({ f, idx }, localIdx) => {
+          const an = attendeeNumbers(idx);
+          return (
+            <div
+              key={f.id}
+              className="grid grid-cols-1 items-end gap-3 rounded-md border p-3 sm:grid-cols-[1fr_1fr_auto]"
+            >
+              <Controller
+                control={form.control}
+                name={`presenti.${idx}.nome`}
+                render={({ field }) => (
+                  <NumberedField
+                    n={an.nome}
+                    label={`${t("attendeeName")} #${localIdx + 1}`}
+                    placeholder="Mario Rossi"
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                control={form.control}
+                name={`presenti.${idx}.ruolo`}
+                render={({ field }) => (
+                  <NumberedField
+                    n={an.ruolo}
+                    label={t("attendeeRole")}
+                    placeholder="QA Manager"
+                    {...field}
+                  />
+                )}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => remove(idx)}
+                disabled={sideCount <= 1}
+                aria-label={t("remove")}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          );
+        })}
+        <Button type="button" variant="secondary" onClick={handleAdd}>
+          <Plus className="mr-1 h-4 w-4" />
+          <Lbl id={LABELS.addAttendee.id}>{t("addAttendee")}</Lbl>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
+
 
 /* ───────── Conclusioni / Final results ───────── */
 type YesNo = "" | "si" | "no";
