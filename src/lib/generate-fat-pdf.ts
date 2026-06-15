@@ -414,14 +414,17 @@ export function generateFatPdf(
     const dataColW = 55;
     const dataLblW = 18;
 
-    // Presenti ditta cliente (massimo 3 per stare in pagina)
-    const sigRowsRaw = customerAttendees.length
-      ? customerAttendees
-      : [
-          { id: "blank-client-1", nome: "", ruolo: "", azienda: "" },
-          { id: "blank-client-2", nome: "", ruolo: "", azienda: "" },
-        ];
-    const signRows = sigRowsRaw.slice(0, 3);
+    // Prima pagina: 3 cliente + 1 produttore (totale fisso 4 righe).
+    // Se cliente < 3, si completa con produttori; manca produttore → riga vuota.
+    const clientPart = customerAttendees.slice(0, 3);
+    const needed = 4 - clientPart.length;
+    const mfgPart = mfgAttendees.slice(0, Math.max(1, needed));
+    const filled: Array<{ id: string; nome: string; ruolo: string; azienda: string } | null> = [
+      ...clientPart,
+      ...mfgPart,
+    ];
+    while (filled.length < 4) filled.push(null);
+    const signRows = filled.slice(0, 4);
     const sigH = sigHeadH + sigRowH * signRows.length;
 
     const blockAH = rowH * 2;     // accettato/non + in_attesa+data
