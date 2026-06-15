@@ -542,8 +542,8 @@ export function generateFatPdf(
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         const maxW = sigNameW - 4;
-        const nameUp = UP(a.nome || "");
-        const compUp = UP(a.azienda || "");
+        const nameUp = UP(a?.nome || "");
+        const compUp = UP(a?.azienda || "");
         let display = nameUp;
         if (compUp) {
           const full = `${nameUp} (${compUp})`;
@@ -559,7 +559,25 @@ export function generateFatPdf(
           }
         }
         doc.text(display, x0 + 2, ry + 5.2, { maxWidth: maxW });
-        doc.text(UP(a.ruolo || ""), x0 + sigNameW + 2, ry + 5.2, { maxWidth: sigRoleW - 4 });
+        // Ruolo: auto-shrink per stare su una sola riga
+        const ruoloTxt = UP(a?.ruolo || "");
+        const roleMaxW = sigRoleW - 4;
+        let roleFs = 8;
+        const minFs = 5;
+        doc.setFontSize(roleFs);
+        while (roleFs > minFs && doc.getTextWidth(ruoloTxt) > roleMaxW) {
+          roleFs -= 0.5;
+          doc.setFontSize(roleFs);
+        }
+        let roleDisplay = ruoloTxt;
+        if (doc.getTextWidth(roleDisplay) > roleMaxW) {
+          while (roleDisplay.length > 0 && doc.getTextWidth(`${roleDisplay}…`) > roleMaxW) {
+            roleDisplay = roleDisplay.slice(0, -1);
+          }
+          roleDisplay = roleDisplay ? `${roleDisplay}…` : "";
+        }
+        doc.text(roleDisplay, x0 + sigNameW + 2, ry + 5.2);
+        doc.setFontSize(8);
         addField({
           x: x0 + sigNameW + sigRoleW + 0.5,
           y: ry + 0.5,
