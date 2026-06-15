@@ -172,6 +172,7 @@ export function generateFatPdf(
     ...nonEmptyAttendees.filter((a) => isMfgAttendee(a)),
   ];
   const customerAttendees = nonEmptyAttendees.filter((a) => !isMfgAttendee(a));
+  const mfgAttendees = nonEmptyAttendees.filter((a) => isMfgAttendee(a));
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Helvetica nei PDF è metricamente equivalente ad Arial e viene
@@ -413,14 +414,17 @@ export function generateFatPdf(
     const dataColW = 55;
     const dataLblW = 18;
 
-    // Presenti ditta cliente (massimo 3 per stare in pagina)
-    const sigRowsRaw = customerAttendees.length
-      ? customerAttendees
-      : [
-          { id: "blank-client-1", nome: "", ruolo: "", azienda: "" },
-          { id: "blank-client-2", nome: "", ruolo: "", azienda: "" },
-        ];
-    const signRows = sigRowsRaw.slice(0, 3);
+    // Prima pagina: 3 cliente + 1 produttore (totale fisso 4 righe).
+    // Se cliente < 3, si completa con produttori; manca produttore → riga vuota.
+    const clientPart = customerAttendees.slice(0, 3);
+    const needed = 4 - clientPart.length;
+    const mfgPart = mfgAttendees.slice(0, Math.max(1, needed));
+    const filled: Array<{ id: string; nome: string; ruolo: string; azienda: string } | null> = [
+      ...clientPart,
+      ...mfgPart,
+    ];
+    while (filled.length < 4) filled.push(null);
+    const signRows = filled.slice(0, 4);
     const sigH = sigHeadH + sigRowH * signRows.length;
 
     const blockAH = rowH * 2;     // accettato/non + in_attesa+data
@@ -538,8 +542,8 @@ export function generateFatPdf(
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         const maxW = sigNameW - 4;
-        const nameUp = UP(a.nome || "");
-        const compUp = UP(a.azienda || "");
+        const nameUp = UP(a?.nome || "");
+        const compUp = UP(a?.azienda || "");
         let display = nameUp;
         if (compUp) {
           const full = `${nameUp} (${compUp})`;
@@ -555,7 +559,25 @@ export function generateFatPdf(
           }
         }
         doc.text(display, x0 + 2, ry + 5.2, { maxWidth: maxW });
-        doc.text(UP(a.ruolo || ""), x0 + sigNameW + 2, ry + 5.2, { maxWidth: sigRoleW - 4 });
+        // Ruolo: auto-shrink per stare su una sola riga
+        const ruoloTxt = UP(a?.ruolo || "");
+        const roleMaxW = sigRoleW - 4;
+        let roleFs = 8;
+        const minFs = 5;
+        doc.setFontSize(roleFs);
+        while (roleFs > minFs && doc.getTextWidth(ruoloTxt) > roleMaxW) {
+          roleFs -= 0.5;
+          doc.setFontSize(roleFs);
+        }
+        let roleDisplay = ruoloTxt;
+        if (doc.getTextWidth(roleDisplay) > roleMaxW) {
+          while (roleDisplay.length > 0 && doc.getTextWidth(`${roleDisplay}…`) > roleMaxW) {
+            roleDisplay = roleDisplay.slice(0, -1);
+          }
+          roleDisplay = roleDisplay ? `${roleDisplay}…` : "";
+        }
+        doc.text(roleDisplay, x0 + sigNameW + 2, ry + 5.2);
+        doc.setFontSize(8);
         addField({
           x: x0 + sigNameW + sigRoleW + 0.5,
           y: ry + 0.5,
