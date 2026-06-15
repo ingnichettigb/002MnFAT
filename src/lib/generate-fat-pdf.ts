@@ -172,6 +172,7 @@ export function generateFatPdf(
     ...nonEmptyAttendees.filter((a) => isMfgAttendee(a)),
   ];
   const customerAttendees = nonEmptyAttendees.filter((a) => !isMfgAttendee(a));
+  const mfgAttendees = nonEmptyAttendees.filter((a) => isMfgAttendee(a));
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Helvetica nei PDF è metricamente equivalente ad Arial e viene
