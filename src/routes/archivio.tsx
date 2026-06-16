@@ -162,6 +162,7 @@ function ArchivioPage() {
                 rows={filtered}
                 activeId={activeId}
                 onOpen={handleOpen}
+                onView={handleView}
                 onDuplicate={duplicateFat}
                 onDelete={deleteFat}
               />
