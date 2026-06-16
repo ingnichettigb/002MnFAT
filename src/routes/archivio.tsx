@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Archive, Copy, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { generateFatPdf } from "@/lib/generate-fat-pdf";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -70,7 +71,7 @@ function statusVariant(s: FatStatus) {
 }
 
 function ArchivioPage() {
-  const { t } = useI18n();
+  const { t, lang, secondary } = useI18n();
   const {
     archive,
     activeId,
@@ -91,6 +92,11 @@ function ArchivioPage() {
   const handleOpen = (id: string) => {
     loadFat(id);
     navigate({ to: "/" });
+  };
+  const handleView = (id: string) => {
+    const f = archive.find((x) => x.id === id);
+    if (!f) return;
+    generateFatPdf(f.state, lang, secondary);
   };
   const handleNew = () => {
     newFat();
@@ -156,6 +162,7 @@ function ArchivioPage() {
                 rows={filtered}
                 activeId={activeId}
                 onOpen={handleOpen}
+                onView={handleView}
                 onDuplicate={duplicateFat}
                 onDelete={deleteFat}
               />
@@ -171,12 +178,14 @@ function ArchiveTable({
   rows,
   activeId,
   onOpen,
+  onView,
   onDuplicate,
   onDelete,
 }: {
   rows: SavedFat[];
   activeId: string | null;
   onOpen: (id: string) => void;
+  onView: (id: string) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
@@ -239,6 +248,14 @@ function ArchiveTable({
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onView(f.id)}
+                      title={t("viewReport") || "Apri report"}
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
