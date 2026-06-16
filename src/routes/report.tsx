@@ -48,8 +48,8 @@ function ReportPage() {
   };
 
   const handleGenerate = () => {
-    saveDraft();
-    toast.success("Report in generazione…");
+    markDone();
+    toast.success(t("reportGeneratedDone"));
     generateFatPdf(state, lang, secondary);
   };
 
