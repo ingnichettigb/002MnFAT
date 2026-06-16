@@ -34,7 +34,7 @@ export const Route = createFileRoute("/report")({
 
 function ReportPage() {
   const navigate = useNavigate();
-  const { state, reset, reorderControls, saveDraft } = useFat();
+  const { state, reset, reorderControls, markDone } = useFat();
   const { t, lang, secondary } = useI18n();
   const { general } = state;
   const selected = state.controls.filter((c) => c.selected);
