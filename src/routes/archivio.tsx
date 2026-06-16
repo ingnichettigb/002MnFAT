@@ -71,7 +71,7 @@ function statusVariant(s: FatStatus) {
 }
 
 function ArchivioPage() {
-  const { t } = useI18n();
+  const { t, lang, secondary } = useI18n();
   const {
     archive,
     activeId,
@@ -92,6 +92,11 @@ function ArchivioPage() {
   const handleOpen = (id: string) => {
     loadFat(id);
     navigate({ to: "/" });
+  };
+  const handleView = (id: string) => {
+    const f = archive.find((x) => x.id === id);
+    if (!f) return;
+    generateFatPdf(f.state, lang, secondary);
   };
   const handleNew = () => {
     newFat();
