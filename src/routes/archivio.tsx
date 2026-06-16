@@ -251,6 +251,14 @@ function ArchiveTable({
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => onView(f.id)}
+                      title={t("viewReport") || "Apri report"}
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => onOpen(f.id)}
                       title={t("open")}
                     >
