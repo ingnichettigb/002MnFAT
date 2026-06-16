@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Archive, Copy, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { generateFatPdf } from "@/lib/generate-fat-pdf";
 
 import { Button } from "@/components/ui/button";
 import {
