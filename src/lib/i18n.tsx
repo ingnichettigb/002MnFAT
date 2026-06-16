@@ -210,6 +210,12 @@ export const dict = {
     es: "¿Eliminar definitivamente este FAT?",
   },
   draftSaved: { it: "Bozza salvata.", en: "Draft saved.", de: "Entwurf gespeichert.", es: "Borrador guardado." },
+  reportGeneratedDone: {
+    it: "Report generato — FAT completato.",
+    en: "Report generated — FAT marked as done.",
+    de: "Bericht erstellt — FAT als abgeschlossen markiert.",
+    es: "Informe generado — FAT marcado como completado.",
+  },
   untitledFat: { it: "FAT senza titolo", en: "Untitled FAT", de: "FAT ohne Titel", es: "FAT sin título" },
   activeFat: { it: "FAT attivo", en: "Active FAT", de: "Aktiver FAT", es: "FAT activo" },
 } satisfies Record<string, Entry>;
