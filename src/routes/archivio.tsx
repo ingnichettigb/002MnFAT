@@ -178,12 +178,14 @@ function ArchiveTable({
   rows,
   activeId,
   onOpen,
+  onView,
   onDuplicate,
   onDelete,
 }: {
   rows: SavedFat[];
   activeId: string | null;
   onOpen: (id: string) => void;
+  onView: (id: string) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
