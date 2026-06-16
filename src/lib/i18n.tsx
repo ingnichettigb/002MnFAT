@@ -218,6 +218,7 @@ export const dict = {
   },
   untitledFat: { it: "FAT senza titolo", en: "Untitled FAT", de: "FAT ohne Titel", es: "FAT sin título" },
   activeFat: { it: "FAT attivo", en: "Active FAT", de: "Aktiver FAT", es: "FAT activo" },
+  viewReport: { it: "Apri report", en: "Open report", de: "Bericht öffnen", es: "Abrir informe" },
 } satisfies Record<string, Entry>;
 
 type Ctx = {
