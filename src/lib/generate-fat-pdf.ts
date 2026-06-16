@@ -539,45 +539,34 @@ export function generateFatPdf(
       });
       signRows.forEach((a, i) => {
         const ry = sy + sigHeadH + sigRowH * i;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        const maxW = sigNameW - 4;
+        // Nome + (Ditta): campo editabile, pre-compilato se disponibile
         const nameUp = UP(a?.nome || "");
         const compUp = UP(a?.azienda || "");
-        let display = nameUp;
-        if (compUp) {
-          const full = `${nameUp} (${compUp})`;
-          if (doc.getTextWidth(full) <= maxW) {
-            display = full;
-          } else {
-            // tronca la sola parte ditta con …
-            let cut = compUp;
-            while (cut.length > 0 && doc.getTextWidth(`${nameUp} (${cut}…)`) > maxW) {
-              cut = cut.slice(0, -1);
-            }
-            display = cut.length > 0 ? `${nameUp} (${cut}…)` : nameUp;
-          }
-        }
-        doc.text(display, x0 + 2, ry + 5.2, { maxWidth: maxW });
-        // Ruolo: auto-shrink per stare su una sola riga
-        const ruoloTxt = UP(a?.ruolo || "");
-        const roleMaxW = sigRoleW - 4;
-        let roleFs = 8;
-        const minFs = 5;
-        doc.setFontSize(roleFs);
-        while (roleFs > minFs && doc.getTextWidth(ruoloTxt) > roleMaxW) {
-          roleFs -= 0.5;
-          doc.setFontSize(roleFs);
-        }
-        let roleDisplay = ruoloTxt;
-        if (doc.getTextWidth(roleDisplay) > roleMaxW) {
-          while (roleDisplay.length > 0 && doc.getTextWidth(`${roleDisplay}…`) > roleMaxW) {
-            roleDisplay = roleDisplay.slice(0, -1);
-          }
-          roleDisplay = roleDisplay ? `${roleDisplay}…` : "";
-        }
-        doc.text(roleDisplay, x0 + sigNameW + 2, ry + 5.2);
-        doc.setFontSize(8);
+        const nameValue = compUp
+          ? nameUp
+            ? `${nameUp} (${compUp})`
+            : `(${compUp})`
+          : nameUp;
+        addField({
+          x: x0 + 0.5,
+          y: ry + 0.5,
+          w: sigNameW - 1,
+          h: sigRowH - 1,
+          name: `${fieldPrefix}_name_${i}`,
+          value: nameValue,
+          fontSize: 8,
+        });
+        // Ruolo: campo editabile, pre-compilato se disponibile
+        addField({
+          x: x0 + sigNameW + 0.5,
+          y: ry + 0.5,
+          w: sigRoleW - 1,
+          h: sigRowH - 1,
+          name: `${fieldPrefix}_role_${i}`,
+          value: UP(a?.ruolo || ""),
+          fontSize: 8,
+        });
+        // Firma
         addField({
           x: x0 + sigNameW + sigRoleW + 0.5,
           y: ry + 0.5,
