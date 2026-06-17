@@ -14,7 +14,7 @@ const D = {
   title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA" },
   subtitle: { it: "FACTORY ACCEPTANCE TEST", en: "FACTORY ACCEPTANCE TEST", de: "FACTORY ACCEPTANCE TEST", es: "FACTORY ACCEPTANCE TEST" },
   manufacturer: { it: "Ditta Produttrice", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
-  customer: { it: "Ditta Cliente", en: "Customer", de: "Kunde", es: "Cliente" },
+  customer: { it: "Ente Verificatore", en: "Verifying Body", de: "Prüfstelle", es: "Organismo Verificador" },
   testData: { it: "Dati del Collaudo", en: "Test Data", de: "Prüfdaten", es: "Datos de la prueba" },
   attendees: { it: "Presenti al FAT", en: "FAT Attendees", de: "FAT-Teilnehmer", es: "Asistentes al FAT" },
   companyName: { it: "Ragione Sociale", en: "Company Name", de: "Firmenname", es: "Razón social" },
@@ -80,10 +80,10 @@ const D = {
     es: "ACCIONES CORRECTIVAS COMPLETADAS",
   },
   clientFatAttendees: {
-    it: "Ditta Cliente",
-    en: "Customer",
-    de: "Kunde",
-    es: "Cliente",
+    it: "Ente Verificatore",
+    en: "Verifying Body",
+    de: "Prüfstelle",
+    es: "Organismo Verificador",
   },
   constructorSign: {
     it: "Firma costruttore",
