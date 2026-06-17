@@ -13,8 +13,9 @@ import { translateControl } from "./fat-defaults";
 const D = {
   title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA" },
   subtitle: { it: "FACTORY ACCEPTANCE TEST", en: "FACTORY ACCEPTANCE TEST", de: "FACTORY ACCEPTANCE TEST", es: "FACTORY ACCEPTANCE TEST" },
-  manufacturer: { it: "Ditta Produttrice", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
+  manufacturer: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
   customer: { it: "Ente Verificatore", en: "Verifying Body", de: "Prüfstelle", es: "Organismo Verificador" },
+  constructorTitle: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
   testData: { it: "Dati del Collaudo", en: "Test Data", de: "Prüfdaten", es: "Datos de la prueba" },
   attendees: { it: "Presenti al FAT", en: "FAT Attendees", de: "FAT-Teilnehmer", es: "Asistentes al FAT" },
   companyName: { it: "Ragione Sociale", en: "Company Name", de: "Firmenname", es: "Razón social" },
@@ -414,18 +415,16 @@ export function generateFatPdf(
     const dataColW = 55;
     const dataLblW = 18;
 
-    // Prima pagina: 3 cliente + 1 produttore (totale fisso 4 righe).
-    // Se cliente < 3, si completa con produttori; manca produttore → riga vuota.
-    const clientPart = customerAttendees.slice(0, 3);
-    const needed = 4 - clientPart.length;
-    const mfgPart = mfgAttendees.slice(0, Math.max(1, needed));
-    const filled: Array<{ id: string; nome: string; ruolo: string; azienda: string } | null> = [
-      ...clientPart,
-      ...mfgPart,
+    // Tabella firme divisa in 2 sezioni:
+    // - Ente Verificatore: 3 righe (sempre, anche vuote) — sfondo azzurro chiaro
+    // - Ente Costruttore: 1 riga (primo firmatario costruttore) — sfondo verde chiaro
+    const verifierRows: Array<{ id: string; nome: string; ruolo: string; azienda: string } | null> = [
+      ...customerAttendees.slice(0, 3),
     ];
-    while (filled.length < 4) filled.push(null);
-    const signRows = filled.slice(0, 4);
-    const sigH = sigHeadH + sigRowH * signRows.length;
+    while (verifierRows.length < 3) verifierRows.push(null);
+    const costruttoreRow = mfgAttendees[0] || null;
+    const totalSigRows = 4; // 3 verificatore + 1 costruttore
+    const sigH = sigHeadH * 2 + sigRowH * totalSigRows;
 
     const blockAH = rowH * 2;     // accettato/non + in_attesa+data
     const caH = rowH;             // completate + firma costruttore
@@ -516,30 +515,50 @@ export function generateFatPdf(
     const sigNameW = 68;
     const sigRoleW = 42;
     const sigSignW = blockW - sigNameW - sigRoleW;
-    const drawSigTable = (sy: number, fieldPrefix: string) => {
+
+    const drawSigSection = (
+      sy: number,
+      fieldPrefix: string,
+      sectionKey: "verifier" | "costruttore",
+      rows: Array<{ id: string; nome: string; ruolo: string; azienda: string } | null>,
+      startIndex: number,
+    ) => {
+      const nRows = rows.length;
+      const sectionH = sigHeadH + sigRowH * nRows;
+      // Sfondo header + righe
+      const headFill: [number, number, number] =
+        sectionKey === "verifier" ? [219, 234, 254] : [209, 250, 229]; // azzurro chiaro / verde chiaro
+      const rowFill: [number, number, number] =
+        sectionKey === "verifier" ? [239, 246, 255] : [236, 253, 245];
+      doc.setFillColor(...headFill);
+      doc.rect(x0, sy, blockW, sigHeadH, "F");
+      doc.setFillColor(...rowFill);
+      doc.rect(x0, sy + sigHeadH, blockW, sigRowH * nRows, "F");
+      // Bordi
       doc.setDrawColor(30, 64, 175);
       doc.setLineWidth(0.35);
-      doc.rect(x0, sy, blockW, sigH);
+      doc.rect(x0, sy, blockW, sectionH);
       doc.line(x0, sy + sigHeadH, x0 + blockW, sy + sigHeadH);
-      doc.line(x0 + sigNameW, sy, x0 + sigNameW, sy + sigH);
-      doc.line(x0 + sigNameW + sigRoleW, sy, x0 + sigNameW + sigRoleW, sy + sigH);
-      for (let i = 1; i < signRows.length; i++) {
+      doc.line(x0 + sigNameW, sy, x0 + sigNameW, sy + sectionH);
+      doc.line(x0 + sigNameW + sigRoleW, sy, x0 + sigNameW + sigRoleW, sy + sectionH);
+      for (let i = 1; i < nRows; i++) {
         doc.line(x0, sy + sigHeadH + sigRowH * i, x0 + blockW, sy + sigHeadH + sigRowH * i);
       }
-      // header row: "— Ditta Cliente — Nome e Cognome" | "Ruolo" | "Firma"
+      // Header
       doc.setFont("helvetica", "bold");
       doc.setFontSize(6);
       doc.setTextColor(0);
-      const clientLbl = bl("clientFatAttendees", lang);
+      const sectionLbl =
+        sectionKey === "verifier" ? bl("clientFatAttendees", lang) : bl("constructorTitle", lang);
       const nameLbl = bl("attName", lang);
-      doc.text(`${clientLbl}  ·  ${nameLbl}`, x0 + 2, sy + 4.6, { maxWidth: sigNameW - 4 });
+      doc.text(`${sectionLbl}  ·  ${nameLbl}`, x0 + 2, sy + 4.6, { maxWidth: sigNameW - 4 });
       doc.text(bl("attRole", lang), x0 + sigNameW + 2, sy + 4.6, { maxWidth: sigRoleW - 4 });
       doc.text(bl("signature", lang), x0 + sigNameW + sigRoleW + 2, sy + 4.6, {
         maxWidth: sigSignW - 4,
       });
-      signRows.forEach((a, i) => {
+      rows.forEach((a, i) => {
         const ry = sy + sigHeadH + sigRowH * i;
-        // Nome + (Ditta): campo editabile, pre-compilato se disponibile
+        const globalIdx = startIndex + i;
         const nameUp = UP(a?.nome || "");
         const compUp = UP(a?.azienda || "");
         const nameValue = compUp
@@ -552,32 +571,37 @@ export function generateFatPdf(
           y: ry + 0.5,
           w: sigNameW - 1,
           h: sigRowH - 1,
-          name: `${fieldPrefix}_name_${i}`,
+          name: `${fieldPrefix}_name_${globalIdx}`,
           value: nameValue,
           fontSize: 8,
         });
-        // Ruolo: campo editabile, pre-compilato se disponibile
         addField({
           x: x0 + sigNameW + 0.5,
           y: ry + 0.5,
           w: sigRoleW - 1,
           h: sigRowH - 1,
-          name: `${fieldPrefix}_role_${i}`,
+          name: `${fieldPrefix}_role_${globalIdx}`,
           value: UP(a?.ruolo || ""),
           fontSize: 8,
         });
-        // Firma
         addField({
           x: x0 + sigNameW + sigRoleW + 0.5,
           y: ry + 0.5,
           w: sigSignW - 1,
           h: sigRowH - 1,
-          name: `${fieldPrefix}_${i}`,
+          name: `${fieldPrefix}_${globalIdx}`,
           fontSize: 8,
         });
       });
+      return sectionH;
+    };
+
+    const drawSigTable = (sy: number, fieldPrefix: string) => {
+      const h1 = drawSigSection(sy, fieldPrefix, "verifier", verifierRows, 0);
+      drawSigSection(sy + h1, fieldPrefix, "costruttore", [costruttoreRow], 3);
     };
     drawSigTable(sigAY, "client_signature_initial");
+
 
     // ===== CA HEADER: "COMPLETATE LE AZIONI CORRETTIVE" + Firma costruttore =====
     const caY = sigAY + sigH + gap;
