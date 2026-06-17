@@ -37,7 +37,7 @@ export const dict = {
     de: "Geben Sie die Informationen ein, die auf dem Deckblatt erscheinen.",
     es: "Introduce la información que aparecerá en la portada del informe.",
   },
-  manufacturerTitle: { it: "Ditta Produttrice", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
+  manufacturerTitle: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
   customerTitle: { it: "Ente Verificatore", en: "Verifying Body", de: "Prüfstelle", es: "Organismo Verificador" },
   commonTitle: { it: "Dati del Collaudo", en: "Test Data", de: "Prüfdaten", es: "Datos de la prueba" },
   attendeesTitle: { it: "Presenti al FAT", en: "FAT Attendees", de: "FAT-Teilnehmer", es: "Asistentes al FAT" },
