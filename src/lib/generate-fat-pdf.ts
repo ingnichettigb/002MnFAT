@@ -727,8 +727,12 @@ export function generateFatPdf(
       nome: UP(a.nome || ""),
       ruolo: UP(a.ruolo || ""),
       azienda: UP(a.azienda || ""),
+      isMfg: isMfgAttendee(a),
     }));
-    while (baseRows.length < 5) baseRows.push({ nome: "", ruolo: "", azienda: "" });
+    while (baseRows.length < 5) baseRows.push({ nome: "", ruolo: "", azienda: "", isMfg: false });
+
+    const VERIFIER_FILL: [number, number, number] = [219, 234, 254]; // azzurro chiaro
+    const COSTRUTTORE_FILL: [number, number, number] = [209, 250, 229]; // verde chiaro
 
     autoTable(doc, {
       startY: cursorY,
@@ -740,7 +744,14 @@ export function generateFatPdf(
           { content: bl("attRole", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
           { content: bl("attCompany", lang), styles: { fontStyle: "bold", fillColor: [240, 240, 240] } },
         ] as any,
-        ...baseRows.map(() => ["", "", ""]),
+        ...baseRows.map((r) => {
+          const fill = r.isMfg ? COSTRUTTORE_FILL : VERIFIER_FILL;
+          return [
+            { content: "", styles: { fillColor: fill } },
+            { content: "", styles: { fillColor: fill } },
+            { content: "", styles: { fillColor: fill } },
+          ] as any;
+        }),
       ],
       styles: { font: "helvetica", fontSize: 12, cellPadding: 2, minCellHeight: 9 },
       headStyles: {
