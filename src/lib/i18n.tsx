@@ -185,10 +185,10 @@ export const dict = {
   // Archivio FAT
   archiveTitle: { it: "Archivio FAT", en: "FAT Archive", de: "FAT-Archiv", es: "Archivo FAT" },
   archiveDesc: {
-    it: "Tutti i FAT salvati, suddivisi per stato. Puoi aprirli, duplicarli o eliminarli.",
-    en: "All saved FATs grouped by status. Open, duplicate or delete them.",
-    de: "Alle gespeicherten FATs nach Status gruppiert. Öffnen, duplizieren oder löschen.",
-    es: "Todos los FAT guardados agrupados por estado. Abrir, duplicar o eliminar.",
+    it: "Tutti i FAT salvati, suddivisi per stato. Puoi aprirli, duplicarli o eliminarli. L'archivio è salvato nel localStorage del browser (sorgente: src/lib/fat-context.tsx).",
+    en: "All saved FATs grouped by status. Open, duplicate or delete them. The archive is stored in the browser's localStorage (source: src/lib/fat-context.tsx).",
+    de: "Alle gespeicherten FATs nach Status gruppiert. Öffnen, duplizieren oder löschen. Das Archiv wird im localStorage des Browsers gespeichert (Quelle: src/lib/fat-context.tsx).",
+    es: "Todos los FAT guardados agrupados por estado. Abrir, duplicar o eliminar. El archivo se guarda en el localStorage del navegador (fuente: src/lib/fat-context.tsx).",
   },
   archiveOpen: { it: "Archivio", en: "Archive", de: "Archiv", es: "Archivo" },
   saveDraft: { it: "Salva bozza", en: "Save draft", de: "Entwurf speichern", es: "Guardar borrador" },
