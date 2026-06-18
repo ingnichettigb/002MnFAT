@@ -128,7 +128,6 @@ function ArchivioPage() {
             <CardTitle className="flex items-center gap-2">
               <Archive className="h-5 w-5" /> {t("archiveTitle")}
             </CardTitle>
-            <CardDescription>{t("archiveDesc")}</CardDescription>
           </div>
           <div className="flex gap-2">
             <Button asChild variant="outline" size="sm">
