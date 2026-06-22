@@ -90,6 +90,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "mini FAT — Verbali di Collaudo" },
+      { name: "description", content: "Factory Acceptance Hub manages Factory Acceptance Tests, generating professional PDF reports with detailed checklists." },
+      { property: "og:description", content: "Factory Acceptance Hub manages Factory Acceptance Tests, generating professional PDF reports with detailed checklists." },
+      { name: "twitter:description", content: "Factory Acceptance Hub manages Factory Acceptance Tests, generating professional PDF reports with detailed checklists." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1b2225a9-c6d8-46df-8847-1e05fa1fd5aa/id-preview-424ddf59--85d49123-e4a9-4e52-b510-892b92a852ea.lovable.app-1782110456692.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1b2225a9-c6d8-46df-8847-1e05fa1fd5aa/id-preview-424ddf59--85d49123-e4a9-4e52-b510-892b92a852ea.lovable.app-1782110456692.png" },
     ],
     links: [
       {
