@@ -265,8 +265,9 @@ function IndexPage() {
         />
 
 
-        {/* Conclusioni / Final results */}
-        <ConclusioniSection form={form} />
+        {/* Conclusioni / Final results — nascosto per ora */}
+        {false && <ConclusioniSection form={form} />}
+
 
         <div className="flex flex-col items-end gap-2">
           {Object.keys(form.formState.errors).length > 0 && (
