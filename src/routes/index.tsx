@@ -653,72 +653,8 @@ function ConclusioniSection({ form }: { form: any }) {
           {...form.register("conclusioni.note")}
         />
 
-        {/* AZIONI CORRETTIVE */}
-        <NumberedRow
-          n={LABELS.azioniCorrettive.id}
-          label={t("azioniCorrettive")}
-        >
-          <Controller
-            control={form.control}
-            name="conclusioni.azioniCorrettive"
-            render={({ field }) => (
-              <ChoiceGroup
-                name="conclusioni.azioniCorrettive"
-                value={(field.value ?? "") as YesNo}
-                onChange={field.onChange}
-                options={yesNoOpts}
-              />
-            )}
-          />
-        </NumberedRow>
-
-        {/* Data + ispettore esterno / controllo interno */}
+        {/* AZIONI CORRETTIVE → DATA FINALE (304–309) nascosti per ora */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <NumberedField
-            n={LABELS.dataIspezione.id}
-            label={t("dataIspezione")}
-            type="date"
-            {...form.register("conclusioni.dataIspezione")}
-          />
-          <NumberedField
-            n={LABELS.ispettoreEsterno.id}
-            label={t("ispettoreEsterno")}
-            {...form.register("conclusioni.ispettoreEsterno")}
-            placeholder="PPG Coatings Nederland BV"
-          />
-          <NumberedField
-            n={LABELS.controlloInterno.id}
-            label={t("controlloInterno")}
-            {...form.register("conclusioni.controlloInterno")}
-            placeholder="Azzini SpA"
-            className="sm:col-span-2"
-          />
-        </div>
-
-        {/* DOPO AZIONI */}
-        <NumberedRow n={LABELS.dopoAzioni.id} label={t("dopoAzioni")}>
-          <Controller
-            control={form.control}
-            name="conclusioni.dopoAzioni"
-            render={({ field }) => (
-              <ChoiceGroup
-                name="conclusioni.dopoAzioni"
-                value={(field.value ?? "") as YesNoNa}
-                onChange={field.onChange}
-                options={yesNoNaOpts}
-              />
-            )}
-          />
-        </NumberedRow>
-
-        {/* Data + firma finali */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <NumberedField
-            n={LABELS.dataFinale.id}
-            label={t("dataFinale")}
-            type="date"
-            {...form.register("conclusioni.dataFinale")}
-          />
           <NumberedField
             n={LABELS.firma.id}
             label={t("firma")}
