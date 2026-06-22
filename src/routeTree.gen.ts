@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as Fase2RouteImport } from './routes/fase2'
 import { Route as ControlliRouteImport } from './routes/controlli'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArchivioRouteImport } from './routes/archivio'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -19,9 +21,19 @@ const ReportRoute = ReportRouteImport.update({
   path: '/report',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Fase2Route = Fase2RouteImport.update({
+  id: '/fase2',
+  path: '/fase2',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ControlliRoute = ControlliRouteImport.update({
   id: '/controlli',
   path: '/controlli',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchivioRoute = ArchivioRouteImport.update({
@@ -38,34 +50,49 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/archivio': typeof ArchivioRoute
+  '/auth': typeof AuthRoute
   '/controlli': typeof ControlliRoute
+  '/fase2': typeof Fase2Route
   '/report': typeof ReportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/archivio': typeof ArchivioRoute
+  '/auth': typeof AuthRoute
   '/controlli': typeof ControlliRoute
+  '/fase2': typeof Fase2Route
   '/report': typeof ReportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/archivio': typeof ArchivioRoute
+  '/auth': typeof AuthRoute
   '/controlli': typeof ControlliRoute
+  '/fase2': typeof Fase2Route
   '/report': typeof ReportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/archivio' | '/controlli' | '/report'
+  fullPaths: '/' | '/archivio' | '/auth' | '/controlli' | '/fase2' | '/report'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/archivio' | '/controlli' | '/report'
-  id: '__root__' | '/' | '/archivio' | '/controlli' | '/report'
+  to: '/' | '/archivio' | '/auth' | '/controlli' | '/fase2' | '/report'
+  id:
+    | '__root__'
+    | '/'
+    | '/archivio'
+    | '/auth'
+    | '/controlli'
+    | '/fase2'
+    | '/report'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArchivioRoute: typeof ArchivioRoute
+  AuthRoute: typeof AuthRoute
   ControlliRoute: typeof ControlliRoute
+  Fase2Route: typeof Fase2Route
   ReportRoute: typeof ReportRoute
 }
 
@@ -78,11 +105,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fase2': {
+      id: '/fase2'
+      path: '/fase2'
+      fullPath: '/fase2'
+      preLoaderRoute: typeof Fase2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/controlli': {
       id: '/controlli'
       path: '/controlli'
       fullPath: '/controlli'
       preLoaderRoute: typeof ControlliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archivio': {
@@ -105,7 +146,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArchivioRoute: ArchivioRoute,
+  AuthRoute: AuthRoute,
   ControlliRoute: ControlliRoute,
+  Fase2Route: Fase2Route,
   ReportRoute: ReportRoute,
 }
 export const routeTree = rootRouteImport
