@@ -168,6 +168,26 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   }, [pathname, navigate]);
 
   if (!checked || !allowed) return null;
-  return <>{children}</>;
+  const isPublic = PUBLIC_PATHS.has(pathname);
+  return (
+    <>
+      {!isPublic && (
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
+            }
+            navigate({ to: "/auth", replace: true });
+          }}
+          className="fixed right-3 top-3 z-50 rounded-md border border-input bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur hover:bg-accent"
+        >
+          Esci
+        </button>
+      )}
+      {children}
+    </>
+  );
 }
+
 
