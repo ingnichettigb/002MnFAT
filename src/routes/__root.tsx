@@ -1,9 +1,12 @@
+import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,6 +15,10 @@ import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
 import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
+
+export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
+const PUBLIC_PATHS = new Set(["/auth"]);
+
 
 function NotFoundComponent() {
   return (
@@ -131,10 +138,56 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <FatProvider>
-          <Outlet />
+          <AuthGate>
+            <Outlet />
+          </AuthGate>
           <Toaster position="top-center" richColors />
         </FatProvider>
       </I18nProvider>
     </QueryClientProvider>
   );
 }
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const [checked, setChecked] = React.useState(false);
+  const [allowed, setAllowed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isPublic = PUBLIC_PATHS.has(pathname);
+    const verified = window.localStorage.getItem(VERIFIED_EMAIL_KEY);
+    if (!verified && !isPublic) {
+      navigate({ to: "/auth", replace: true });
+      setAllowed(false);
+    } else {
+      setAllowed(true);
+    }
+    setChecked(true);
+  }, [pathname, navigate]);
+
+  if (!checked || !allowed) return null;
+  const isPublic = PUBLIC_PATHS.has(pathname);
+  return (
+    <>
+      {!isPublic && (
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
+            }
+            navigate({ to: "/auth", replace: true });
+          }}
+          className="fixed right-3 top-3 z-50 rounded-md border border-input bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur hover:bg-accent"
+        >
+          Esci
+        </button>
+      )}
+      {children}
+    </>
+  );
+}
+
+

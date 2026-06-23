@@ -1,29 +1,30 @@
-## Obiettivo
+## Come vedere la schermata di login
 
-Il bottone **8 — Genera Report FAT** deve, oltre a generare il PDF, **salvare definitivamente** il FAT marcandolo come "completato" (status `done`).
+Al momento la schermata con **email + PUK + Prosegui** esiste già ma è montata sulla rotta `/auth`, non sulla home `/` (che mostra ancora direttamente l'app FAT). Per questo non la vedi aprendo il preview.
 
-## Comportamento attuale vs nuovo
+Hai due opzioni:
 
-| | Oggi | Nuovo |
-|---|---|---|
-| Salvataggio | `saveDraft()` (bozza, status resta `in_progress`) | `markDone()` (status → `done`) |
-| Generazione PDF | sì (download + apertura browser) | sì (invariato) |
-| Toast | "Report in generazione…" | "Report generato e FAT completato" |
-| Rigenerazione su FAT già `done` | consentita | consentita (resta `done`, ri-scarica PDF) |
-| Modificabilità dopo | — | Il FAT resta modificabile; se l'utente cambia un campo lo status torna a `in_progress` (logica già esistente in `updateActiveState`) |
+### Opzione A — Apri direttamente l'URL (nessuna modifica al codice)
+Vai a:
+- Preview: `https://id-preview--85d49123-e4a9-4e52-b510-892b92a852ea.lovable.app/auth`
+- Published: `https://piccolo-fat-report.lovable.app/auth`
+- Dominio: `https://002mnfat.corporateboostservice.eu/auth`
 
-## Modifiche
+Utile per testare subito il flusso OTP senza toccare il routing.
 
-**File: `src/routes/report.tsx`**
-- In `handleGenerate`: sostituire `saveDraft()` con `markDone()`.
-- Aggiornare il toast in "Report generato — FAT contrassegnato come completato" (con chiave i18n).
+### Opzione B — Rendere `/auth` la vera schermata iniziale (gate di accesso)
+Trasformiamo `/auth` nel "cancello" dell'app:
 
-**File: `src/lib/i18n.tsx`**
-- Aggiungere chiave `reportGeneratedDone` (IT: "Report generato — FAT completato", EN: "Report generated — FAT marked as done").
+1. La home `/` (e tutte le altre rotte tipo `/archivio`, `/controlli`, `/report`, `/fase2`) controllano se l'utente ha già una email verificata.
+2. Se **non** è verificata → redirect automatico a `/auth`.
+3. Se **sì** → l'utente entra nell'app FAT come adesso.
+4. Lo stato "email verificata" viene salvato in `localStorage` (chiave `002MnFAT:verifiedEmail`) al completamento dell'OTP (o al bypass dei 7 click), così la verifica persiste tra refresh finché l'utente non fa logout / pulisce il browser.
+5. Aggiungiamo un piccolo link "Esci" in alto che cancella la chiave e riporta a `/auth`.
 
-Nessuna modifica alla logica di `markDone` (già presente in `fat-context.tsx` e già preserva i dati / consente modifiche successive che riportano lo status a `in_progress`).
+Nessuna modifica a database, server functions o flusso OTP: cambia solo il routing client-side.
 
-## Note
+### Quale preferisci?
+- **A** se vuoi solo testare la Fase 1 senza ancora "blindare" l'app.
+- **B** se la Fase 1 deve essere obbligatoria per usare l'app FAT.
 
-- Nessun cambiamento al PDF, ai form, o all'archivio.
-- La rigenerazione su un FAT `done` chiama di nuovo `markDone()` (idempotente: resta `done`, aggiorna solo `updatedAt`).
+Fammi sapere quale scegli (o se vuoi una variante, es. gate solo su `/` ma lasciando libere altre rotte) e procedo.
