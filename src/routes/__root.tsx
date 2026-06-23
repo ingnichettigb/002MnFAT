@@ -138,10 +138,36 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <FatProvider>
-          <Outlet />
+          <AuthGate>
+            <Outlet />
+          </AuthGate>
           <Toaster position="top-center" richColors />
         </FatProvider>
       </I18nProvider>
     </QueryClientProvider>
   );
 }
+
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const [checked, setChecked] = React.useState(false);
+  const [allowed, setAllowed] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isPublic = PUBLIC_PATHS.has(pathname);
+    const verified = window.localStorage.getItem(VERIFIED_EMAIL_KEY);
+    if (!verified && !isPublic) {
+      navigate({ to: "/auth", replace: true });
+      setAllowed(false);
+    } else {
+      setAllowed(true);
+    }
+    setChecked(true);
+  }, [pathname, navigate]);
+
+  if (!checked || !allowed) return null;
+  return <>{children}</>;
+}
+
