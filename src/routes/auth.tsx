@@ -13,6 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { requestOtp, verifyOtp } from "@/lib/otp.functions";
+import { VERIFIED_EMAIL_KEY } from "@/routes/__root";
+
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
