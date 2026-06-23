@@ -1,9 +1,12 @@
+import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,6 +15,10 @@ import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
 import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
+
+export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
+const PUBLIC_PATHS = new Set(["/auth"]);
+
 
 function NotFoundComponent() {
   return (
