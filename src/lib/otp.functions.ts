@@ -31,7 +31,7 @@ async function sendOtpEmail(to: string, code: string) {
         "X-Connection-Api-Key": apiKey,
       },
       body: JSON.stringify({
-        from: "002MnFAT <onboarding@resend.dev>",
+        from: "002MnFAT <team@corporateboostservice.eu>",
         to: [to],
         subject: `Codice di verifica: ${code}`,
         html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px">
