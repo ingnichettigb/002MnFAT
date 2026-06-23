@@ -44,9 +44,16 @@ function AuthPage() {
   // Dev bypass: 7 consecutive clicks of "Prosegui"
   const clickCountRef = React.useRef(0);
 
-  const goPhase2 = (msg = "Email verificata con successo") => {
+  const goPhase2 = (msg = "Email verificata con successo", verifiedEmail?: string) => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        VERIFIED_EMAIL_KEY,
+        verifiedEmail ?? email.trim().toLowerCase() ?? "bypass",
+      );
+    }
     navigate({ to: "/fase2", search: { msg } });
   };
+
 
   const handleProsegui = async (e: React.FormEvent) => {
     e.preventDefault();
