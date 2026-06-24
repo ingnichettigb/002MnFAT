@@ -156,18 +156,18 @@ function AuthPage() {
         </CardHeader>
         <CardContent>
           {stage === "email" && (
-            <form onSubmit={handleProsegui} className="space-y-4">
+            <form onSubmit={handleProsegui} className="space-y-4" noValidate>
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  required
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="mario@example.com"
                 />
+
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="puk">PUK</Label>
