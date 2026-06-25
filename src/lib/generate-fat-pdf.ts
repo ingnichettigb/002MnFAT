@@ -1327,16 +1327,24 @@ export function generateFatPdf(
     doc.setTextColor(0);
   }
 
-  // Apri il PDF in una nuova scheda del browser (così è leggibile anche
-  // senza Adobe Reader) e scarica il file in parallelo.
+  // Apri il PDF in una nuova scheda usando un File: il nome del file
+  // (mini-fat_*.pdf) viene ereditato dall'oggetto File invece del solito
+  // hash del blob URL. Nessun download separato → un solo PDF.
   try {
     const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank", "noopener,noreferrer");
-    // Revoca l'URL dopo qualche minuto (la scheda l'ha già caricato).
+    const file = new File([blob], filename, { type: "application/pdf" });
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5 * 60 * 1000);
   } catch {
-    // se l'apertura fallisce (popup bloccato), procedi comunque al download
+    // fallback: download diretto se qualcosa va storto
+    doc.save(filename);
   }
-  doc.save(filename);
 }
