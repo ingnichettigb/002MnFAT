@@ -89,8 +89,14 @@ type FormValues = z.infer<typeof schema>;
 
 function IndexPage() {
   const navigate = useNavigate();
-  const { state, setGeneral, activeId } = useFat();
-  const { t } = useI18n();
+  const { state, setGeneral, activeId, markDone } = useFat();
+  const { t, lang, secondary } = useI18n();
+
+  const handleGenerateReport = () => {
+    markDone();
+    toast.success(t("reportGeneratedDone"));
+    generateFatPdf(state, lang, secondary);
+  };
 
   const form = useForm<FormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
