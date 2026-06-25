@@ -6,12 +6,15 @@ import { z } from "zod";
 import { useEffect, useId } from "react";
 import { Trash2, Plus } from "lucide-react";
 
+import { toast } from "sonner";
+
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
+import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
