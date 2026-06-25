@@ -132,7 +132,7 @@ function IndexPage() {
       </header>
 
       <FatToolbar />
-      <FatStepper current={1} />
+      <FatStepper current={1} onReportClick={handleGenerateReport} />
 
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
