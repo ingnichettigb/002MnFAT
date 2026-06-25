@@ -48,7 +48,6 @@ function ControlliPage() {
     toast.success(t("reportGeneratedDone"));
     generateFatPdf(state, lang, secondary);
   };
-  const [newLabel, setNewLabel] = useState("");
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
 
