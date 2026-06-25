@@ -3,7 +3,13 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { LABELS } from "@/lib/fat-numbering";
 
-export function FatStepper({ current }: { current: 1 | 2 | 3 }) {
+export function FatStepper({
+  current,
+  onReportClick,
+}: {
+  current: 1 | 2 | 3;
+  onReportClick?: () => void;
+}) {
   const { t } = useI18n();
   const steps = [
     { to: "/" as const,          label: t("stepGeneral"),  num: LABELS.stepGeneral.id },
@@ -16,10 +22,18 @@ export function FatStepper({ current }: { current: 1 | 2 | 3 }) {
         const n = (i + 1) as 1 | 2 | 3;
         const active = n === current;
         const done = n < current;
+        const isReportStep = n === 3;
+        const handleClick = isReportStep && onReportClick
+          ? (e: React.MouseEvent) => {
+              e.preventDefault();
+              onReportClick();
+            }
+          : undefined;
         return (
           <div key={s.to} className="flex items-center gap-2 sm:gap-4">
             <Link
               to={s.to}
+              onClick={handleClick}
               className={cn(
                 "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors",
                 active && "bg-primary text-primary-foreground",

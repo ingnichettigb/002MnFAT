@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
@@ -9,6 +10,7 @@ import { SortableControlsList } from "@/components/sortable-controls-list";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, controlNumber } from "@/lib/fat-numbering";
+import { generateFatPdf } from "@/lib/generate-fat-pdf";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,8 +40,14 @@ function ControlliPage() {
   const navigate = useNavigate();
   const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls, reorderControls } =
     useFat();
-  const { t } = useI18n();
+  const { t, lang, secondary } = useI18n();
   const [newLabel, setNewLabel] = useState("");
+
+  const handleGenerateReport = () => {
+    markDone();
+    toast.success(t("reportGeneratedDone"));
+    generateFatPdf(state, lang, secondary);
+  };
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
 
@@ -69,7 +77,7 @@ function ControlliPage() {
       </header>
 
       <FatToolbar />
-      <FatStepper current={2} />
+      <FatStepper current={2} onReportClick={handleGenerateReport} />
 
       <Card>
         <CardHeader>
