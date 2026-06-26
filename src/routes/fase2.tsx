@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/fase2")({
 
 function Fase2Page() {
   const { msg } = Route.useSearch();
+  const navigate = useNavigate();
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-8">
       <Card className="w-full">
@@ -35,6 +37,12 @@ function Fase2Page() {
           <p className="mt-3 text-sm text-muted-foreground">
             Fase 2 da implementare.
           </p>
+          <Button
+            className="mt-4 w-full"
+            onClick={() => navigate({ to: "/" })}
+          >
+            Accesso sviluppatore
+          </Button>
         </CardContent>
       </Card>
     </div>
