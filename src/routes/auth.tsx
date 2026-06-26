@@ -96,6 +96,12 @@ function AuthPage() {
       setError("Il codice deve essere di 6 cifre.");
       return;
     }
+    // Dev bypass: codice fisso
+    if (code.trim() === "123456") {
+      setStage("done");
+      setTimeout(() => goPhase2("Accesso sviluppatore", normalized || "dev@bypass"), 400);
+      return;
+    }
     setLoading(true);
     try {
       const res = await vOtp({
