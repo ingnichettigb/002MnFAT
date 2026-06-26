@@ -41,9 +41,6 @@ function AuthPage() {
   const [info, setInfo] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
-  // Dev bypass: 7 consecutive clicks of "Prosegui"
-  const clickCountRef = React.useRef(0);
-
   const goPhase2 = (msg = "Email verificata con successo", verifiedEmail?: string) => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(
@@ -60,14 +57,14 @@ function AuthPage() {
     setError(null);
     setInfo(null);
 
-    clickCountRef.current += 1;
-    if (clickCountRef.current >= 7) {
-      clickCountRef.current = 0;
-      goPhase2();
+    const normalized = email.trim().toLowerCase();
+
+    // Dev bypass: credenziali fisse
+    if (normalized === "xxx@xxx" && puk.trim() === "XXX") {
+      goPhase2("Accesso sviluppatore", "dev@bypass");
       return;
     }
 
-    const normalized = email.trim().toLowerCase();
     if (!normalized) {
       setError("Inserisci una email valida.");
       return;
