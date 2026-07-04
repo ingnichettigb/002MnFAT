@@ -18,6 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
+import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
+
 
 export const Route = createFileRoute("/report")({
   head: () => ({
@@ -47,11 +49,15 @@ function ReportPage() {
       : d.toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
   };
 
+  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
+
   const handleGenerate = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
-    generateFatPdf(state, lang, secondary);
+    const filename = generateFatPdf(state, lang, secondary);
+    showPdfSaved(filename);
   };
+
 
   const handleReset = () => {
     if (confirm(t("restartConfirm"))) {
@@ -230,9 +236,11 @@ function ReportPage() {
           </Button>
         </div>
       </div>
+      {pdfSavedDialog}
     </div>
   );
 }
+
 
 function Field({ label, value }: { label: string; value: string }) {
   return (

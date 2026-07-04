@@ -134,7 +134,8 @@ export function generateFatPdf(
   state: FatState,
   lang: Lang = "it",
   secondary: Lang | null = null,
-) {
+): string {
+
   const { general, controls } = state;
   // Escludo dalle pagine "controllo" le voci che hanno una pagina fissa dedicata
   // in fondo al report (Varie / Deviazioni / Azioni correttive), così non vengono
@@ -1347,4 +1348,6 @@ export function generateFatPdf(
     // fallback: download diretto se qualcosa va storto
     doc.save(filename);
   }
+  return filename;
 }
+

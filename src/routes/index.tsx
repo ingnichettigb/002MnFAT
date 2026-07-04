@@ -15,6 +15,7 @@ import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
+import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -92,11 +93,15 @@ function IndexPage() {
   const { state, setGeneral, activeId, markDone } = useFat();
   const { t, lang, secondary } = useI18n();
 
+  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
+
   const handleGenerateReport = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
-    generateFatPdf(state, lang, secondary);
+    const filename = generateFatPdf(state, lang, secondary);
+    showPdfSaved(filename);
   };
+
 
   const form = useForm<FormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -289,9 +294,11 @@ function IndexPage() {
           </Button>
         </div>
       </form>
+      {pdfSavedDialog}
     </div>
   );
 }
+
 
 /* ───────── Party (Manufacturer / Customer) sub-form ───────── */
 type PartyNums = {

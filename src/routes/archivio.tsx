@@ -2,6 +2,7 @@ import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { Archive, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
+import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -82,6 +83,7 @@ function ArchivioPage() {
   } = useFat();
   const navigate = useNavigate();
   const [tab, setTab] = React.useState<FatStatus | "all">("all");
+  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
 
   const sorted = React.useMemo(
     () => [...archive].sort((a, b) => b.updatedAt - a.updatedAt),
@@ -96,8 +98,10 @@ function ArchivioPage() {
   const handleView = (id: string) => {
     const f = archive.find((x) => x.id === id);
     if (!f) return;
-    generateFatPdf(f.state, lang, secondary);
+    const filename = generateFatPdf(f.state, lang, secondary);
+    showPdfSaved(filename);
   };
+
   const handleNew = () => {
     newFat();
     navigate({ to: "/" });
@@ -169,9 +173,11 @@ function ArchivioPage() {
           </Tabs>
         </CardContent>
       </Card>
+      {pdfSavedDialog}
     </div>
   );
 }
+
 
 function ArchiveTable({
   rows,
