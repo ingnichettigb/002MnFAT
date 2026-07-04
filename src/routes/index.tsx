@@ -294,9 +294,11 @@ function IndexPage() {
           </Button>
         </div>
       </form>
+      {pdfSavedDialog}
     </div>
   );
 }
+
 
 /* ───────── Party (Manufacturer / Customer) sub-form ───────── */
 type PartyNums = {
