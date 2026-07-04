@@ -93,11 +93,15 @@ function IndexPage() {
   const { state, setGeneral, activeId, markDone } = useFat();
   const { t, lang, secondary } = useI18n();
 
+  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
+
   const handleGenerateReport = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
-    generateFatPdf(state, lang, secondary);
+    const filename = generateFatPdf(state, lang, secondary);
+    showPdfSaved(filename);
   };
+
 
   const form = useForm<FormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
