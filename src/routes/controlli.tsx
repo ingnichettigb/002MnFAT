@@ -44,11 +44,15 @@ function ControlliPage() {
   const { t, lang, secondary } = useI18n();
   const [newLabel, setNewLabel] = useState("");
 
+  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
+
   const handleGenerateReport = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
-    generateFatPdf(state, lang, secondary);
+    const filename = generateFatPdf(state, lang, secondary);
+    showPdfSaved(filename);
   };
+
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
 
