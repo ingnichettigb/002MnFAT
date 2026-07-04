@@ -173,9 +173,11 @@ function ArchivioPage() {
           </Tabs>
         </CardContent>
       </Card>
+      {pdfSavedDialog}
     </div>
   );
 }
+
 
 function ArchiveTable({
   rows,
