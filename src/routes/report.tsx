@@ -18,6 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
+import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
+
 
 export const Route = createFileRoute("/report")({
   head: () => ({
