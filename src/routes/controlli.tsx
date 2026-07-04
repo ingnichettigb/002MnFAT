@@ -186,6 +186,8 @@ function ControlliPage() {
           </div>
         </CardContent>
       </Card>
+      {pdfSavedDialog}
     </div>
   );
 }
+
