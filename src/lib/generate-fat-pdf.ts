@@ -1348,4 +1348,6 @@ export function generateFatPdf(
     // fallback: download diretto se qualcosa va storto
     doc.save(filename);
   }
+  return filename;
 }
+
