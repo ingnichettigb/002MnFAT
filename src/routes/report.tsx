@@ -49,11 +49,15 @@ function ReportPage() {
       : d.toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
   };
 
+  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
+
   const handleGenerate = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
-    generateFatPdf(state, lang, secondary);
+    const filename = generateFatPdf(state, lang, secondary);
+    showPdfSaved(filename);
   };
+
 
   const handleReset = () => {
     if (confirm(t("restartConfirm"))) {
