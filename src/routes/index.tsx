@@ -15,6 +15,7 @@ import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
+import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
