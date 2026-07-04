@@ -236,9 +236,11 @@ function ReportPage() {
           </Button>
         </div>
       </div>
+      {pdfSavedDialog}
     </div>
   );
 }
+
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
