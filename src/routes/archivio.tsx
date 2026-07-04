@@ -83,6 +83,7 @@ function ArchivioPage() {
   } = useFat();
   const navigate = useNavigate();
   const [tab, setTab] = React.useState<FatStatus | "all">("all");
+  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
 
   const sorted = React.useMemo(
     () => [...archive].sort((a, b) => b.updatedAt - a.updatedAt),
@@ -97,8 +98,10 @@ function ArchivioPage() {
   const handleView = (id: string) => {
     const f = archive.find((x) => x.id === id);
     if (!f) return;
-    generateFatPdf(f.state, lang, secondary);
+    const filename = generateFatPdf(f.state, lang, secondary);
+    showPdfSaved(filename);
   };
+
   const handleNew = () => {
     newFat();
     navigate({ to: "/" });
