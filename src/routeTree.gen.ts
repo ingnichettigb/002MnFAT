@@ -10,20 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReportRouteImport } from './routes/report'
-import { Route as Fase2RouteImport } from './routes/fase2'
 import { Route as ControlliRouteImport } from './routes/controlli'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AttivazioneRouteImport } from './routes/attivazione'
 import { Route as ArchivioRouteImport } from './routes/archivio'
 import { Route as IndexRouteImport } from './routes/index'
 
 const ReportRoute = ReportRouteImport.update({
   id: '/report',
   path: '/report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Fase2Route = Fase2RouteImport.update({
-  id: '/fase2',
-  path: '/fase2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ControlliRoute = ControlliRouteImport.update({
@@ -34,6 +29,11 @@ const ControlliRoute = ControlliRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AttivazioneRoute = AttivazioneRouteImport.update({
+  id: '/attivazione',
+  path: '/attivazione',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchivioRoute = ArchivioRouteImport.update({
@@ -50,49 +50,55 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/archivio': typeof ArchivioRoute
+  '/attivazione': typeof AttivazioneRoute
   '/auth': typeof AuthRoute
   '/controlli': typeof ControlliRoute
-  '/fase2': typeof Fase2Route
   '/report': typeof ReportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/archivio': typeof ArchivioRoute
+  '/attivazione': typeof AttivazioneRoute
   '/auth': typeof AuthRoute
   '/controlli': typeof ControlliRoute
-  '/fase2': typeof Fase2Route
   '/report': typeof ReportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/archivio': typeof ArchivioRoute
+  '/attivazione': typeof AttivazioneRoute
   '/auth': typeof AuthRoute
   '/controlli': typeof ControlliRoute
-  '/fase2': typeof Fase2Route
   '/report': typeof ReportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/archivio' | '/auth' | '/controlli' | '/fase2' | '/report'
+  fullPaths:
+    | '/'
+    | '/archivio'
+    | '/attivazione'
+    | '/auth'
+    | '/controlli'
+    | '/report'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/archivio' | '/auth' | '/controlli' | '/fase2' | '/report'
+  to: '/' | '/archivio' | '/attivazione' | '/auth' | '/controlli' | '/report'
   id:
     | '__root__'
     | '/'
     | '/archivio'
+    | '/attivazione'
     | '/auth'
     | '/controlli'
-    | '/fase2'
     | '/report'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArchivioRoute: typeof ArchivioRoute
+  AttivazioneRoute: typeof AttivazioneRoute
   AuthRoute: typeof AuthRoute
   ControlliRoute: typeof ControlliRoute
-  Fase2Route: typeof Fase2Route
   ReportRoute: typeof ReportRoute
 }
 
@@ -103,13 +109,6 @@ declare module '@tanstack/react-router' {
       path: '/report'
       fullPath: '/report'
       preLoaderRoute: typeof ReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fase2': {
-      id: '/fase2'
-      path: '/fase2'
-      fullPath: '/fase2'
-      preLoaderRoute: typeof Fase2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/controlli': {
@@ -124,6 +123,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/attivazione': {
+      id: '/attivazione'
+      path: '/attivazione'
+      fullPath: '/attivazione'
+      preLoaderRoute: typeof AttivazioneRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archivio': {
@@ -146,9 +152,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArchivioRoute: ArchivioRoute,
+  AttivazioneRoute: AttivazioneRoute,
   AuthRoute: AuthRoute,
   ControlliRoute: ControlliRoute,
-  Fase2Route: Fase2Route,
   ReportRoute: ReportRoute,
 }
 export const routeTree = rootRouteImport
