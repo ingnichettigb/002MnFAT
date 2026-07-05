@@ -15,7 +15,6 @@ import {
 import { requestOtp, verifyOtp } from "@/lib/otp.functions";
 import { VERIFIED_EMAIL_KEY } from "@/routes/__root";
 
-
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
@@ -28,6 +27,9 @@ export const Route = createFileRoute("/auth")({
 
 type Stage = "email" | "otp" | "done";
 
+const RATE_LIMIT_MSG =
+  "Hai già ricevuto 3 codici di verifica. Riprova tra 24 ore oppure controlla la posta in arrivo (anche spam) per i codici già inviati.";
+
 function AuthPage() {
   const navigate = useNavigate();
   const reqOtp = useServerFn(requestOtp);
@@ -35,36 +37,24 @@ function AuthPage() {
 
   const [stage, setStage] = React.useState<Stage>("email");
   const [email, setEmail] = React.useState("");
-  const [puk, setPuk] = React.useState("");
   const [code, setCode] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [info, setInfo] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
-  const goPhase2 = (msg = "Email verificata con successo", verifiedEmail?: string) => {
+  const goActivation = (verifiedEmail: string) => {
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        VERIFIED_EMAIL_KEY,
-        verifiedEmail ?? email.trim().toLowerCase() ?? "bypass",
-      );
+      window.localStorage.setItem(VERIFIED_EMAIL_KEY, verifiedEmail);
     }
-    navigate({ to: "/fase2", search: { msg } });
+    navigate({ to: "/attivazione" });
   };
 
-
-  const handleProsegui = async (e: React.FormEvent) => {
+  const handleRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setInfo(null);
 
     const normalized = email.trim().toLowerCase();
-
-    // Dev bypass: credenziali fisse
-    if (normalized === "xxx@xxx" && puk.trim() === "XXX") {
-      goPhase2("Accesso sviluppatore", "dev@bypass");
-      return;
-    }
-
     if (!normalized) {
       setError("Inserisci una email valida.");
       return;
@@ -73,8 +63,12 @@ function AuthPage() {
     setLoading(true);
     try {
       const res = await reqOtp({ data: { email: normalized } });
-      if (res.alreadyVerified) {
-        goPhase2();
+      if ("rateLimited" in res && res.rateLimited) {
+        setError(RATE_LIMIT_MSG);
+        return;
+      }
+      if ("alreadyVerified" in res && res.alreadyVerified) {
+        goActivation(normalized);
         return;
       }
       setStage("otp");
@@ -96,12 +90,6 @@ function AuthPage() {
       setError("Il codice deve essere di 6 cifre.");
       return;
     }
-    // Dev bypass: codice fisso
-    if (code.trim() === "123456") {
-      setStage("done");
-      setTimeout(() => goPhase2("Accesso sviluppatore", normalized || "dev@bypass"), 400);
-      return;
-    }
     setLoading(true);
     try {
       const res = await vOtp({
@@ -109,7 +97,7 @@ function AuthPage() {
       });
       if (res.ok) {
         setStage("done");
-        setTimeout(() => goPhase2(), 800);
+        setTimeout(() => goActivation(normalized), 600);
       } else if (res.reason === "expired") {
         setError("Codice scaduto, richiedi un nuovo codice.");
       } else {
@@ -131,8 +119,12 @@ function AuthPage() {
     try {
       const normalized = email.trim().toLowerCase();
       const res = await reqOtp({ data: { email: normalized } });
-      if (res.alreadyVerified) {
-        goPhase2();
+      if ("rateLimited" in res && res.rateLimited) {
+        setError(RATE_LIMIT_MSG);
+        return;
+      }
+      if ("alreadyVerified" in res && res.alreadyVerified) {
+        goActivation(normalized);
         return;
       }
       setInfo(`Nuovo codice inviato a ${normalized}`);
@@ -152,14 +144,14 @@ function AuthPage() {
         <CardHeader>
           <CardTitle>002MnFAT — Accesso</CardTitle>
           <CardDescription>
-            {stage === "email" && "Inserisci la tua email per iniziare."}
+            {stage === "email" && "Passaggio 1 di 2 — Verifica email."}
             {stage === "otp" && "Inserisci il codice ricevuto per email."}
             {stage === "done" && "Email verificata con successo."}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {stage === "email" && (
-            <form onSubmit={handleProsegui} className="space-y-4" noValidate>
+            <form onSubmit={handleRequest} className="space-y-4" noValidate>
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -170,21 +162,10 @@ function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="mario@example.com"
                 />
-
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="puk">PUK</Label>
-                <Input
-                  id="puk"
-                  type="text"
-                  value={puk}
-                  onChange={(e) => setPuk(e.target.value)}
-                  placeholder="Codice PUK"
-                />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Attendere…" : "Prosegui"}
+                {loading ? "Attendere…" : "Invia codice"}
               </Button>
             </form>
           )}

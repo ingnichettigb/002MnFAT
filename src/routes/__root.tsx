@@ -17,7 +17,9 @@ import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
 
 export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
+export const ACTIVATED_KEY = "002MnFAT:activated";
 const PUBLIC_PATHS = new Set(["/auth"]);
+const ACTIVATION_PATH = "/attivazione";
 
 
 function NotFoundComponent() {
@@ -157,9 +159,17 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     const isPublic = PUBLIC_PATHS.has(pathname);
+    const isActivation = pathname === ACTIVATION_PATH;
     const verified = window.localStorage.getItem(VERIFIED_EMAIL_KEY);
-    if (!verified && !isPublic) {
+    const activated = window.localStorage.getItem(ACTIVATED_KEY);
+
+    if (isPublic) {
+      setAllowed(true);
+    } else if (!verified) {
       navigate({ to: "/auth", replace: true });
+      setAllowed(false);
+    } else if (!activated && !isActivation) {
+      navigate({ to: "/attivazione", replace: true });
       setAllowed(false);
     } else {
       setAllowed(true);
@@ -177,6 +187,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
           onClick={() => {
             if (typeof window !== "undefined") {
               window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
+              window.localStorage.removeItem(ACTIVATED_KEY);
             }
             navigate({ to: "/auth", replace: true });
           }}
