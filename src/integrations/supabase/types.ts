@@ -20,6 +20,8 @@ export type Database = {
           email: string
           id: string
           is_verified: boolean
+          otp_attempts: number
+          otp_window_start: string | null
           source: string | null
           verification_code: string | null
           verified_at: string | null
@@ -29,6 +31,8 @@ export type Database = {
           email: string
           id?: string
           is_verified?: boolean
+          otp_attempts?: number
+          otp_window_start?: string | null
           source?: string | null
           verification_code?: string | null
           verified_at?: string | null
@@ -38,11 +42,81 @@ export type Database = {
           email?: string
           id?: string
           is_verified?: boolean
+          otp_attempts?: number
+          otp_window_start?: string | null
           source?: string | null
           verification_code?: string | null
           verified_at?: string | null
         }
         Relationships: []
+      }
+      licenses: {
+        Row: {
+          activated_at: string | null
+          app_code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          license_key: string
+          user_email: string
+        }
+        Insert: {
+          activated_at?: string | null
+          app_code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          license_key: string
+          user_email: string
+        }
+        Update: {
+          activated_at?: string | null
+          app_code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          license_key?: string
+          user_email?: string
+        }
+        Relationships: []
+      }
+      puk_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          license_id: string
+          used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          license_id: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          license_id?: string
+          used?: boolean
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "puk_codes_license_id_fkey"
+            columns: ["license_id"]
+            isOneToOne: false
+            referencedRelation: "licenses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
