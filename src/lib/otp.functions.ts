@@ -1,8 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { APP_CODE } from "@/lib/app-config";
 
-const SOURCE = "002MnFAT";
 const OTP_TTL_MIN = 10;
+const OTP_MAX_PER_WINDOW = 3;
+const OTP_WINDOW_HOURS = 24;
 
 const emailSchema = z
   .string()
@@ -31,7 +33,7 @@ async function sendOtpEmail(to: string, code: string) {
         "X-Connection-Api-Key": apiKey,
       },
       body: JSON.stringify({
-        from: "002MnFAT <team@corporateboostservice.eu>",
+        from: `${APP_CODE} <team@corporateboostservice.eu>`,
         to: [to],
         subject: `Codice di verifica: ${code}`,
         html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px">
@@ -59,28 +61,73 @@ export const requestOtp = createServerFn({ method: "POST" })
     );
     const email = data.email;
 
-    // 1) check existing verified
-    const { data: existing, error: selErr } = await supabaseAdmin
+    // 1) already verified?
+    const { data: verified, error: verErr } = await supabaseAdmin
       .from("lead_emails")
-      .select("id, is_verified")
+      .select("id")
       .ilike("email", email)
       .eq("is_verified", true)
       .limit(1)
       .maybeSingle();
-    if (selErr) throw new Error(selErr.message);
-    if (existing) {
+    if (verErr) throw new Error(verErr.message);
+    if (verified) {
       return { alreadyVerified: true as const };
     }
 
-    // 2) generate and insert new OTP row
+    // 2) get the current pending row for this email (if any) to track rate-limit window
+    const { data: pending, error: pendErr } = await supabaseAdmin
+      .from("lead_emails")
+      .select("id, otp_attempts, otp_window_start")
+      .ilike("email", email)
+      .eq("is_verified", false)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (pendErr) throw new Error(pendErr.message);
+
+    const now = Date.now();
+    let attempts = pending?.otp_attempts ?? 0;
+    let windowStart = pending?.otp_window_start
+      ? new Date(pending.otp_window_start as string).getTime()
+      : 0;
+
+    const windowMs = OTP_WINDOW_HOURS * 3600 * 1000;
+    if (!windowStart || now - windowStart > windowMs) {
+      attempts = 0;
+      windowStart = now;
+    }
+
+    if (attempts >= OTP_MAX_PER_WINDOW) {
+      return { rateLimited: true as const };
+    }
+
     const code = generateOtp();
-    const { error: insErr } = await supabaseAdmin.from("lead_emails").insert({
-      email,
-      verification_code: code,
-      is_verified: false,
-      source: SOURCE,
-    });
-    if (insErr) throw new Error(insErr.message);
+    const nextAttempts = attempts + 1;
+    const windowIso = new Date(windowStart).toISOString();
+
+    if (pending) {
+      const { error: updErr } = await supabaseAdmin
+        .from("lead_emails")
+        .update({
+          verification_code: code,
+          otp_attempts: nextAttempts,
+          otp_window_start: windowIso,
+        })
+        .eq("id", pending.id);
+      if (updErr) throw new Error(updErr.message);
+    } else {
+      const { error: insErr } = await supabaseAdmin
+        .from("lead_emails")
+        .insert({
+          email,
+          verification_code: code,
+          is_verified: false,
+          source: APP_CODE,
+          otp_attempts: nextAttempts,
+          otp_window_start: windowIso,
+        });
+      if (insErr) throw new Error(insErr.message);
+    }
 
     await sendOtpEmail(email, code);
     return { alreadyVerified: false as const };
