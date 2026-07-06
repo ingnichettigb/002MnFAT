@@ -67,10 +67,6 @@ function AuthPage() {
         setError(RATE_LIMIT_MSG);
         return;
       }
-      if ("alreadyVerified" in res && res.alreadyVerified) {
-        goActivation(normalized);
-        return;
-      }
       setStage("otp");
       setInfo(`Abbiamo inviato il codice a ${normalized}`);
     } catch (err) {
