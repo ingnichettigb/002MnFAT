@@ -135,15 +135,7 @@ export const verifyOtp = createServerFn({ method: "POST" })
     );
     const { email, code } = data;
 
-    // already verified?
-    const { data: alreadyOk } = await supabaseAdmin
-      .from("lead_emails")
-      .select("id")
-      .ilike("email", email)
-      .eq("is_verified", true)
-      .limit(1)
-      .maybeSingle();
-    if (alreadyOk) return { ok: true as const };
+    // Always verify the entered code against the current pending row.
 
     // find latest matching code
     const { data: row, error } = await supabaseAdmin
