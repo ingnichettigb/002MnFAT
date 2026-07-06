@@ -97,7 +97,7 @@ function AuthPage() {
       } else if (res.reason === "expired") {
         setError("Codice scaduto, richiedi un nuovo codice.");
       } else {
-        setError("Codice non valido.");
+        setError("Codice non corretto, riprova");
       }
     } catch (err) {
       setError(
