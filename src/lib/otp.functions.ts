@@ -89,7 +89,7 @@ export const requestOtp = createServerFn({ method: "POST" })
 
     const code = generateOtp();
     const nextAttempts = attempts + 1;
-    const windowIso = new Date(windowStart).toISOString();
+    const sentAtIso = new Date(now).toISOString();
 
     // Reuse the row only if it's still pending; otherwise start a fresh one.
     if (latest && !latest.is_verified) {
@@ -98,7 +98,7 @@ export const requestOtp = createServerFn({ method: "POST" })
         .update({
           verification_code: code,
           otp_attempts: nextAttempts,
-          otp_window_start: windowIso,
+          otp_window_start: sentAtIso,
         })
         .eq("id", latest.id);
       if (updErr) throw new Error(updErr.message);
@@ -111,7 +111,7 @@ export const requestOtp = createServerFn({ method: "POST" })
           is_verified: false,
           source: APP_CODE,
           otp_attempts: nextAttempts,
-          otp_window_start: windowIso,
+          otp_window_start: sentAtIso,
         });
       if (insErr) throw new Error(insErr.message);
     }
@@ -140,7 +140,7 @@ export const verifyOtp = createServerFn({ method: "POST" })
     // find latest matching code
     const { data: row, error } = await supabaseAdmin
       .from("lead_emails")
-      .select("id, verification_code, created_at, is_verified")
+      .select("id, verification_code, otp_window_start, created_at, is_verified")
       .ilike("email", email)
       .eq("verification_code", code)
       .eq("is_verified", false)
@@ -152,8 +152,10 @@ export const verifyOtp = createServerFn({ method: "POST" })
       return { ok: false as const, reason: "invalid" as const };
     }
 
-    const createdAt = new Date(row.created_at as string).getTime();
-    const ageMin = (Date.now() - createdAt) / 60000;
+    const sentAt = row.otp_window_start
+      ? new Date(row.otp_window_start as string).getTime()
+      : new Date(row.created_at as string).getTime();
+    const ageMin = (Date.now() - sentAt) / 60000;
     if (ageMin > OTP_TTL_MIN) {
       return { ok: false as const, reason: "expired" as const };
     }
