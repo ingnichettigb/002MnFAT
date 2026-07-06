@@ -119,10 +119,6 @@ function AuthPage() {
         setError(RATE_LIMIT_MSG);
         return;
       }
-      if ("alreadyVerified" in res && res.alreadyVerified) {
-        goActivation(normalized);
-        return;
-      }
       setInfo(`Nuovo codice inviato a ${normalized}`);
       setCode("");
     } catch (err) {
