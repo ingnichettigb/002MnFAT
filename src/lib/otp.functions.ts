@@ -61,34 +61,20 @@ export const requestOtp = createServerFn({ method: "POST" })
     );
     const email = data.email;
 
-    // 1) already verified?
-    const { data: verified, error: verErr } = await supabaseAdmin
+    // Get latest row for this email (any status) for rate-limit tracking
+    const { data: latest, error: latestErr } = await supabaseAdmin
       .from("lead_emails")
-      .select("id")
+      .select("id, is_verified, otp_attempts, otp_window_start")
       .ilike("email", email)
-      .eq("is_verified", true)
-      .limit(1)
-      .maybeSingle();
-    if (verErr) throw new Error(verErr.message);
-    if (verified) {
-      return { alreadyVerified: true as const };
-    }
-
-    // 2) get the current pending row for this email (if any) to track rate-limit window
-    const { data: pending, error: pendErr } = await supabaseAdmin
-      .from("lead_emails")
-      .select("id, otp_attempts, otp_window_start")
-      .ilike("email", email)
-      .eq("is_verified", false)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (pendErr) throw new Error(pendErr.message);
+    if (latestErr) throw new Error(latestErr.message);
 
     const now = Date.now();
-    let attempts = pending?.otp_attempts ?? 0;
-    let windowStart = pending?.otp_window_start
-      ? new Date(pending.otp_window_start as string).getTime()
+    let attempts = latest?.otp_attempts ?? 0;
+    let windowStart = latest?.otp_window_start
+      ? new Date(latest.otp_window_start as string).getTime()
       : 0;
 
     const windowMs = OTP_WINDOW_HOURS * 3600 * 1000;
@@ -105,7 +91,8 @@ export const requestOtp = createServerFn({ method: "POST" })
     const nextAttempts = attempts + 1;
     const windowIso = new Date(windowStart).toISOString();
 
-    if (pending) {
+    // Reuse the row only if it's still pending; otherwise start a fresh one.
+    if (latest && !latest.is_verified) {
       const { error: updErr } = await supabaseAdmin
         .from("lead_emails")
         .update({
@@ -113,7 +100,7 @@ export const requestOtp = createServerFn({ method: "POST" })
           otp_attempts: nextAttempts,
           otp_window_start: windowIso,
         })
-        .eq("id", pending.id);
+        .eq("id", latest.id);
       if (updErr) throw new Error(updErr.message);
     } else {
       const { error: insErr } = await supabaseAdmin
@@ -130,7 +117,7 @@ export const requestOtp = createServerFn({ method: "POST" })
     }
 
     await sendOtpEmail(email, code);
-    return { alreadyVerified: false as const };
+    return { sent: true as const };
   });
 
 export const verifyOtp = createServerFn({ method: "POST" })
@@ -148,15 +135,7 @@ export const verifyOtp = createServerFn({ method: "POST" })
     );
     const { email, code } = data;
 
-    // already verified?
-    const { data: alreadyOk } = await supabaseAdmin
-      .from("lead_emails")
-      .select("id")
-      .ilike("email", email)
-      .eq("is_verified", true)
-      .limit(1)
-      .maybeSingle();
-    if (alreadyOk) return { ok: true as const };
+    // Always verify the entered code against the current pending row.
 
     // find latest matching code
     const { data: row, error } = await supabaseAdmin
