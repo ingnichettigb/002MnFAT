@@ -123,16 +123,17 @@ function AuthPage() {
     try {
       const normalized = email.trim().toLowerCase();
       const res = await reqOtp({ data: { email: normalized } });
-      if ("rateLimited" in res && res.rateLimited) {
-        setError(RATE_LIMIT_MSG);
+      if (!res.ok) {
+        if (res.reason === "rate_limited") setError(RATE_LIMIT_MSG);
+        else setError(SEND_FAIL_MSG);
         return;
       }
       setInfo(`Nuovo codice inviato a ${normalized}`);
       setCode("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Errore durante l'invio del codice.",
-      );
+      console.error(err);
+      setError(SEND_FAIL_MSG);
+
     } finally {
       setLoading(false);
     }
