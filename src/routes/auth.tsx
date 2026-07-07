@@ -102,19 +102,19 @@ function AuthPage() {
       if (res.ok) {
         setStage("done");
         setTimeout(() => goActivation(normalized), 600);
-      } else if (res.reason === "expired") {
-        setError("Codice scaduto, richiedi un nuovo codice.");
+      } else if (res.reason === "verify_save_failed") {
+        setError(OTP_SAVE_FAIL_MSG);
       } else {
-        setError("Codice non corretto, riprova");
+        setError(OTP_INVALID_MSG);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Errore durante la verifica.",
-      );
+      console.error(err);
+      setError(OTP_SAVE_FAIL_MSG);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleResend = async () => {
     setError(null);
