@@ -78,7 +78,12 @@ export const requestOtp = createServerFn({ method: "POST" })
       : 0;
 
     const windowMs = OTP_WINDOW_HOURS * 3600 * 1000;
-    if (!windowStart || now - windowStart > windowMs) {
+
+    if (latest?.is_verified) {
+      // Verified owners can always request new codes; reset attempts.
+      attempts = 0;
+      windowStart = now;
+    } else if (!windowStart || now - windowStart > windowMs) {
       attempts = 0;
       windowStart = now;
     }
@@ -86,6 +91,7 @@ export const requestOtp = createServerFn({ method: "POST" })
     if (attempts >= OTP_MAX_PER_WINDOW) {
       return { ok: false as const, reason: "rate_limited" as const, code: "E-011" };
     }
+
 
 
     const code = generateOtp();
@@ -167,8 +173,13 @@ export const verifyOtp = createServerFn({ method: "POST" })
 
       const { error: updErr } = await supabaseAdmin
         .from("lead_emails")
-        .update({ is_verified: true, verified_at: new Date().toISOString() })
+        .update({
+          is_verified: true,
+          verified_at: new Date().toISOString(),
+          otp_attempts: 0,
+        })
         .eq("id", row.id);
+
       if (updErr) throw new Error(updErr.message);
 
       // Confirm the flag really landed in the DB before signaling success.
