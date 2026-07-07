@@ -173,8 +173,13 @@ export const verifyOtp = createServerFn({ method: "POST" })
 
       const { error: updErr } = await supabaseAdmin
         .from("lead_emails")
-        .update({ is_verified: true, verified_at: new Date().toISOString() })
+        .update({
+          is_verified: true,
+          verified_at: new Date().toISOString(),
+          otp_attempts: 0,
+        })
         .eq("id", row.id);
+
       if (updErr) throw new Error(updErr.message);
 
       // Confirm the flag really landed in the DB before signaling success.
