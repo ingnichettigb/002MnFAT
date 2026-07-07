@@ -84,8 +84,9 @@ export const requestOtp = createServerFn({ method: "POST" })
     }
 
     if (attempts >= OTP_MAX_PER_WINDOW) {
-      return { rateLimited: true as const };
+      return { ok: false as const, reason: "rate_limited" as const, code: "E-011" };
     }
+
 
     const code = generateOtp();
     const nextAttempts = attempts + 1;
