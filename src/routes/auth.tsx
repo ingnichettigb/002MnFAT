@@ -28,7 +28,14 @@ export const Route = createFileRoute("/auth")({
 type Stage = "email" | "otp" | "done";
 
 const RATE_LIMIT_MSG =
-  "Hai già ricevuto 3 codici di verifica. Riprova tra 24 ore oppure controlla la posta in arrivo (anche spam) per i codici già inviati.";
+  "Hai già ricevuto 3 codici di verifica. Riprova tra 24 ore. (E-011)";
+const SEND_FAIL_MSG =
+  "Impossibile inviare il codice. Verifica l'indirizzo email. (E-010)";
+const OTP_INVALID_MSG =
+  "Codice non corretto. Riprova o richiedi un nuovo invio. (E-012)";
+const OTP_SAVE_FAIL_MSG =
+  "Errore tecnico durante la verifica. Riprova. (E-013)";
+
 
 function AuthPage() {
   const navigate = useNavigate();
