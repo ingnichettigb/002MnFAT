@@ -25,8 +25,21 @@ export const Route = createFileRoute("/attivazione")({
   component: AttivazionePage,
 });
 
-const INVALID_MSG =
-  "Codice licenza o PUK non validi, oppure già utilizzati. Verifica i dati ricevuti via email o contattaci.";
+const REASON_MESSAGES: Record<string, string> = {
+  license_not_found:
+    "Il codice licenza inserito non risulta valido. Verifica di averlo copiato correttamente dall'email di acquisto. (E-101)",
+  email_mismatch:
+    "Questo codice licenza è associato a un altro indirizzo email. Verifica di aver usato l'email con cui hai effettuato l'acquisto. (E-102)",
+  license_expired:
+    "Questa licenza risulta scaduta. Contattaci per il rinnovo. (E-103)",
+  puk_not_found:
+    "Il codice PUK inserito non è valido per questa licenza. Verifica di averlo copiato correttamente dall'email di acquisto. (E-201)",
+  puk_already_used:
+    "Questo codice PUK risulta già utilizzato. Se hai già attivato la licenza in precedenza, contattaci per assistenza. (E-202)",
+  server_error:
+    "Si è verificato un errore tecnico. Riprova tra qualche minuto o contattaci indicando il codice errore. (E-500)",
+};
+
 
 function AttivazionePage() {
   const navigate = useNavigate();
