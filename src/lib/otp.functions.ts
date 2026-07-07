@@ -137,41 +137,57 @@ export const verifyOtp = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import(
-      "@/integrations/supabase/client.server"
-    );
-    const { email, code } = data;
+    try {
+      const { supabaseAdmin } = await import(
+        "@/integrations/supabase/client.server"
+      );
+      const { email, code } = data;
 
-    // Always verify the entered code against the current pending row.
+      const { data: row, error } = await supabaseAdmin
+        .from("lead_emails")
+        .select("id, verification_code, otp_window_start, created_at, is_verified")
+        .ilike("email", email)
+        .eq("verification_code", code)
+        .eq("is_verified", false)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!row) {
+        return { ok: false as const, reason: "invalid" as const, code: "E-012" };
+      }
 
-    // find latest matching code
-    const { data: row, error } = await supabaseAdmin
-      .from("lead_emails")
-      .select("id, verification_code, otp_window_start, created_at, is_verified")
-      .ilike("email", email)
-      .eq("verification_code", code)
-      .eq("is_verified", false)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
-    if (!row) {
-      return { ok: false as const, reason: "invalid" as const };
+      const sentAt = row.otp_window_start
+        ? new Date(row.otp_window_start as string).getTime()
+        : new Date(row.created_at as string).getTime();
+      const ageMin = (Date.now() - sentAt) / 60000;
+      if (ageMin > OTP_TTL_MIN) {
+        return { ok: false as const, reason: "invalid" as const, code: "E-012" };
+      }
+
+      const { error: updErr } = await supabaseAdmin
+        .from("lead_emails")
+        .update({ is_verified: true, verified_at: new Date().toISOString() })
+        .eq("id", row.id);
+      if (updErr) throw new Error(updErr.message);
+
+      // Confirm the flag really landed in the DB before signaling success.
+      const { data: confirm, error: confErr } = await supabaseAdmin
+        .from("lead_emails")
+        .select("id, is_verified")
+        .eq("id", row.id)
+        .limit(1)
+        .maybeSingle();
+      if (confErr) throw new Error(confErr.message);
+      if (!confirm || confirm.is_verified !== true) {
+        return { ok: false as const, reason: "verify_save_failed" as const, code: "E-013" };
+      }
+
+      return { ok: true as const };
+    } catch (err) {
+      console.error("verifyOtp error:", err);
+      return { ok: false as const, reason: "verify_save_failed" as const, code: "E-013" };
     }
+  });
 
-    const sentAt = row.otp_window_start
-      ? new Date(row.otp_window_start as string).getTime()
-      : new Date(row.created_at as string).getTime();
-    const ageMin = (Date.now() - sentAt) / 60000;
-    if (ageMin > OTP_TTL_MIN) {
-      return { ok: false as const, reason: "expired" as const };
-    }
-
-    const { error: updErr } = await supabaseAdmin
-      .from("lead_emails")
-      .update({ is_verified: true, verified_at: new Date().toISOString() })
-      .eq("id", row.id);
-    if (updErr) throw new Error(updErr.message);
-
-    return { ok: true as const };
   });
