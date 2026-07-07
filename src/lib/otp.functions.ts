@@ -116,9 +116,15 @@ export const requestOtp = createServerFn({ method: "POST" })
       if (insErr) throw new Error(insErr.message);
     }
 
-    await sendOtpEmail(email, code);
-    return { sent: true as const };
+    try {
+      await sendOtpEmail(email, code);
+    } catch (err) {
+      console.error("sendOtpEmail failed:", err);
+      return { ok: false as const, reason: "send_failed" as const, code: "E-010" };
+    }
+    return { ok: true as const, sent: true as const };
   });
+
 
 export const verifyOtp = createServerFn({ method: "POST" })
   .inputValidator((input: { email: string; code: string }) =>
