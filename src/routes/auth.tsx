@@ -28,7 +28,14 @@ export const Route = createFileRoute("/auth")({
 type Stage = "email" | "otp" | "done";
 
 const RATE_LIMIT_MSG =
-  "Hai già ricevuto 3 codici di verifica. Riprova tra 24 ore oppure controlla la posta in arrivo (anche spam) per i codici già inviati.";
+  "Hai già ricevuto 3 codici di verifica. Riprova tra 24 ore. (E-011)";
+const SEND_FAIL_MSG =
+  "Impossibile inviare il codice. Verifica l'indirizzo email. (E-010)";
+const OTP_INVALID_MSG =
+  "Codice non corretto. Riprova o richiedi un nuovo invio. (E-012)";
+const OTP_SAVE_FAIL_MSG =
+  "Errore tecnico durante la verifica. Riprova. (E-013)";
+
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -63,20 +70,21 @@ function AuthPage() {
     setLoading(true);
     try {
       const res = await reqOtp({ data: { email: normalized } });
-      if ("rateLimited" in res && res.rateLimited) {
-        setError(RATE_LIMIT_MSG);
+      if (!res.ok) {
+        if (res.reason === "rate_limited") setError(RATE_LIMIT_MSG);
+        else setError(SEND_FAIL_MSG);
         return;
       }
       setStage("otp");
       setInfo(`Abbiamo inviato il codice a ${normalized}`);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Errore durante l'invio del codice.",
-      );
+      console.error(err);
+      setError(SEND_FAIL_MSG);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,19 +102,19 @@ function AuthPage() {
       if (res.ok) {
         setStage("done");
         setTimeout(() => goActivation(normalized), 600);
-      } else if (res.reason === "expired") {
-        setError("Codice scaduto, richiedi un nuovo codice.");
+      } else if (res.reason === "verify_save_failed") {
+        setError(OTP_SAVE_FAIL_MSG);
       } else {
-        setError("Codice non corretto, riprova");
+        setError(OTP_INVALID_MSG);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Errore durante la verifica.",
-      );
+      console.error(err);
+      setError(OTP_SAVE_FAIL_MSG);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleResend = async () => {
     setError(null);
@@ -115,16 +123,17 @@ function AuthPage() {
     try {
       const normalized = email.trim().toLowerCase();
       const res = await reqOtp({ data: { email: normalized } });
-      if ("rateLimited" in res && res.rateLimited) {
-        setError(RATE_LIMIT_MSG);
+      if (!res.ok) {
+        if (res.reason === "rate_limited") setError(RATE_LIMIT_MSG);
+        else setError(SEND_FAIL_MSG);
         return;
       }
       setInfo(`Nuovo codice inviato a ${normalized}`);
       setCode("");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Errore durante l'invio del codice.",
-      );
+      console.error(err);
+      setError(SEND_FAIL_MSG);
+
     } finally {
       setLoading(false);
     }
