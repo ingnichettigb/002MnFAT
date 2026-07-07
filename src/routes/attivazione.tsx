@@ -89,9 +89,13 @@ function AttivazionePage() {
         navigate({ to: "/auth", replace: true });
         return;
       }
-      setError(INVALID_MSG);
+      setError(
+        REASON_MESSAGES[res.reason] ?? REASON_MESSAGES.server_error,
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Errore durante l'attivazione.");
+      console.error(err);
+      setError(REASON_MESSAGES.server_error);
+
     } finally {
       setLoading(false);
     }
