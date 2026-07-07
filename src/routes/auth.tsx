@@ -70,20 +70,21 @@ function AuthPage() {
     setLoading(true);
     try {
       const res = await reqOtp({ data: { email: normalized } });
-      if ("rateLimited" in res && res.rateLimited) {
-        setError(RATE_LIMIT_MSG);
+      if (!res.ok) {
+        if (res.reason === "rate_limited") setError(RATE_LIMIT_MSG);
+        else setError(SEND_FAIL_MSG);
         return;
       }
       setStage("otp");
       setInfo(`Abbiamo inviato il codice a ${normalized}`);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Errore durante l'invio del codice.",
-      );
+      console.error(err);
+      setError(SEND_FAIL_MSG);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
