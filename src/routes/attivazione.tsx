@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { verifyAndActivateLicense } from "@/lib/license.functions";
 import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY } from "@/routes/__root";
+import { APP_CODE } from "@/lib/app-config";
 
 export const Route = createFileRoute("/attivazione")({
   head: () => ({
