@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { verifyAndActivateLicense } from "@/lib/license.functions";
 import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY } from "@/routes/__root";
+import { APP_CODE } from "@/lib/app-config";
 
 export const Route = createFileRoute("/attivazione")({
   head: () => ({
@@ -107,7 +108,7 @@ function AttivazionePage() {
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-8">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Attivazione licenza</CardTitle>
+          <CardTitle>Attivazione licenza — {APP_CODE}</CardTitle>
           <CardDescription>
             Passaggio 2 di 2 — Inserisci il codice licenza e il PUK ricevuti via
             email al momento dell'acquisto.
