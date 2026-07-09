@@ -34,6 +34,9 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import(
         "@/integrations/supabase/client.server"
       );
+      const { supabaseExternal } = await import(
+        "@/integrations/supabase/client.external"
+      );
       const { email, licenseKey, puk } = data;
 
       // 1) email must be verified
