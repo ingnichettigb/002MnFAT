@@ -225,6 +225,22 @@ function AuthPage() {
               Email verificata con successo. Reindirizzamento…
             </p>
           )}
+
+          <div className="mt-6 border-t pt-4">
+            <Button
+              type="button"
+              className="w-full bg-red-600 text-white hover:bg-red-700"
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.localStorage.setItem(VERIFIED_EMAIL_KEY, "dev@bypass.local");
+                  window.localStorage.setItem("002MnFAT:activated", "1");
+                }
+                navigate({ to: "/" });
+              }}
+            >
+              Sviluppatore — bypass
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
