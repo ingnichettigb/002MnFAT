@@ -13,6 +13,7 @@ import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
 import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
+import { InfoDialog } from "@/components/info-dialog";
 import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
@@ -133,7 +134,10 @@ function IndexPage() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("appSubtitle")}</p>
         </div>
-        <LangSwitcher />
+        <div className="flex items-center gap-2">
+          <LangSwitcher />
+          <InfoDialog />
+        </div>
       </header>
 
       <FatToolbar />
