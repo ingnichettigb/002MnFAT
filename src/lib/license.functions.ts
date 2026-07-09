@@ -34,6 +34,9 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import(
         "@/integrations/supabase/client.server"
       );
+      const { supabaseExternal } = await import(
+        "@/integrations/supabase/client.external"
+      );
       const { email, licenseKey, puk } = data;
 
       // 1) email must be verified
@@ -50,7 +53,7 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
       }
 
       // 2) find license by key+app (no email filter yet, so we can distinguish mismatch)
-      const { data: license, error: lErr } = await supabaseAdmin
+      const { data: license, error: lErr } = await supabaseExternal
         .from("licenses")
         .select("id, is_active, expires_at, activated_at, user_email")
         .eq("license_key", licenseKey)
@@ -76,7 +79,7 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
       }
 
       // 3) find matching puk
-      const { data: pukRow, error: pErr } = await supabaseAdmin
+      const { data: pukRow, error: pErr } = await supabaseExternal
         .from("puk_codes")
         .select("id, used")
         .eq("license_id", license.id)
@@ -98,7 +101,7 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
 
       // 4) activate: set activated_at (if null) + mark puk used
       if (!license.activated_at) {
-        const { error: actErr } = await supabaseAdmin
+        const { error: actErr } = await supabaseExternal
           .from("licenses")
           .update({ activated_at: new Date().toISOString() })
           .eq("id", license.id)
@@ -106,7 +109,7 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
         if (actErr) throw new Error(actErr.message);
       }
 
-      const { error: pukUpdErr } = await supabaseAdmin
+      const { error: pukUpdErr } = await supabaseExternal
         .from("puk_codes")
         .update({ used: true, used_at: new Date().toISOString() })
         .eq("id", pukRow.id)
