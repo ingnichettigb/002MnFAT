@@ -13,7 +13,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { verifyAndActivateLicense } from "@/lib/license.functions";
+import { checkTermsConsent } from "@/lib/consent.functions";
+import { TermsConsent } from "@/components/terms-consent";
 import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY } from "@/routes/__root";
+import { useI18n } from "@/lib/i18n";
 import { APP_CODE } from "@/lib/app-config";
 
 export const Route = createFileRoute("/attivazione")({
