@@ -123,6 +123,19 @@ function AttivazionePage() {
 
   if (!email) return null;
 
+  if (pendingConsent) {
+    return (
+      <TermsConsent
+        licenseId={pendingConsent}
+        email={email}
+        initialLang={primary}
+        onAccepted={finalizeActivation}
+      />
+    );
+  }
+
+
+
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-8">
       <Card className="w-full">
