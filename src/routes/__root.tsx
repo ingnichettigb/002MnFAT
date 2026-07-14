@@ -88,23 +88,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test.",
+          "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test (IT/EN).",
       },
       { name: "author", content: "mini FAT" },
       { property: "og:title", content: "mini FAT — Verbali di Collaudo" },
       {
         property: "og:description",
-        content: "Compila e genera in PDF il verbale FAT.",
+        content: "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test (IT/EN).",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "mini FAT — Verbali di Collaudo" },
-      { name: "description", content: "Factory Acceptance Hub manages Factory Acceptance Tests, generating professional PDF reports with detailed checklists." },
-      { property: "og:description", content: "Factory Acceptance Hub manages Factory Acceptance Tests, generating professional PDF reports with detailed checklists." },
-      { name: "twitter:description", content: "Factory Acceptance Hub manages Factory Acceptance Tests, generating professional PDF reports with detailed checklists." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1b2225a9-c6d8-46df-8847-1e05fa1fd5aa/id-preview-424ddf59--85d49123-e4a9-4e52-b510-892b92a852ea.lovable.app-1782110456692.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1b2225a9-c6d8-46df-8847-1e05fa1fd5aa/id-preview-424ddf59--85d49123-e4a9-4e52-b510-892b92a852ea.lovable.app-1782110456692.png" },
+      { name: "description", content: "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test (IT/EN)." },
+      { property: "og:description", content: "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test (IT/EN)." },
+      { name: "twitter:description", content: "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test (IT/EN)." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/0yS65EUwnpUx9OQts7qM6xTJ5vi2/social-images/social-1784016340172-2026_TARGA_MniniFAT.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/0yS65EUwnpUx9OQts7qM6xTJ5vi2/social-images/social-1784016340172-2026_TARGA_MniniFAT.webp" },
     ],
     links: [
       {
