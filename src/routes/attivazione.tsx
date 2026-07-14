@@ -142,7 +142,7 @@ function AttivazionePage() {
         <CardHeader>
           <CardTitle>Attivazione licenza — {APP_CODE}</CardTitle>
           <CardDescription>
-            Passaggio 2 di 2 — Inserisci il codice licenza e il PUK ricevuti via
+            Passaggio 2 di 3 — Inserisci il codice licenza e il PUK ricevuti via
             email al momento dell'acquisto.
           </CardDescription>
         </CardHeader>
