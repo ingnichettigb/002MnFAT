@@ -48,12 +48,17 @@ const REASON_MESSAGES: Record<string, string> = {
 function AttivazionePage() {
   const navigate = useNavigate();
   const activate = useServerFn(verifyAndActivateLicense);
+  const checkConsent = useServerFn(checkTermsConsent);
+  const { primary } = useI18n();
 
   const [email, setEmail] = React.useState<string | null>(null);
   const [licenseKey, setLicenseKey] = React.useState("");
   const [puk, setPuk] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [pendingConsent, setPendingConsent] = React.useState<string | null>(
+    null,
+  );
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -64,6 +69,13 @@ function AttivazionePage() {
     }
     setEmail(verified);
   }, [navigate]);
+
+  const finalizeActivation = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(ACTIVATED_KEY, "1");
+    }
+    navigate({ to: "/" });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,10 +95,14 @@ function AttivazionePage() {
         },
       });
       if (res.ok) {
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(ACTIVATED_KEY, "1");
+        const consent = await checkConsent({
+          data: { licenseId: res.licenseId },
+        });
+        if (consent.accepted) {
+          finalizeActivation();
+        } else {
+          setPendingConsent(res.licenseId);
         }
-        navigate({ to: "/" });
         return;
       }
       if (res.reason === "email_not_verified") {
