@@ -1,65 +1,96 @@
+# Step 2.5 — Accettazione Condizioni d'Uso
 
-# Guida info — audit, riscrittura e traduzione 4 lingue
+Nuovo step obbligatorio tra attivazione licenza e accesso alla SaaS, con consenso persistito su `license_consents` (tabella esistente, non modificata) e testo in 4 lingue riutilizzabile per altri prodotti.
 
-## Obiettivo
+## 1. Config app (`src/lib/app-config.ts`)
 
-La guida attuale in `src/components/info-dialog.tsx` è testo copiato dal PDF del manuale, hard-coded in italiano. Va (1) verificata rispetto a ciò che l'app fa davvero e (2) tradotta in IT/EN/DE/ES seguendo la **lingua primaria** già gestita da `useI18n()` (`src/lib/i18n.tsx`).
+Estendere il file esistente aggiungendo:
 
-## Fase 1 — Audit del comportamento reale
+- `APP_NAME = "mini FAT"` — nome mostrato nel testo delle condizioni (interpolato al posto di `{{APP_NAME}}`).
+- `TERMS_VERSION = "v1"` — versione condizioni. Cambiandola in futuro si forzerà un nuovo consenso.
 
-Leggo e confronto con la guida attuale:
+Per riuso su altri SaaS: solo `APP_CODE`, `APP_NAME`, `TERMS_VERSION` cambiano; tutto il resto è generico.
 
-- `src/routes/index.tsx` — header, `LangSwitcher`, `InfoDialog`, apertura stepper.
-- `src/components/fat-stepper.tsx` — passi Dati Generali → Controlli → Report.
-- `src/components/fat-toolbar.tsx` — pulsanti TEMPL / DOC / ARCH / SALVA / NEW / PDF (verifico nomi reali, ordine, comportamento).
-- `src/routes/controlli.tsx` — selezione controlli, personalizzati, riordino.
-- `src/routes/report.tsx` — riepilogo, generazione PDF, stato "completato".
-- `src/routes/archivio.tsx` — filtri stato (Da lavorare / In lavorazione / Completati / Tutti), apri / duplica / elimina.
-- `src/lib/fat-context.tsx` — dove/come vengono salvati i FAT (localStorage).
-- `src/lib/generate-fat-pdf.ts` — cosa finisce nel PDF (frontespizio, capitoli per controllo, conclusioni, firme).
-- `src/lib/i18n.tsx` — logica primaria/secondaria (già letto): la primaria è la lingua UI, la secondaria affianca i testi nei campi tradotti (`primaria / secondaria`).
+## 2. Nuovo file traduzioni (`src/lib/terms-i18n.ts`)
 
-Per ogni sezione della guida attuale segno: ✅ corretta, ✏️ da correggere, ➕ da aggiungere, ➖ da rimuovere. Il risultato dell'audit diventa la nuova struttura di contenuti.
+File separato dal `dict` principale per non appesantirlo. Struttura:
 
-## Fase 2 — Contenuti (bozza di sezioni)
+```
+export const TERMS: Record<Lang, {
+  langLabel: string;             // "Italiano" / "English" / ...
+  pageTitle: string;             // "Condizioni d'Uso"
+  stepLabel: string;             // "Passaggio 3 di 3"
+  checkboxLabel: string;         // "Ho letto e accetto le condizioni d'uso"
+  acceptButton: string;          // "Accetta e continua"
+  acceptingButton: string;       // "Salvataggio…"
+  errorGeneric: string;          // fallback errore
+  content: {                     // corpo delle condizioni
+    heading: string;             // "CONDIZIONI D'USO DEL SOFTWARE"
+    subheading: string;          // "{{APP_NAME}} — Versione 1.0"
+    sections: Array<{ title: string; body: string }>; // 9 sezioni numerate
+    footer: string;              // "Versione: v1 — Ultimo aggiornamento: 14 luglio 2026"
+  };
+}>
+```
 
-Contenuti scritti sulla base dell'audit, non del PDF. Sezioni previste (titoli finali confermati dopo l'audit):
+Testo italiano preso fedelmente dal brief. Traduzioni EN/DE/ES prodotte mantenendo:
 
-1. Cos'è mini FAT e a cosa serve
-2. Barra lingue — primaria (badge 1) e secondaria (badge 2), come cambiano i testi
-3. Header e pulsante info
-4. Stepper: Dati Generali → Controlli → Report
-5. Toolbar: TEMPL, DOC, ARCH, SALVA, NEW, PDF (solo quelli realmente presenti)
-6. Dati Generali: Ente Costruttore, Ente Verificatore, Dati collaudo, Presenti
-7. Controlli: preset, personalizzati, riordino, selezione
-8. Report: riepilogo, generazione PDF, marcatura "completato"
-9. Archivio: stati, apri / duplica / elimina, salvataggio in localStorage
-10. Conclusioni e firme
-11. Note tecniche (dati locali al browser, nessun invio server per il verbale)
+- stessa struttura a 9 punti numerati con stessi titoli,
+- registro legale/formale,
+- riferimenti invariati (Paddle.com Market Limited, P.IVA IT01235350194, GDPR, Foro di Cremona, `/pagamenti-merchant-of-record`),
+- placeholder `{{APP_NAME}}` conservato nel testo e sostituito a runtime.
 
-## Fase 3 — i18n
+## 3. Nuovo componente riutilizzabile (`src/components/terms-consent.tsx`)
 
-Sposto ogni stringa della guida dentro `src/lib/i18n.tsx` come nuove chiavi con prefisso `guide` (es. `guideSectionLangTitle`, `guideSectionLangBody`), ognuna con i 4 campi `it / en / de / es`. Traduzioni scritte a mano (non machine translation cieca), coerenti con la terminologia già presente nel dizionario (es. "Ente Costruttore" → `manufacturerTitle`, "Controlli" → `controlsTitle`), così la guida usa gli stessi termini della UI.
+Componente puro presentazionale + logica, riutilizzabile senza modifiche:
 
-Per la resa nel dialog uso **solo la lingua primaria** (`primary`), non il formato affiancato `primaria / secondaria` usato dai campi form — un testo lungo diventerebbe illeggibile. Regola esplicita nella guida: "la guida segue la lingua primaria selezionata in alto".
+- Props: `licenseId: string`, `email: string`, `onAccepted: () => void`.
+- Stato interno: `lang` (default `'it'`), `checked`, `loading`, `error`.
+- Selettore lingua in alto: 4 pill/button (IT/EN/DE/ES) coerenti col brand (`#06090f` bg, `#0a2a4a` surface, `#b4ff3c` accent attivo).
+- Box scrollabile (`max-h-[50vh] overflow-y-auto`) con `heading`, `subheading`, le 9 sezioni e il footer, con `{{APP_NAME}}` sostituito da `APP_NAME`.
+- Checkbox obbligatoria + label tradotta.
+- Bottone "Accetta e continua" tradotto, disabilitato finché `!checked || loading`.
+- Al click: chiama la server function `recordTermsConsent` (vedi §4). Su successo → `onAccepted()`. Su errore generico → mostra `errorGeneric`.
 
-## Fase 4 — Refactor `info-dialog.tsx`
+## 4. Server function (`src/lib/consent.functions.ts`)
 
-- Rimuovo il testo italiano hard-coded.
-- Uso `const { t, primary } = useI18n();` e compongo il contenuto da chiavi `guide*`.
-- I titoli di sezione sono `<h3>` con token del design system, il corpo `<p>` / `<ul>`.
-- Il dialog resta `max-w-2xl`, `max-h-[85vh]`, `overflow-y-auto`, trigger `Button variant="outline" size="icon"` con `Info` lucide (già com'è).
-- Aggiungo `aria-label` tradotto (`guideOpen`: "Guida" / "Guide" / "Anleitung" / "Guía").
+Nuovo file, pattern identico a `license.functions.ts`:
 
-## Dettagli tecnici
+- `checkTermsConsent({ licenseId })` → interroga `supabaseExternal.from('license_consents').select('id').eq('license_id', licenseId).eq('terms_version', TERMS_VERSION).maybeSingle()`. Ritorna `{ accepted: boolean }`.
+- `recordTermsConsent({ licenseId, language })`:
+  - Legge `app_code` dalla riga `licenses` corrispondente (evita di fidarsi del client).
+  - Insert su `license_consents` con `license_id`, `app_code`, `language`, `terms_version = TERMS_VERSION`, `user_agent` (header `user-agent` via `getRequestHeader`), `ip_address` (header `x-forwarded-for` prima virgola, altrimenti `null`).
+  - Se errore Postgres `code === '23505'` (violazione UNIQUE `license_id, terms_version`) → ritorna `{ ok: true, alreadyExisted: true }`.
+  - Altri errori → ritorna `{ ok: false, code: 'E-301' }`; il componente mostra `errorGeneric` e blocca l'accesso.
+  - Successo → `{ ok: true, alreadyExisted: false }`.
 
-- Nessun cambio a routing, auth, backend, PDF, o toolbar: modifiche circoscritte a `src/components/info-dialog.tsx` e `src/lib/i18n.tsx`.
-- Nessuna nuova dipendenza.
-- Reattività: cambiando la lingua primaria dal `LangSwitcher` la guida si riaggiorna automaticamente (React re-render da context).
-- Verifica finale: aprire il dialog nelle 4 lingue e controllare che ogni sezione riflette il codice attuale (toolbar, stepper, archivio).
+Entrambe usano `supabaseExternal` (mai il client Lovable).
 
-## Fuori scopo
+## 5. Integrazione nel flusso attivazione (`src/routes/attivazione.tsx`)
 
-- Riscrittura del PDF manuale allegato.
-- Modifiche alla logica di `cycleLang` o al comportamento primaria/secondaria.
-- Traduzione della guida nel formato affiancato `IT / EN` (usiamo solo primaria per leggibilità).
+Dopo `activate(...)` con `res.ok === true`:
+
+1. Chiama `checkTermsConsent({ licenseId: res.licenseId })`.
+2. Se `accepted === true` → comportamento attuale: setta `ACTIVATED_KEY` e naviga a `/`.
+3. Se `accepted === false` → NON setta ancora `ACTIVATED_KEY`, memorizza `licenseId` in stato locale e mostra `<TermsConsent licenseId={...} email={email} onAccepted={...} />` al posto del form.
+4. In `onAccepted`: setta `ACTIVATED_KEY` e naviga a `/`.
+
+Aggiornare `CardDescription` in "Passaggio 2 di 3" quando serve.
+
+## 6. Auth gate (`src/routes/__root.tsx`)
+
+Nessuna modifica strutturale: la sequenza `verified → activated → app` resta valida. Il consenso è verificato dentro `attivazione.tsx` prima di scrivere `ACTIVATED_KEY`, quindi l'utente non può raggiungere la SaaS senza aver firmato. Casi limite (utente già `ACTIVATED_KEY=1` in localStorage da sessioni precedenti a questa modifica) non sono gestiti: il consenso è comunque persistito lato server per nuove attivazioni, coerente con il brief che descrive il nuovo flusso post-attivazione.
+
+## Note tecniche
+
+- `license_consents` non è nella lista `<supabase-tables>` locale ma è nel DB esterno (`supabaseExternal`) — nessuna migration.
+- `TERMS_VERSION` centralizzato: cambiando a `'v2'` in futuro, `checkTermsConsent` non trova il record e forza nuova accettazione automaticamente.
+- `APP_NAME` interpolato via semplice `str.replaceAll('{{APP_NAME}}', APP_NAME)` in tutte e 4 le lingue.
+- Colori brand applicati via classi Tailwind arbitrarie / inline style solo sul componente consenso, per non toccare il design system globale.
+
+## Out of scope
+
+- Nessuna modifica a `license_consents`, `licenses`, `puk_codes`, `lead_emails`.
+- Nessuna modifica al client Supabase standard.
+- Nessuna riscrittura dell'auth gate o del flusso OTP.
+- Nessuna pagina pubblica `/condizioni-uso` (solo il consenso in-flow).
