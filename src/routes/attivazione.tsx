@@ -13,7 +13,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { verifyAndActivateLicense } from "@/lib/license.functions";
+import { checkTermsConsent } from "@/lib/consent.functions";
+import { TermsConsent } from "@/components/terms-consent";
 import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY } from "@/routes/__root";
+import { useI18n } from "@/lib/i18n";
 import { APP_CODE } from "@/lib/app-config";
 
 export const Route = createFileRoute("/attivazione")({
@@ -45,12 +48,17 @@ const REASON_MESSAGES: Record<string, string> = {
 function AttivazionePage() {
   const navigate = useNavigate();
   const activate = useServerFn(verifyAndActivateLicense);
+  const checkConsent = useServerFn(checkTermsConsent);
+  const { primary } = useI18n();
 
   const [email, setEmail] = React.useState<string | null>(null);
   const [licenseKey, setLicenseKey] = React.useState("");
   const [puk, setPuk] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [pendingConsent, setPendingConsent] = React.useState<string | null>(
+    null,
+  );
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -61,6 +69,13 @@ function AttivazionePage() {
     }
     setEmail(verified);
   }, [navigate]);
+
+  const finalizeActivation = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(ACTIVATED_KEY, "1");
+    }
+    navigate({ to: "/" });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,10 +95,14 @@ function AttivazionePage() {
         },
       });
       if (res.ok) {
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(ACTIVATED_KEY, "1");
+        const consent = await checkConsent({
+          data: { licenseId: res.licenseId },
+        });
+        if (consent.accepted) {
+          finalizeActivation();
+        } else {
+          setPendingConsent(res.licenseId);
         }
-        navigate({ to: "/" });
         return;
       }
       if (res.reason === "email_not_verified") {
@@ -104,13 +123,26 @@ function AttivazionePage() {
 
   if (!email) return null;
 
+  if (pendingConsent) {
+    return (
+      <TermsConsent
+        licenseId={pendingConsent}
+        email={email}
+        initialLang={primary}
+        onAccepted={finalizeActivation}
+      />
+    );
+  }
+
+
+
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-8">
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Attivazione licenza — {APP_CODE}</CardTitle>
           <CardDescription>
-            Passaggio 2 di 2 — Inserisci il codice licenza e il PUK ricevuti via
+            Passaggio 2 di 3 — Inserisci il codice licenza e il PUK ricevuti via
             email al momento dell'acquisto.
           </CardDescription>
         </CardHeader>
