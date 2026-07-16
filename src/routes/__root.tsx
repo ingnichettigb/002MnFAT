@@ -18,8 +18,12 @@ import { Toaster } from "@/components/ui/sonner";
 
 export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
 export const ACTIVATED_KEY = "002MnFAT:activated";
+export const LICENSE_ID_KEY = "002MnFAT:licenseId";
+export const CONSENT_KEY = "002MnFAT:consent";
 const PUBLIC_PATHS = new Set(["/auth"]);
 const ACTIVATION_PATH = "/attivazione";
+const CONSENT_PATH = "/condizioni";
+
 
 
 function NotFoundComponent() {
@@ -160,8 +164,11 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return;
     const isPublic = PUBLIC_PATHS.has(pathname);
     const isActivation = pathname === ACTIVATION_PATH;
+    const isConsent = pathname === CONSENT_PATH;
     const verified = window.localStorage.getItem(VERIFIED_EMAIL_KEY);
     const activated = window.localStorage.getItem(ACTIVATED_KEY);
+    const consent = window.localStorage.getItem(CONSENT_KEY);
+    const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
 
     if (isPublic) {
       setAllowed(true);
@@ -171,11 +178,15 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     } else if (!activated && !isActivation) {
       navigate({ to: "/attivazione", replace: true });
       setAllowed(false);
+    } else if (activated && !consent && licenseId && !isConsent && !isActivation) {
+      navigate({ to: "/condizioni", replace: true });
+      setAllowed(false);
     } else {
       setAllowed(true);
     }
     setChecked(true);
   }, [pathname, navigate]);
+
 
   if (!checked || !allowed) return null;
   const isPublic = PUBLIC_PATHS.has(pathname);
@@ -188,7 +199,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
             if (typeof window !== "undefined") {
               window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
               window.localStorage.removeItem(ACTIVATED_KEY);
+              window.localStorage.removeItem(LICENSE_ID_KEY);
+              window.localStorage.removeItem(CONSENT_KEY);
             }
+
             navigate({ to: "/auth", replace: true });
           }}
           className="fixed right-3 top-3 z-50 rounded-md border border-input bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur hover:bg-accent"

@@ -15,7 +15,7 @@ import {
 import { verifyAndActivateLicense } from "@/lib/license.functions";
 import { checkTermsConsent } from "@/lib/consent.functions";
 import { TermsConsent } from "@/components/terms-consent";
-import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY } from "@/routes/__root";
+import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, CONSENT_KEY } from "@/routes/__root";
 import { useI18n } from "@/lib/i18n";
 import { APP_CODE } from "@/lib/app-config";
 
@@ -73,9 +73,11 @@ function AttivazionePage() {
   const finalizeActivation = () => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(ACTIVATED_KEY, "1");
+      window.localStorage.setItem(CONSENT_KEY, "1");
     }
     navigate({ to: "/" });
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,6 +97,9 @@ function AttivazionePage() {
         },
       });
       if (res.ok) {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(LICENSE_ID_KEY, res.licenseId);
+        }
         const consent = await checkConsent({
           data: { licenseId: res.licenseId },
         });
@@ -105,6 +110,7 @@ function AttivazionePage() {
         }
         return;
       }
+
       if (res.reason === "email_not_verified") {
         navigate({ to: "/auth", replace: true });
         return;
