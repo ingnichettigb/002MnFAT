@@ -18,8 +18,12 @@ import { Toaster } from "@/components/ui/sonner";
 
 export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
 export const ACTIVATED_KEY = "002MnFAT:activated";
+export const LICENSE_ID_KEY = "002MnFAT:licenseId";
+export const CONSENT_KEY = "002MnFAT:consent";
 const PUBLIC_PATHS = new Set(["/auth"]);
 const ACTIVATION_PATH = "/attivazione";
+const CONSENT_PATH = "/condizioni";
+
 
 
 function NotFoundComponent() {

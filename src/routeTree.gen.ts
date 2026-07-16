@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as ControlliRouteImport } from './routes/controlli'
+import { Route as CondizioniRouteImport } from './routes/condizioni'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AttivazioneRouteImport } from './routes/attivazione'
 import { Route as ArchivioRouteImport } from './routes/archivio'
@@ -24,6 +25,11 @@ const ReportRoute = ReportRouteImport.update({
 const ControlliRoute = ControlliRouteImport.update({
   id: '/controlli',
   path: '/controlli',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CondizioniRoute = CondizioniRouteImport.update({
+  id: '/condizioni',
+  path: '/condizioni',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/archivio': typeof ArchivioRoute
   '/attivazione': typeof AttivazioneRoute
   '/auth': typeof AuthRoute
+  '/condizioni': typeof CondizioniRoute
   '/controlli': typeof ControlliRoute
   '/report': typeof ReportRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/archivio': typeof ArchivioRoute
   '/attivazione': typeof AttivazioneRoute
   '/auth': typeof AuthRoute
+  '/condizioni': typeof CondizioniRoute
   '/controlli': typeof ControlliRoute
   '/report': typeof ReportRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/archivio': typeof ArchivioRoute
   '/attivazione': typeof AttivazioneRoute
   '/auth': typeof AuthRoute
+  '/condizioni': typeof CondizioniRoute
   '/controlli': typeof ControlliRoute
   '/report': typeof ReportRoute
 }
@@ -79,16 +88,25 @@ export interface FileRouteTypes {
     | '/archivio'
     | '/attivazione'
     | '/auth'
+    | '/condizioni'
     | '/controlli'
     | '/report'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/archivio' | '/attivazione' | '/auth' | '/controlli' | '/report'
+  to:
+    | '/'
+    | '/archivio'
+    | '/attivazione'
+    | '/auth'
+    | '/condizioni'
+    | '/controlli'
+    | '/report'
   id:
     | '__root__'
     | '/'
     | '/archivio'
     | '/attivazione'
     | '/auth'
+    | '/condizioni'
     | '/controlli'
     | '/report'
   fileRoutesById: FileRoutesById
@@ -98,6 +116,7 @@ export interface RootRouteChildren {
   ArchivioRoute: typeof ArchivioRoute
   AttivazioneRoute: typeof AttivazioneRoute
   AuthRoute: typeof AuthRoute
+  CondizioniRoute: typeof CondizioniRoute
   ControlliRoute: typeof ControlliRoute
   ReportRoute: typeof ReportRoute
 }
@@ -116,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/controlli'
       fullPath: '/controlli'
       preLoaderRoute: typeof ControlliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/condizioni': {
+      id: '/condizioni'
+      path: '/condizioni'
+      fullPath: '/condizioni'
+      preLoaderRoute: typeof CondizioniRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -154,19 +180,10 @@ const rootRouteChildren: RootRouteChildren = {
   ArchivioRoute: ArchivioRoute,
   AttivazioneRoute: AttivazioneRoute,
   AuthRoute: AuthRoute,
+  CondizioniRoute: CondizioniRoute,
   ControlliRoute: ControlliRoute,
   ReportRoute: ReportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
