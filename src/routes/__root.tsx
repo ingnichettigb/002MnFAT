@@ -175,11 +175,20 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     } else if (!verified) {
       navigate({ to: "/auth", replace: true });
       setAllowed(false);
+    } else if (isConsent) {
+      if (!licenseId) {
+        window.localStorage.removeItem(ACTIVATED_KEY);
+        window.localStorage.removeItem(CONSENT_KEY);
+        navigate({ to: "/attivazione", replace: true });
+        setAllowed(false);
+      } else {
+        setAllowed(true);
+      }
+    } else if (licenseId && !consent && !isActivation) {
+      navigate({ to: "/condizioni", replace: true });
+      setAllowed(false);
     } else if (!activated && !isActivation) {
       navigate({ to: "/attivazione", replace: true });
-      setAllowed(false);
-    } else if (activated && !consent && licenseId && !isConsent && !isActivation) {
-      navigate({ to: "/condizioni", replace: true });
       setAllowed(false);
     } else {
       setAllowed(true);
