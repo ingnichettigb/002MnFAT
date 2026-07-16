@@ -199,7 +199,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
             if (typeof window !== "undefined") {
               window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
               window.localStorage.removeItem(ACTIVATED_KEY);
+              window.localStorage.removeItem(LICENSE_ID_KEY);
+              window.localStorage.removeItem(CONSENT_KEY);
             }
+
             navigate({ to: "/auth", replace: true });
           }}
           className="fixed right-3 top-3 z-50 rounded-md border border-input bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur hover:bg-accent"
