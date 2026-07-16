@@ -164,8 +164,11 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     if (typeof window === "undefined") return;
     const isPublic = PUBLIC_PATHS.has(pathname);
     const isActivation = pathname === ACTIVATION_PATH;
+    const isConsent = pathname === CONSENT_PATH;
     const verified = window.localStorage.getItem(VERIFIED_EMAIL_KEY);
     const activated = window.localStorage.getItem(ACTIVATED_KEY);
+    const consent = window.localStorage.getItem(CONSENT_KEY);
+    const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
 
     if (isPublic) {
       setAllowed(true);
@@ -175,11 +178,15 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     } else if (!activated && !isActivation) {
       navigate({ to: "/attivazione", replace: true });
       setAllowed(false);
+    } else if (activated && !consent && licenseId && !isConsent && !isActivation) {
+      navigate({ to: "/condizioni", replace: true });
+      setAllowed(false);
     } else {
       setAllowed(true);
     }
     setChecked(true);
   }, [pathname, navigate]);
+
 
   if (!checked || !allowed) return null;
   const isPublic = PUBLIC_PATHS.has(pathname);
