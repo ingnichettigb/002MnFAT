@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { verifyAndActivateLicense } from "@/lib/license.functions";
 import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, CONSENT_KEY } from "@/routes/__root";
-import { useI18n } from "@/lib/i18n";
 import { APP_CODE } from "@/lib/app-config";
 
 export const Route = createFileRoute("/attivazione")({
@@ -46,7 +45,6 @@ const REASON_MESSAGES: Record<string, string> = {
 function AttivazionePage() {
   const navigate = useNavigate();
   const activate = useServerFn(verifyAndActivateLicense);
-  const { primary } = useI18n();
 
   const [email, setEmail] = React.useState<string | null>(null);
   const [licenseKey, setLicenseKey] = React.useState("");
