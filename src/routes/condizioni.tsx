@@ -1,9 +1,7 @@
 import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 
 import { TermsConsent } from "@/components/terms-consent";
-import { checkTermsConsent } from "@/lib/consent.functions";
 import {
   VERIFIED_EMAIL_KEY,
   ACTIVATED_KEY,
@@ -25,7 +23,6 @@ export const Route = createFileRoute("/condizioni")({
 
 function CondizioniPage() {
   const navigate = useNavigate();
-  const check = useServerFn(checkTermsConsent);
   const { primary } = useI18n();
 
   const [email, setEmail] = React.useState<string | null>(null);
@@ -48,20 +45,8 @@ function CondizioniPage() {
     }
     setEmail(verified);
     setLicenseId(lid);
-
-    // If consent already recorded server-side, skip
-    check({ data: { licenseId: lid } })
-      .then((res) => {
-        if (res.accepted) {
-          window.localStorage.setItem(CONSENT_KEY, "1");
-          window.localStorage.setItem(ACTIVATED_KEY, "1");
-          navigate({ to: "/", replace: true });
-        } else {
-          setReady(true);
-        }
-      })
-      .catch(() => setReady(true));
-  }, [navigate, check]);
+    setReady(true);
+  }, [navigate]);
 
   const handleAccepted = () => {
     if (typeof window !== "undefined") {
