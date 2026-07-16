@@ -15,7 +15,7 @@ import {
 import { verifyAndActivateLicense } from "@/lib/license.functions";
 import { checkTermsConsent } from "@/lib/consent.functions";
 import { TermsConsent } from "@/components/terms-consent";
-import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY } from "@/routes/__root";
+import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, CONSENT_KEY } from "@/routes/__root";
 import { useI18n } from "@/lib/i18n";
 import { APP_CODE } from "@/lib/app-config";
 
