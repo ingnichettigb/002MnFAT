@@ -97,6 +97,9 @@ function AttivazionePage() {
         },
       });
       if (res.ok) {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(LICENSE_ID_KEY, res.licenseId);
+        }
         const consent = await checkConsent({
           data: { licenseId: res.licenseId },
         });
@@ -107,6 +110,7 @@ function AttivazionePage() {
         }
         return;
       }
+
       if (res.reason === "email_not_verified") {
         navigate({ to: "/auth", replace: true });
         return;
