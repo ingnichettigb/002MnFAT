@@ -73,9 +73,11 @@ function AttivazionePage() {
   const finalizeActivation = () => {
     if (typeof window !== "undefined") {
       window.localStorage.setItem(ACTIVATED_KEY, "1");
+      window.localStorage.setItem(CONSENT_KEY, "1");
     }
     navigate({ to: "/" });
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
