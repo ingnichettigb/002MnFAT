@@ -41,7 +41,7 @@ import { LABELS } from "@/lib/fat-numbering";
 export const Route = createFileRoute("/archivio")({
   head: () => ({
     meta: [
-      { title: "Archivio FAT — mini FAT" },
+      { title: "Archivio FAT — Mini F.A.T." },
       {
         name: "description",
         content:

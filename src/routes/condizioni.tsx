@@ -13,7 +13,7 @@ import { useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/condizioni")({
   head: () => ({
     meta: [
-      { title: "Condizioni d'Uso — mini FAT" },
+      { title: "Condizioni d'Uso — Mini F.A.T." },
       { name: "description", content: "Accettazione delle condizioni d'uso." },
       { name: "robots", content: "noindex" },
     ],

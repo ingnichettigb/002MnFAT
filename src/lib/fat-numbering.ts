@@ -1,5 +1,5 @@
 // =============================================================================
-// REGISTRO UNICO DI NUMERAZIONE per "mini FAT"
+// REGISTRO UNICO DI NUMERAZIONE per "Mini F.A.T."
 // -----------------------------------------------------------------------------
 // Ogni etichetta dell'app (titoli pagina, header sezione, label di campo,
 // pulsanti, step) ha qui un id numerico UNIVOCO.  Lo usiamo come apice
