@@ -27,7 +27,7 @@ import {
 export const Route = createFileRoute("/controlli")({
   head: () => ({
     meta: [
-      { title: "Controlli — mini FAT" },
+      { title: "Controlli — Mini F.A.T." },
       {
         name: "description",
         content: "Seleziona i controlli da includere nel verbale FAT.",
@@ -74,7 +74,7 @@ function ControlliPage() {
       <header className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            mini FAT
+            Mini F.A.T.
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("controlsDesc")}</p>
         </div>

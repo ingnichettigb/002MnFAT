@@ -32,11 +32,11 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "mini FAT — Verbali di Collaudo" },
+      { title: "Mini F.A.T. — Verbali di Collaudo" },
       {
         name: "description",
         content:
-          "mini FAT: compila e genera in PDF il verbale di Factory Acceptance Test (IT/EN).",
+          "Mini F.A.T.: compila e genera in PDF il verbale di Factory Acceptance Test (IT/EN).",
       },
     ],
   }),
@@ -130,7 +130,7 @@ function IndexPage() {
       <header className="mb-6 flex items-start justify-between gap-4">
         <div className="text-center sm:text-left">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            mini FAT
+            Mini F.A.T.
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("appSubtitle")}</p>
         </div>

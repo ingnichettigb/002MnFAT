@@ -24,7 +24,7 @@ import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 export const Route = createFileRoute("/report")({
   head: () => ({
     meta: [
-      { title: "Genera Report — mini FAT" },
+      { title: "Genera Report — Mini F.A.T." },
       {
         name: "description",
         content: "Riepilogo e generazione del PDF del verbale FAT (IT/EN).",
@@ -71,7 +71,7 @@ function ReportPage() {
       <header className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            mini FAT
+            Mini F.A.T.
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {t("reportSubtitle")}

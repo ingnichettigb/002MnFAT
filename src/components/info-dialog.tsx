@@ -39,14 +39,14 @@ type GuideContent = {
 
 const GUIDE: Record<Lang, GuideContent> = {
   it: {
-    dialogTitle: "mini FAT — Guida all'uso",
+    dialogTitle: "Mini F.A.T. — Guida all'uso",
     dialogDescription:
       "Come funziona il generatore di verbali di Factory Acceptance Test.",
     langNote:
       "Questa guida segue la lingua primaria selezionata in alto (bandiera con badge 1).",
     sections: [
       {
-        title: "1. Cos'è mini FAT",
+        title: "1. Cos'è Mini F.A.T.",
         intro:
           "Applicazione web per compilare e generare in PDF i verbali di Factory Acceptance Test. I dati sono salvati localmente nel browser (localStorage); il PDF viene generato sul dispositivo, senza invio a server esterni.",
       },
@@ -134,14 +134,14 @@ const GUIDE: Record<Lang, GuideContent> = {
     ],
   },
   en: {
-    dialogTitle: "mini FAT — User guide",
+    dialogTitle: "Mini F.A.T. — User guide",
     dialogDescription:
       "How the Factory Acceptance Test report generator works.",
     langNote:
       "This guide follows the primary language selected at the top (flag with badge 1).",
     sections: [
       {
-        title: "1. What is mini FAT",
+        title: "1. What is Mini F.A.T.",
         intro:
           "Web app to fill in and generate Factory Acceptance Test reports as PDF. Data is stored locally in the browser (localStorage); the PDF is generated on the device, without sending anything to an external server.",
       },
@@ -229,14 +229,14 @@ const GUIDE: Record<Lang, GuideContent> = {
     ],
   },
   de: {
-    dialogTitle: "mini FAT — Bedienungsanleitung",
+    dialogTitle: "Mini F.A.T. — Bedienungsanleitung",
     dialogDescription:
       "So funktioniert der Generator für Factory-Acceptance-Test-Berichte.",
     langNote:
       "Diese Anleitung folgt der oben ausgewählten primären Sprache (Flagge mit Abzeichen 1).",
     sections: [
       {
-        title: "1. Was ist mini FAT",
+        title: "1. Was ist Mini F.A.T.",
         intro:
           "Web-App zum Ausfüllen und Erstellen von Factory-Acceptance-Test-Berichten als PDF. Die Daten werden lokal im Browser gespeichert (localStorage); das PDF wird auf dem Gerät erstellt, ohne Übertragung an einen externen Server.",
       },
@@ -324,14 +324,14 @@ const GUIDE: Record<Lang, GuideContent> = {
     ],
   },
   es: {
-    dialogTitle: "mini FAT — Guía de uso",
+    dialogTitle: "Mini F.A.T. — Guía de uso",
     dialogDescription:
       "Cómo funciona el generador de informes Factory Acceptance Test.",
     langNote:
       "Esta guía sigue el idioma principal seleccionado arriba (bandera con distintivo 1).",
     sections: [
       {
-        title: "1. Qué es mini FAT",
+        title: "1. Qué es Mini F.A.T.",
         intro:
           "Aplicación web para rellenar y generar en PDF los informes de Factory Acceptance Test. Los datos se guardan localmente en el navegador (localStorage); el PDF se genera en el dispositivo, sin envío a servidores externos.",
       },
