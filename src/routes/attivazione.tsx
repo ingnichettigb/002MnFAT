@@ -79,7 +79,7 @@ function AttivazionePage() {
   const [email, setEmail] = React.useState<string | null>(null);
   const [licenseKey, setLicenseKey] = React.useState("");
   const [puk, setPuk] = React.useState("");
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<ReasonInfo | null>(null);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
