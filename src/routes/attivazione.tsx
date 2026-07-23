@@ -26,21 +26,49 @@ export const Route = createFileRoute("/attivazione")({
   component: AttivazionePage,
 });
 
-const REASON_MESSAGES: Record<string, string> = {
-  license_not_found:
-    "Il codice licenza inserito non risulta valido. Verifica di averlo copiato correttamente dall'email di acquisto. (E-101)",
-  license_expired:
-    "Questa licenza risulta scaduta. Contattaci per il rinnovo. (E-103)",
-  puk_not_found:
-    "Il codice PUK inserito non è valido. Verifica di averlo copiato correttamente dall'email di acquisto. (E-201)",
-  puk_claimed_by_other:
-    "Questo codice PUK risulta già associato a un altro utente. Ogni PUK può essere usato da una sola persona. (E-202)",
-  puk_wrong_product:
-    "Questo codice PUK non è valido per questo prodotto. Verifica di aver ricevuto il PUK corretto. (E-203)",
-  puk_not_in_license:
-    "Questo codice PUK non appartiene alla licenza indicata. Verifica di aver abbinato correttamente licenza e PUK. (E-204)",
-  server_error:
-    "Si è verificato un errore tecnico. Riprova tra qualche minuto o contattaci indicando il codice errore. (E-500)",
+type ReasonInfo = { message: string; code: string };
+
+const REASON_MESSAGES: Record<string, ReasonInfo> = {
+  email_not_verified: {
+    message:
+      "La tua email non risulta ancora verificata. Torna al passaggio precedente e completa la verifica con il codice ricevuto via email.",
+    code: "E-001",
+  },
+  license_not_found: {
+    message:
+      "Il codice licenza inserito non è valido. Controlla di averlo copiato correttamente dall'email di acquisto (senza spazi iniziali o finali).",
+    code: "E-101",
+  },
+  license_expired: {
+    message:
+      "Questa licenza risulta scaduta. Contatta il supporto per verificare il rinnovo o l'acquisto di una nuova licenza.",
+    code: "E-103",
+  },
+  puk_not_found: {
+    message:
+      "Il codice PUK (numero ebook) inserito non è valido. Verifica di averlo copiato correttamente dall'email di acquisto.",
+    code: "E-201",
+  },
+  puk_wrong_product: {
+    message:
+      "Questo codice PUK non è valido per questa applicazione. Verifica di aver inserito il codice corretto per il prodotto che stai attivando.",
+    code: "E-203",
+  },
+  puk_not_in_license: {
+    message:
+      "Questo codice PUK non risulta associato alla licenza inserita. Verifica che entrambi i codici provengano dalla stessa email di acquisto.",
+    code: "E-204",
+  },
+  puk_claimed_by_other: {
+    message:
+      "Questo codice PUK è già stato attivato da un altro utente. Ogni codice PUK è personale e può essere usato una sola volta. Se la licenza prevede più utenti, contatta chi ha effettuato l'acquisto per ricevere un codice PUK non ancora utilizzato.",
+    code: "E-202",
+  },
+  server_error: {
+    message:
+      "Si è verificato un errore tecnico imprevisto. Riprova tra qualche minuto o contattaci indicando il codice errore (E-500).",
+    code: "E-500",
+  },
 };
 
 
@@ -51,7 +79,7 @@ function AttivazionePage() {
   const [email, setEmail] = React.useState<string | null>(null);
   const [licenseKey, setLicenseKey] = React.useState("");
   const [puk, setPuk] = React.useState("");
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<ReasonInfo | null>(null);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -69,7 +97,7 @@ function AttivazionePage() {
     setError(null);
     if (!email) return;
     if (!licenseKey.trim() || !puk.trim()) {
-      setError("Compila entrambi i campi.");
+      setError({ message: "Compila entrambi i campi.", code: "" });
       return;
     }
     setLoading(true);
@@ -145,7 +173,16 @@ function AttivazionePage() {
                 autoComplete="off"
               />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <div className="space-y-1">
+                <p className="text-sm text-destructive">{error.message}</p>
+                {error.code && (
+                  <p className="text-xs text-muted-foreground">
+                    Codice errore: {error.code}
+                  </p>
+                )}
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Attivazione…" : "Attiva"}
             </Button>
