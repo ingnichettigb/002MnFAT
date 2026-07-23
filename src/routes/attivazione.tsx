@@ -97,7 +97,7 @@ function AttivazionePage() {
     setError(null);
     if (!email) return;
     if (!licenseKey.trim() || !puk.trim()) {
-      setError("Compila entrambi i campi.");
+      setError({ message: "Compila entrambi i campi.", code: "" });
       return;
     }
     setLoading(true);
