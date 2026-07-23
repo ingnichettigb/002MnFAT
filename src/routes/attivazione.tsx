@@ -173,7 +173,16 @@ function AttivazionePage() {
                 autoComplete="off"
               />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && (
+              <div className="space-y-1">
+                <p className="text-sm text-destructive">{error.message}</p>
+                {error.code && (
+                  <p className="text-xs text-muted-foreground">
+                    Codice errore: {error.code}
+                  </p>
+                )}
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Attivazione…" : "Attiva"}
             </Button>
