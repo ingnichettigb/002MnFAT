@@ -494,12 +494,21 @@ Ordine operativo per portare il sistema su un'altra SaaS del portfolio (es. `001
    - `src/lib/terms-i18n.ts` — riscrivi il testo Terms per la nuova SaaS.
    - `src/routes/auth.tsx`, `src/routes/attivazione.tsx`, `src/routes/condizioni.tsx` —
      invariati salvo le stringhe di titolo.
-   - `src/routes/__root.tsx` — copia l'`AuthGate` e le costanti di localStorage
+   - `src/routes/_root.tsx` — copia l'`AuthGate` e le costanti di localStorage
      (`VERIFIED_EMAIL_KEY`, `LICENSE_ID_KEY`, `ACTIVATED_KEY`, `CONSENT_KEY`).
    - `src/start.ts` — includi `attachSupabaseAuth` nel `functionMiddleware`.
 
+5bis. **NAMESPACING LOCALSTORAGE (fondamentale, non dimenticare)**
+
+   Nel nuovo file `_root.tsx`, cambia il prefisso di TUTTE le 4 costanti localStorage da
+   `002MnFAT:` al nuovo `APP_CODE` del progetto (es. `001SmMntnnc:verifiedEmail`,
+   `001SmMntnnc:activated`, `001SmMntnnc:licenseId`, `001SmMntnnc:consent`). Se questo
+   passaggio viene dimenticato, e in futuro un utente usa più SaaS del portfolio sullo stesso
+   dominio/browser, le chiavi di sessione andrebbero in conflitto tra un'app e l'altra.
+
 6. **Registrazione middleware bearer** (se il progetto usa server functions autenticate):
    verifica che `src/start.ts` monti `attachSupabaseAuth`.
+
 
 7. **Test end-to-end — 9 scenari minimi:**
    1. **Attivazione nuova**: email verificata + licenza valida + PUK libero → `ok: true, reactivated: false`, `puk_codes.user_id` popolato, `licenses.activated_at` valorizzato.
