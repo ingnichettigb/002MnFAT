@@ -388,7 +388,7 @@ Il codice tecnico è mostrato in piccolo sotto il messaggio descrittivo.
 
 **File route attivazione:** `src/routes/attivazione.tsx` (route `/attivazione`, step 2/3).
 
-**File gating:** `src/routes/_root.tsx` (layout root, single underscore).
+**File gating:** `src/routes/__root.tsx` (layout root, double underscore).
 
 ### 7.1 Costanti localStorage (namespaced per app)
 
