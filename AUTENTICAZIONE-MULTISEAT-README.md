@@ -60,7 +60,14 @@ Tabella di legame **N:N** licenza ↔ PUK (modo canonico, sostituisce il FK dire
 | `id`          | uuid | PK                               |
 | `license_id`  | uuid | FK → `licenses(id)`, NOT NULL    |
 | `puk_id`      | uuid | FK → `puk_codes(id)`, NOT NULL   |
-| UNIQUE        |      | `(license_id, puk_id)`           |
+
+> ⚠️ **Attenzione:** non esiste attualmente un vincolo UNIQUE su questa coppia di colonne.
+> Nulla impedisce di creare righe duplicate `(license_id, puk_id)` per errore applicativo o retry.
+> Valutare l'aggiunta di:
+> ```sql
+> ALTER TABLE license_puk_map ADD CONSTRAINT uq_license_puk UNIQUE (license_id, puk_id);
+> ```
+
 
 ### 2.4 `public.users` (external — portfolio globale)
 
@@ -377,9 +384,40 @@ Il codice tecnico è mostrato in piccolo sotto il messaggio descrittivo.
 
 ---
 
-## 7. UI di attivazione
+## 7. UI di attivazione e gating globale
 
-**File:** `src/routes/attivazione.tsx` (route `/attivazione`, step 2/3).
+**File route attivazione:** `src/routes/attivazione.tsx` (route `/attivazione`, step 2/3).
+
+**File gating:** `src/routes/_root.tsx` (layout root, single underscore).
+
+### 7.1 Costanti localStorage (namespaced per app)
+
+In `src/routes/_root.tsx` le chiavi di stato sono definite con prefisso uguale a `APP_CODE`
+(`002MnFAT`):
+
+```typescript
+export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
+export const ACTIVATED_KEY      = "002MnFAT:activated";
+export const LICENSE_ID_KEY     = "002MnFAT:licenseId";
+export const CONSENT_KEY        = "002MnFAT:consent";
+```
+
+### 7.2 AuthGate — sequenza di accesso
+
+Il componente `AuthGate` in `src/routes/_root.tsx` avvolge `<Outlet />` e decide se l'utente
+può rimanere sulla route corrente. Logica di redirect:
+
+1. **Email non verificata** (`VERIFIED_EMAIL_KEY` assente) → redirect a `/auth`.
+2. **Email verificata ma nessuna licenza attivata** (`LICENSE_ID_KEY` assente) → redirect a
+   `/attivazione`.
+3. **Licenza attivata ma consenso Terms mancante** (`CONSENT_KEY` assente, route non è
+   `/condizioni`) → redirect a `/condizioni`.
+4. **Tutto presente** → accesso consentito alla route richiesta.
+
+Eccezioni: le route pubbliche (es. `/auth`) e la route `/condizioni` hanno gestioni
+specifiche per evitare loop di redirect.
+
+### 7.3 Campi e flusso di `attivazione.tsx`
 
 **Campi:**
 - Email verificata (readonly, letta da `localStorage` chiave `VERIFIED_EMAIL_KEY`).
@@ -398,6 +436,20 @@ Il codice tecnico è mostrato in piccolo sotto il messaggio descrittivo.
 5. Su `reason === "email_not_verified"` forza redirect a `/auth`.
 
 Bottone secondario "Cambia email" pulisce `VERIFIED_EMAIL_KEY` e riporta a `/auth`.
+
+### 7.4 Logout / "Esci"
+
+In `src/routes/_root.tsx` è presente un pulsante fisso "Esci" (visibile su tutte le route
+protette) che rimuove tutte e 4 le chiavi localStorage e riporta l'utente a `/auth`:
+
+```typescript
+window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
+window.localStorage.removeItem(ACTIVATED_KEY);
+window.localStorage.removeItem(LICENSE_ID_KEY);
+window.localStorage.removeItem(CONSENT_KEY);
+navigate({ to: "/auth", replace: true });
+```
+
 
 ---
 
@@ -442,12 +494,21 @@ Ordine operativo per portare il sistema su un'altra SaaS del portfolio (es. `001
    - `src/lib/terms-i18n.ts` — riscrivi il testo Terms per la nuova SaaS.
    - `src/routes/auth.tsx`, `src/routes/attivazione.tsx`, `src/routes/condizioni.tsx` —
      invariati salvo le stringhe di titolo.
-   - `src/routes/__root.tsx` — copia l'`AuthGate` e le costanti di localStorage
+   - `src/routes/_root.tsx` — copia l'`AuthGate` e le costanti di localStorage
      (`VERIFIED_EMAIL_KEY`, `LICENSE_ID_KEY`, `ACTIVATED_KEY`, `CONSENT_KEY`).
    - `src/start.ts` — includi `attachSupabaseAuth` nel `functionMiddleware`.
 
+5bis. **NAMESPACING LOCALSTORAGE (fondamentale, non dimenticare)**
+
+   Nel nuovo file `_root.tsx`, cambia il prefisso di TUTTE le 4 costanti localStorage da
+   `002MnFAT:` al nuovo `APP_CODE` del progetto (es. `001SmMntnnc:verifiedEmail`,
+   `001SmMntnnc:activated`, `001SmMntnnc:licenseId`, `001SmMntnnc:consent`). Se questo
+   passaggio viene dimenticato, e in futuro un utente usa più SaaS del portfolio sullo stesso
+   dominio/browser, le chiavi di sessione andrebbero in conflitto tra un'app e l'altra.
+
 6. **Registrazione middleware bearer** (se il progetto usa server functions autenticate):
    verifica che `src/start.ts` monti `attachSupabaseAuth`.
+
 
 7. **Test end-to-end — 9 scenari minimi:**
    1. **Attivazione nuova**: email verificata + licenza valida + PUK libero → `ok: true, reactivated: false`, `puk_codes.user_id` popolato, `licenses.activated_at` valorizzato.
