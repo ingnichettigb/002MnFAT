@@ -388,11 +388,11 @@ Il codice tecnico è mostrato in piccolo sotto il messaggio descrittivo.
 
 **File route attivazione:** `src/routes/attivazione.tsx` (route `/attivazione`, step 2/3).
 
-**File gating:** `src/routes/_root.tsx` (layout root, single underscore).
+**File gating:** `src/routes/__root.tsx` (layout root, double underscore).
 
 ### 7.1 Costanti localStorage (namespaced per app)
 
-In `src/routes/_root.tsx` le chiavi di stato sono definite con prefisso uguale a `APP_CODE`
+In `src/routes/__root.tsx` le chiavi di stato sono definite con prefisso uguale a `APP_CODE`
 (`002MnFAT`):
 
 ```typescript
@@ -404,18 +404,40 @@ export const CONSENT_KEY        = "002MnFAT:consent";
 
 ### 7.2 AuthGate — sequenza di accesso
 
-Il componente `AuthGate` in `src/routes/_root.tsx` avvolge `<Outlet />` e decide se l'utente
-può rimanere sulla route corrente. Logica di redirect:
+Il componente `AuthGate` in `src/routes/__root.tsx` avvolge `<Outlet />` e decide se
+l'utente può rimanere sulla route corrente. Logica reale implementata nel codice:
 
-1. **Email non verificata** (`VERIFIED_EMAIL_KEY` assente) → redirect a `/auth`.
-2. **Email verificata ma nessuna licenza attivata** (`LICENSE_ID_KEY` assente) → redirect a
-   `/attivazione`.
-3. **Licenza attivata ma consenso Terms mancante** (`CONSENT_KEY` assente, route non è
-   `/condizioni`) → redirect a `/condizioni`.
-4. **Tutto presente** → accesso consentito alla route richiesta.
+```typescript
+const PUBLIC_PATHS = new Set(["/auth"]);
+const ACTIVATION_PATH = "/attivazione";
+const CONSENT_PATH = "/condizioni";
 
-Eccezioni: le route pubbliche (es. `/auth`) e la route `/condizioni` hanno gestioni
-specifiche per evitare loop di redirect.
+const isPublic = PUBLIC_PATHS.has(pathname);
+const isActivation = pathname === ACTIVATION_PATH;
+const isConsent = pathname === CONSENT_PATH;
+
+const verified = localStorage.getItem(VERIFIED_EMAIL_KEY);
+const activated = localStorage.getItem(ACTIVATED_KEY);
+const consent = localStorage.getItem(CONSENT_KEY);
+const licenseId = localStorage.getItem(LICENSE_ID_KEY);
+```
+
+Sequenza di decisione:
+
+1. **Route pubblica** (es. `/auth`) → accesso sempre consentito.
+2. **Email non verificata** (`VERIFIED_EMAIL_KEY` assente) → redirect a `/auth`.
+3. **Route `/condizioni` senza licenza** (`LICENSE_ID_KEY` assente) → pulisce
+   `ACTIVATED_KEY` e `CONSENT_KEY`, poi redirect a `/attivazione`.
+4. **Route `/condizioni` con licenza presente** → accesso consentito (la pagina mostra
+   i Terms e attende la spunta).
+5. **Licenza attivata (`LICENSE_ID_KEY` presente) ma consenso mancante** (`CONSENT_KEY`
+   assente) e route non è `/attivazione` → redirect a `/condizioni`.
+6. **Licenza non completata** (`ACTIVATED_KEY` assente) e route non è `/attivazione` →
+   redirect a `/attivazione`.
+7. **Tutto presente** → accesso consentito alla route richiesta.
+
+Questa sequenza impedisce di bypassare uno step caricando direttamente una route
+protetta, anche se il `localStorage` è stato manomesso parzialmente.
 
 ### 7.3 Campi e flusso di `attivazione.tsx`
 
@@ -439,7 +461,7 @@ Bottone secondario "Cambia email" pulisce `VERIFIED_EMAIL_KEY` e riporta a `/aut
 
 ### 7.4 Logout / "Esci"
 
-In `src/routes/_root.tsx` è presente un pulsante fisso "Esci" (visibile su tutte le route
+In `src/routes/__root.tsx` è presente un pulsante fisso "Esci" (visibile su tutte le route
 protette) che rimuove tutte e 4 le chiavi localStorage e riporta l'utente a `/auth`:
 
 ```typescript
@@ -494,13 +516,13 @@ Ordine operativo per portare il sistema su un'altra SaaS del portfolio (es. `001
    - `src/lib/terms-i18n.ts` — riscrivi il testo Terms per la nuova SaaS.
    - `src/routes/auth.tsx`, `src/routes/attivazione.tsx`, `src/routes/condizioni.tsx` —
      invariati salvo le stringhe di titolo.
-   - `src/routes/_root.tsx` — copia l'`AuthGate` e le costanti di localStorage
-     (`VERIFIED_EMAIL_KEY`, `LICENSE_ID_KEY`, `ACTIVATED_KEY`, `CONSENT_KEY`).
+    - `src/routes/__root.tsx` — copia l'`AuthGate` e le costanti di localStorage
+      (`VERIFIED_EMAIL_KEY`, `LICENSE_ID_KEY`, `ACTIVATED_KEY`, `CONSENT_KEY`).
    - `src/start.ts` — includi `attachSupabaseAuth` nel `functionMiddleware`.
 
 5bis. **NAMESPACING LOCALSTORAGE (fondamentale, non dimenticare)**
 
-   Nel nuovo file `_root.tsx`, cambia il prefisso di TUTTE le 4 costanti localStorage da
+   Nel nuovo file `__root.tsx`, cambia il prefisso di TUTTE le 4 costanti localStorage da
    `002MnFAT:` al nuovo `APP_CODE` del progetto (es. `001SmMntnnc:verifiedEmail`,
    `001SmMntnnc:activated`, `001SmMntnnc:licenseId`, `001SmMntnnc:consent`). Se questo
    passaggio viene dimenticato, e in futuro un utente usa più SaaS del portfolio sullo stesso
