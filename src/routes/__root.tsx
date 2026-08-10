@@ -15,14 +15,28 @@ import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
 import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
+import { checkLicenseStatus } from "@/lib/license.functions";
+import {
+  VERIFIED_EMAIL_KEY,
+  ACTIVATED_KEY,
+  LICENSE_ID_KEY,
+  CONSENT_KEY,
+  LAST_LICENSE_CHECK_KEY,
+  LICENSE_INVALID_REASON_KEY,
+  clearGateKeys,
+  clearLicenseKeys,
+} from "@/lib/app-config";
 
-export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
-export const ACTIVATED_KEY = "002MnFAT:activated";
-export const LICENSE_ID_KEY = "002MnFAT:licenseId";
-export const CONSENT_KEY = "002MnFAT:consent";
-const PUBLIC_PATHS = new Set(["/auth"]);
+export {
+  VERIFIED_EMAIL_KEY,
+  ACTIVATED_KEY,
+  LICENSE_ID_KEY,
+  CONSENT_KEY,
+};
+const PUBLIC_PATHS = new Set(["/auth", "/licenza-scaduta"]);
 const ACTIVATION_PATH = "/attivazione";
 const CONSENT_PATH = "/condizioni";
+
 
 
 
