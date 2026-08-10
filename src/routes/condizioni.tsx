@@ -82,7 +82,14 @@ function CondizioniPage() {
     navigate({ to: "/", replace: true });
   };
 
-  if (!ready || !email || !licenseId) return null;
+  if (!ready || !email || !licenseId) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-sm text-muted-foreground">
+        …
+      </div>
+    );
+  }
+
 
   return (
     <TermsConsent
