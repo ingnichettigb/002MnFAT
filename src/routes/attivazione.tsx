@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { verifyAndActivateLicense } from "@/lib/license.functions";
-import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, CONSENT_KEY } from "@/routes/__root";
+import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, CONSENT_KEY, clearGateKeys } from "@/lib/app-config";
 import { APP_CODE } from "@/lib/app-config";
 
 export const Route = createFileRoute("/attivazione")({
@@ -189,11 +189,10 @@ function AttivazionePage() {
             <button
               type="button"
               onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
-                }
+                clearGateKeys();
                 navigate({ to: "/auth", replace: true });
               }}
+
               className="text-xs text-muted-foreground underline"
             >
               Cambia email

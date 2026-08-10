@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 
 import { TermsConsent } from "@/components/terms-consent";
 import {
@@ -7,7 +8,8 @@ import {
   ACTIVATED_KEY,
   LICENSE_ID_KEY,
   CONSENT_KEY,
-} from "@/routes/__root";
+} from "@/lib/app-config";
+import { checkTermsConsent } from "@/lib/consent.functions";
 import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/condizioni")({
@@ -24,6 +26,7 @@ export const Route = createFileRoute("/condizioni")({
 function CondizioniPage() {
   const navigate = useNavigate();
   const { primary } = useI18n();
+  const consentFn = useServerFn(checkTermsConsent);
 
   const [email, setEmail] = React.useState<string | null>(null);
   const [licenseId, setLicenseId] = React.useState<string | null>(null);
@@ -31,6 +34,7 @@ function CondizioniPage() {
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
+    let cancelled = false;
     const verified = window.localStorage.getItem(VERIFIED_EMAIL_KEY);
     const lid = window.localStorage.getItem(LICENSE_ID_KEY);
     if (!verified) {
@@ -43,10 +47,32 @@ function CondizioniPage() {
       navigate({ to: "/attivazione", replace: true });
       return;
     }
-    setEmail(verified);
-    setLicenseId(lid);
-    setReady(true);
-  }, [navigate]);
+
+    void (async () => {
+      try {
+        const res = await consentFn({ data: { licenseId: lid } });
+        if (cancelled) return;
+        if (res.accepted) {
+          // Consenso già registrato sul DB (es. altro browser): salta la pagina
+          window.localStorage.setItem(CONSENT_KEY, "1");
+          window.localStorage.setItem(ACTIVATED_KEY, "1");
+          navigate({ to: "/", replace: true });
+          return;
+        }
+      } catch (err) {
+        console.error("checkTermsConsent call error:", err);
+      }
+      if (cancelled) return;
+      setEmail(verified);
+      setLicenseId(lid);
+      setReady(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, consentFn]);
+
 
   const handleAccepted = () => {
     if (typeof window !== "undefined") {
@@ -56,7 +82,14 @@ function CondizioniPage() {
     navigate({ to: "/", replace: true });
   };
 
-  if (!ready || !email || !licenseId) return null;
+  if (!ready || !email || !licenseId) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-sm text-muted-foreground">
+        …
+      </div>
+    );
+  }
+
 
   return (
     <TermsConsent

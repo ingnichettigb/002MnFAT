@@ -1,9 +1,27 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { APP_CODE } from "@/lib/app-config";
+import type { LicenseStatus } from "@/lib/license-status.server";
 
 const emailSchema = z.string().trim().toLowerCase().email().max(254);
 const keySchema = z.string().trim().min(1).max(128);
+
+export const checkLicenseStatus = createServerFn({ method: "POST" })
+  .inputValidator((input: { licenseId: string }) =>
+    z.object({ licenseId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data }): Promise<LicenseStatus> => {
+    try {
+      const { runLicenseStatus } = await import(
+        "@/lib/license-status.server"
+      );
+      return await runLicenseStatus(data.licenseId);
+    } catch (err) {
+      console.error("checkLicenseStatus error:", err);
+      return { valid: true, reason: null };
+    }
+  });
+
 
 type FailReason =
   | "email_not_verified"

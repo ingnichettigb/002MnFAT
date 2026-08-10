@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -15,14 +16,28 @@ import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
 import { I18nProvider } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
+import { checkLicenseStatus } from "@/lib/license.functions";
+import {
+  VERIFIED_EMAIL_KEY,
+  ACTIVATED_KEY,
+  LICENSE_ID_KEY,
+  CONSENT_KEY,
+  LAST_LICENSE_CHECK_KEY,
+  LICENSE_INVALID_REASON_KEY,
+  clearGateKeys,
+  clearLicenseKeys,
+} from "@/lib/app-config";
 
-export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
-export const ACTIVATED_KEY = "002MnFAT:activated";
-export const LICENSE_ID_KEY = "002MnFAT:licenseId";
-export const CONSENT_KEY = "002MnFAT:consent";
-const PUBLIC_PATHS = new Set(["/auth"]);
+export {
+  VERIFIED_EMAIL_KEY,
+  ACTIVATED_KEY,
+  LICENSE_ID_KEY,
+  CONSENT_KEY,
+};
+const PUBLIC_PATHS = new Set(["/auth", "/licenza-scaduta"]);
 const ACTIVATION_PATH = "/attivazione";
 const CONSENT_PATH = "/condizioni";
+
 
 
 
@@ -157,11 +172,13 @@ function RootComponent() {
 function AuthGate({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
+  const statusFn = useServerFn(checkLicenseStatus);
   const [checked, setChecked] = React.useState(false);
   const [allowed, setAllowed] = React.useState(false);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
+    let cancelled = false;
     const isPublic = PUBLIC_PATHS.has(pathname);
     const isActivation = pathname === ACTIVATION_PATH;
     const isConsent = pathname === CONSENT_PATH;
@@ -170,31 +187,68 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     const consent = window.localStorage.getItem(CONSENT_KEY);
     const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
 
+    const settle = (value: boolean) => {
+      if (cancelled) return;
+      setAllowed(value);
+      setChecked(true);
+    };
+
     if (isPublic) {
-      setAllowed(true);
+      settle(true);
     } else if (!verified) {
       navigate({ to: "/auth", replace: true });
-      setAllowed(false);
+      settle(false);
     } else if (isConsent) {
       if (!licenseId) {
         window.localStorage.removeItem(ACTIVATED_KEY);
         window.localStorage.removeItem(CONSENT_KEY);
         navigate({ to: "/attivazione", replace: true });
-        setAllowed(false);
+        settle(false);
       } else {
-        setAllowed(true);
+        settle(true);
       }
     } else if (licenseId && !consent && !isActivation) {
       navigate({ to: "/condizioni", replace: true });
-      setAllowed(false);
+      settle(false);
     } else if (!activated && !isActivation) {
       navigate({ to: "/attivazione", replace: true });
-      setAllowed(false);
+      settle(false);
+    } else if (!isActivation && activated && licenseId) {
+      // Rivalidazione della licenza a OGNI caricamento di pagina protetta.
+      setChecked(false);
+      void (async () => {
+        try {
+          const res = await statusFn({ data: { licenseId } });
+          if (cancelled) return;
+          if (res.valid) {
+            window.localStorage.setItem(
+              LAST_LICENSE_CHECK_KEY,
+              new Date().toISOString(),
+            );
+            settle(true);
+          } else {
+            window.localStorage.setItem(
+              LICENSE_INVALID_REASON_KEY,
+              res.reason ?? "",
+            );
+            clearLicenseKeys();
+            navigate({ to: "/licenza-scaduta", replace: true });
+            settle(false);
+          }
+        } catch (err) {
+          // fail-open: nessun blocco per errori tecnici
+          console.error("license revalidation error:", err);
+          settle(true);
+        }
+      })();
     } else {
-      setAllowed(true);
+      settle(true);
     }
-    setChecked(true);
-  }, [pathname, navigate]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname, navigate, statusFn]);
 
 
   if (!checked || !allowed) return null;
@@ -205,13 +259,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
         <button
           type="button"
           onClick={() => {
-            if (typeof window !== "undefined") {
-              window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
-              window.localStorage.removeItem(ACTIVATED_KEY);
-              window.localStorage.removeItem(LICENSE_ID_KEY);
-              window.localStorage.removeItem(CONSENT_KEY);
-            }
-
+            clearGateKeys();
             navigate({ to: "/auth", replace: true });
           }}
           className="fixed right-3 top-3 z-50 rounded-md border border-input bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur hover:bg-accent"
