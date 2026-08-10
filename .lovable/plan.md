@@ -1,96 +1,44 @@
-# Step 2.5 — Accettazione Condizioni d'Uso
+# Allineamento funnel di ingresso allo standard 001SmMntnnc
 
-Nuovo step obbligatorio tra attivazione licenza e accesso alla SaaS, con consenso persistito su `license_consents` (tabella esistente, non modificata) e testo in 4 lingue riutilizzabile per altri prodotti.
+## Nota importante prima di procedere
 
-## 1. Config app (`src/lib/app-config.ts`)
+Ho provato ad aprire il progetto di riferimento 001SmMntnnc da questo workspace: l'unico progetto accessibile con quel nome (PWA-001SmMntnnc) contiene solo il template vuoto — non ci sono `src/lib/app-config.ts`, `license.functions.ts`, `condizioni.tsx`, `licenza-scaduta.tsx`. Quindi **non posso leggere il codice sorgente di riferimento**: implementerò seguendo alla lettera la tua descrizione. Se vuoi copia identica byte-per-byte, incollami i 4 file di riferimento.
 
-Estendere il file esistente aggiungendo:
+## Cosa toccherò, file per file
 
-- `APP_NAME = "mini FAT"` — nome mostrato nel testo delle condizioni (interpolato al posto di `{{APP_NAME}}`).
-- `TERMS_VERSION = "v1"` — versione condizioni. Cambiandola in futuro si forzerà un nuovo consenso.
+1. `src/lib/app-config.ts` — diventa il punto unico delle chiavi di sessione: le 4 chiavi oggi in `__root.tsx` (`VERIFIED_EMAIL_KEY`, `ACTIVATED_KEY`, `LICENSE_ID_KEY`, `CONSENT_KEY`, prefisso `002MnFAT:` invariato) più `LAST_LICENSE_CHECK_KEY` e `LICENSE_INVALID_REASON_KEY`. Aggiungo `GATE_KEYS` (le 5 chiavi tranne `LICENSE_INVALID_REASON_KEY`), `LICENSE_KEYS` (activated, licenseId, consent, lastCheck — l'email verificata resta), e `clearGateKeys()` / `clearLicenseKeys()` (no-op lato server).
 
-Per riuso su altri SaaS: solo `APP_CODE`, `APP_NAME`, `TERMS_VERSION` cambiano; tutto il resto è generico.
+2. `src/routes/__root.tsx` —
+   - rimuovo le 4 `export const` chiavi e le re-importo da `@/lib/app-config` (mantengo un re-export solo se serve a non rompere import esterni: preferisco aggiornare gli import, vedi punto 3);
+   - `PUBLIC_PATHS` include anche `/licenza-scaduta`;
+   - `AuthGate`: quando il path è protetto (non pubblico, non `/attivazione`) e i flag locali dicono "attivato", chiamo `checkLicenseStatus({ data: { licenseId } })` **prima** di concedere l'accesso. `valid === true` → scrivo `LAST_LICENSE_CHECK_KEY` e mostro il contenuto; `valid === false` → scrivo il motivo in `LICENSE_INVALID_REASON_KEY`, `clearLicenseKeys()`, redirect a `/licenza-scaduta`; eccezione di rete → accesso concesso (fail-open). Nessuna cache: ad ogni caricamento di pagina protetta.
+   - bottone "Esci" → `clearGateKeys()` invece delle 4 `removeItem`.
 
-## 2. Nuovo file traduzioni (`src/lib/terms-i18n.ts`)
+3. `src/routes/auth.tsx`, `src/routes/attivazione.tsx`, `src/routes/condizioni.tsx` — cambio la sorgente degli import da `@/routes/__root` a `@/lib/app-config`. In `attivazione.tsx` il "Cambia email" usa `clearGateKeys()`.
 
-File separato dal `dict` principale per non appesantirlo. Struttura:
+4. `src/lib/license.functions.ts` — aggiungo `checkLicenseStatus` (server fn POST, input `{ licenseId: uuid }`) che si appoggia a un helper `runLicenseStatus`: legge `is_active, expires_at` da `licenses` sul DB esterno per quell'id e ritorna `{ valid, reason: "expired" | "deactivated" | "not_found" | null }`. Fail-open su qualunque errore: `{ valid: true, reason: null }`. Non toccherò `verifyAndActivateLicense`.
 
-```
-export const TERMS: Record<Lang, {
-  langLabel: string;             // "Italiano" / "English" / ...
-  pageTitle: string;             // "Condizioni d'Uso"
-  stepLabel: string;             // "Passaggio 3 di 3"
-  checkboxLabel: string;         // "Ho letto e accetto le condizioni d'uso"
-  acceptButton: string;          // "Accetta e continua"
-  acceptingButton: string;       // "Salvataggio…"
-  errorGeneric: string;          // fallback errore
-  content: {                     // corpo delle condizioni
-    heading: string;             // "CONDIZIONI D'USO DEL SOFTWARE"
-    subheading: string;          // "{{APP_NAME}} — Versione 1.0"
-    sections: Array<{ title: string; body: string }>; // 9 sezioni numerate
-    footer: string;              // "Versione: v1 — Ultimo aggiornamento: 14 luglio 2026"
-  };
-}>
-```
+5. `src/routes/condizioni.tsx` — nell'`useEffect`, dopo aver letto email/licenseId, chiamo `checkTermsConsent({ data: { licenseId } })`: se `accepted === true` scrivo `CONSENT_KEY="1"` e `ACTIVATED_KEY="1"` e navigo a `/`; altrimenti mostro il form. Stato `ready` + loader per evitare il flash del form.
 
-Testo italiano preso fedelmente dal brief. Traduzioni EN/DE/ES prodotte mantenendo:
+6. `src/routes/licenza-scaduta.tsx` (nuovo) — legge `LICENSE_INVALID_REASON_KEY`, messaggio distinto per `expired` / `deactivated` / `not_found` (default generico), bottone verso `/attivazione`. Route pubblica, `head()` con titolo proprio e `robots: noindex`.
 
-- stessa struttura a 9 punti numerati con stessi titoli,
-- registro legale/formale,
-- riferimenti invariati (Paddle.com Market Limited, P.IVA IT01235350194, GDPR, Foro di Cremona, `/pagamenti-merchant-of-record`),
-- placeholder `{{APP_NAME}}` conservato nel testo e sostituito a runtime.
+## Cosa NON toccherò
 
-## 3. Nuovo componente riutilizzabile (`src/components/terms-consent.tsx`)
+- Il testo delle condizioni d'uso (`src/lib/terms-i18n.ts`, `src/components/terms-consent.tsx`).
+- Il flusso OTP (`src/lib/otp.functions.ts`) e la logica di `auth.tsx` oltre alla riga di import.
+- `verifyAndActivateLicense` e le tabelle/DB (nessuna migrazione).
+- Tutte le pagine applicative: `index.tsx`, `controlli.tsx`, `report.tsx`, `archivio.tsx`, PDF, i18n, componenti FAT.
+- I client Supabase generati e i README esistenti (posso aggiornarli dopo, se vuoi).
 
-Componente puro presentazionale + logica, riutilizzabile senza modifiche:
+## Punti ambigui / da confermare
 
-- Props: `licenseId: string`, `email: string`, `onAccepted: () => void`.
-- Stato interno: `lang` (default `'it'`), `checked`, `loading`, `error`.
-- Selettore lingua in alto: 4 pill/button (IT/EN/DE/ES) coerenti col brand (`#06090f` bg, `#0a2a4a` surface, `#b4ff3c` accent attivo).
-- Box scrollabile (`max-h-[50vh] overflow-y-auto`) con `heading`, `subheading`, le 9 sezioni e il footer, con `{{APP_NAME}}` sostituito da `APP_NAME`.
-- Checkbox obbligatoria + label tradotta.
-- Bottone "Accetta e continua" tradotto, disabilitato finché `!checked || loading`.
-- Al click: chiama la server function `recordTermsConsent` (vedi §4). Su successo → `onAccepted()`. Su errore generico → mostra `errorGeneric`.
+1. I 4 file di riferimento di 001SmMntnnc non sono leggibili (vedi nota). Procedo "a specifica" oppure aspetti di incollarmeli?
+2. Le chiavi restano con prefisso `002MnFAT:` (nessuna migrazione delle sessioni esistenti). Confermi?
+3. `checkLicenseStatus` viene chiamata da `AuthGate` senza autenticazione: è una server fn pubblica che accetta un `licenseId`. Espone solo `valid`/`reason`, quindi la ritengo accettabile — segnalo per trasparenza.
+4. Testo dei messaggi di `/licenza-scaduta`: solo italiano (come `attivazione.tsx`) o tradotto nelle 4 lingue via `useI18n`? Di default faccio **solo italiano**, coerente con le altre pagine del funnel.
+5. Passaggio che potrebbe mancare per coerenza: aggiornare `FLUSSO-INGRESSO-README.md` / `AUTENTICAZIONE-MULTISEAT-README.md` con il nuovo step di rivalidazione e la nuova route. Fuori dal tuo elenco: lo faccio solo se me lo confermi.
 
-## 4. Server function (`src/lib/consent.functions.ts`)
+## Verifiche finali che farò
 
-Nuovo file, pattern identico a `license.functions.ts`:
-
-- `checkTermsConsent({ licenseId })` → interroga `supabaseExternal.from('license_consents').select('id').eq('license_id', licenseId).eq('terms_version', TERMS_VERSION).maybeSingle()`. Ritorna `{ accepted: boolean }`.
-- `recordTermsConsent({ licenseId, language })`:
-  - Legge `app_code` dalla riga `licenses` corrispondente (evita di fidarsi del client).
-  - Insert su `license_consents` con `license_id`, `app_code`, `language`, `terms_version = TERMS_VERSION`, `user_agent` (header `user-agent` via `getRequestHeader`), `ip_address` (header `x-forwarded-for` prima virgola, altrimenti `null`).
-  - Se errore Postgres `code === '23505'` (violazione UNIQUE `license_id, terms_version`) → ritorna `{ ok: true, alreadyExisted: true }`.
-  - Altri errori → ritorna `{ ok: false, code: 'E-301' }`; il componente mostra `errorGeneric` e blocca l'accesso.
-  - Successo → `{ ok: true, alreadyExisted: false }`.
-
-Entrambe usano `supabaseExternal` (mai il client Lovable).
-
-## 5. Integrazione nel flusso attivazione (`src/routes/attivazione.tsx`)
-
-Dopo `activate(...)` con `res.ok === true`:
-
-1. Chiama `checkTermsConsent({ licenseId: res.licenseId })`.
-2. Se `accepted === true` → comportamento attuale: setta `ACTIVATED_KEY` e naviga a `/`.
-3. Se `accepted === false` → NON setta ancora `ACTIVATED_KEY`, memorizza `licenseId` in stato locale e mostra `<TermsConsent licenseId={...} email={email} onAccepted={...} />` al posto del form.
-4. In `onAccepted`: setta `ACTIVATED_KEY` e naviga a `/`.
-
-Aggiornare `CardDescription` in "Passaggio 2 di 3" quando serve.
-
-## 6. Auth gate (`src/routes/__root.tsx`)
-
-Nessuna modifica strutturale: la sequenza `verified → activated → app` resta valida. Il consenso è verificato dentro `attivazione.tsx` prima di scrivere `ACTIVATED_KEY`, quindi l'utente non può raggiungere la SaaS senza aver firmato. Casi limite (utente già `ACTIVATED_KEY=1` in localStorage da sessioni precedenti a questa modifica) non sono gestiti: il consenso è comunque persistito lato server per nuove attivazioni, coerente con il brief che descrive il nuovo flusso post-attivazione.
-
-## Note tecniche
-
-- `license_consents` non è nella lista `<supabase-tables>` locale ma è nel DB esterno (`supabaseExternal`) — nessuna migration.
-- `TERMS_VERSION` centralizzato: cambiando a `'v2'` in futuro, `checkTermsConsent` non trova il record e forza nuova accettazione automaticamente.
-- `APP_NAME` interpolato via semplice `str.replaceAll('{{APP_NAME}}', APP_NAME)` in tutte e 4 le lingue.
-- Colori brand applicati via classi Tailwind arbitrarie / inline style solo sul componente consenso, per non toccare il design system globale.
-
-## Out of scope
-
-- Nessuna modifica a `license_consents`, `licenses`, `puk_codes`, `lead_emails`.
-- Nessuna modifica al client Supabase standard.
-- Nessuna riscrittura dell'auth gate o del flusso OTP.
-- Nessuna pagina pubblica `/condizioni-uso` (solo il consenso in-flow).
+- Typecheck del progetto.
+- Conferma dei tre comportamenti richiesti (consenso cross-browser via DB, revoca licenza → `/licenza-scaduta` con motivo, fail-open su errore tecnico).
