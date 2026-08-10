@@ -30,13 +30,15 @@ Ho provato ad aprire il progetto di riferimento 001SmMntnnc da questo workspace:
 - Tutte le pagine applicative: `index.tsx`, `controlli.tsx`, `report.tsx`, `archivio.tsx`, PDF, i18n, componenti FAT.
 - I client Supabase generati e i README esistenti (posso aggiornarli dopo, se vuoi).
 
-## Punti ambigui / da confermare
+## Punti chiusi (confermati)
 
-1. I 4 file di riferimento di 001SmMntnnc non sono leggibili (vedi nota). Procedo "a specifica" oppure aspetti di incollarmeli?
-2. Le chiavi restano con prefisso `002MnFAT:` (nessuna migrazione delle sessioni esistenti). Confermi?
-3. `checkLicenseStatus` viene chiamata da `AuthGate` senza autenticazione: è una server fn pubblica che accetta un `licenseId`. Espone solo `valid`/`reason`, quindi la ritengo accettabile — segnalo per trasparenza.
-4. Testo dei messaggi di `/licenza-scaduta`: solo italiano (come `attivazione.tsx`) o tradotto nelle 4 lingue via `useI18n`? Di default faccio **solo italiano**, coerente con le altre pagine del funnel.
-5. Passaggio che potrebbe mancare per coerenza: aggiornare `FLUSSO-INGRESSO-README.md` / `AUTENTICAZIONE-MULTISEAT-README.md` con il nuovo step di rivalidazione e la nuova route. Fuori dal tuo elenco: lo faccio solo se me lo confermi.
+1. Procedo a specifica, senza i file di riferimento.
+2. Prefisso `002MnFAT:` invariato, nessuna migrazione delle sessioni.
+3. `checkLicenseStatus` pubblica, stesso pattern di `checkTermsConsent`.
+4. `/licenza-scaduta` tradotta nelle **4 lingue** (it/en/de/es) via `useI18n`, come il resto dell'app.
+5. README non aggiornati in questo passaggio.
+6. Bottone finale di `/licenza-scaduta`: prima di navigare ricontrolla `VERIFIED_EMAIL_KEY` in localStorage — presente → `/attivazione`, assente → `/auth`.
+
 
 ## Verifiche finali che farò
 
