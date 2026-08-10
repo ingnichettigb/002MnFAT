@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as LicenzaScadutaRouteImport } from './routes/licenza-scaduta'
 import { Route as ControlliRouteImport } from './routes/controlli'
 import { Route as CondizioniRouteImport } from './routes/condizioni'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -20,6 +21,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const ReportRoute = ReportRouteImport.update({
   id: '/report',
   path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicenzaScadutaRoute = LicenzaScadutaRouteImport.update({
+  id: '/licenza-scaduta',
+  path: '/licenza-scaduta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ControlliRoute = ControlliRouteImport.update({
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/condizioni': typeof CondizioniRoute
   '/controlli': typeof ControlliRoute
+  '/licenza-scaduta': typeof LicenzaScadutaRoute
   '/report': typeof ReportRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/condizioni': typeof CondizioniRoute
   '/controlli': typeof ControlliRoute
+  '/licenza-scaduta': typeof LicenzaScadutaRoute
   '/report': typeof ReportRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/condizioni': typeof CondizioniRoute
   '/controlli': typeof ControlliRoute
+  '/licenza-scaduta': typeof LicenzaScadutaRoute
   '/report': typeof ReportRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/condizioni'
     | '/controlli'
+    | '/licenza-scaduta'
     | '/report'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/condizioni'
     | '/controlli'
+    | '/licenza-scaduta'
     | '/report'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/condizioni'
     | '/controlli'
+    | '/licenza-scaduta'
     | '/report'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CondizioniRoute: typeof CondizioniRoute
   ControlliRoute: typeof ControlliRoute
+  LicenzaScadutaRoute: typeof LicenzaScadutaRoute
   ReportRoute: typeof ReportRoute
 }
 
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/report'
       fullPath: '/report'
       preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licenza-scaduta': {
+      id: '/licenza-scaduta'
+      path: '/licenza-scaduta'
+      fullPath: '/licenza-scaduta'
+      preLoaderRoute: typeof LicenzaScadutaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/controlli': {
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CondizioniRoute: CondizioniRoute,
   ControlliRoute: ControlliRoute,
+  LicenzaScadutaRoute: LicenzaScadutaRoute,
   ReportRoute: ReportRoute,
 }
 export const routeTree = rootRouteImport
