@@ -189,11 +189,10 @@ function AttivazionePage() {
             <button
               type="button"
               onClick={() => {
-                if (typeof window !== "undefined") {
-                  window.localStorage.removeItem(VERIFIED_EMAIL_KEY);
-                }
+                clearGateKeys();
                 navigate({ to: "/auth", replace: true });
               }}
+
               className="text-xs text-muted-foreground underline"
             >
               Cambia email
