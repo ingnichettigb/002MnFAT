@@ -271,9 +271,4 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   );
 }
 
-      {children}
-    </>
-  );
-}
-
 
