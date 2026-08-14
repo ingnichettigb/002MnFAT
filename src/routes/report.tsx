@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { FileDown, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/card";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
+import { burnLicenseIfSingleUse } from "@/lib/license.functions";
+import { LICENSE_ID_KEY } from "@/lib/app-config";
 
 
 export const Route = createFileRoute("/report")({
@@ -50,12 +53,25 @@ function ReportPage() {
   };
 
   const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
+  const burnIfSingleUse = useServerFn(burnLicenseIfSingleUse);
 
   const handleGenerate = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
     const filename = generateFatPdf(state, lang, secondary);
     showPdfSaved(filename);
+
+    // Se la licenza corrente e' a uso singolo, la "brucia" subito dopo la
+    // generazione del PDF (no-op per licenze normali). Fire-and-forget:
+    // il PDF e' gia' stato scaricato, non blocchiamo/segnaliamo nulla in UI.
+    if (typeof window !== "undefined") {
+      const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
+      if (licenseId) {
+        void burnIfSingleUse({ data: { licenseId } }).catch((err) => {
+          console.error("burnLicenseIfSingleUse call failed:", err);
+        });
+      }
+    }
   };
 
 

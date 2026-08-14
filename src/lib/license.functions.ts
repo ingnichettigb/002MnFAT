@@ -80,7 +80,7 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
       // 2) find license by key + app_code (no email filter: self-claim scenario)
       const { data: license, error: lErr } = await ext
         .from("licenses")
-        .select("id, is_active, expires_at, activated_at")
+        .select("id, is_active, expires_at, activated_at, subscription_type")
         .eq("license_key", licenseKey)
         .eq("app_code", APP_CODE)
         .eq("is_active", true)
@@ -182,11 +182,20 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
         }
       }
 
-      // 7) mark license activated_at if still null (first claim on this license)
+      // 7) mark license activated_at if still null (first claim on this license).
+      //    Se la licenza e' a uso singolo (subscription_type === "single_use"),
+      //    le 48h di validita' partono da QUESTO istante (primo accesso reale),
+      //    non dall'acquisto: valorizziamo expires_at nello stesso UPDATE.
       if (!license.activated_at) {
+        const nowIso = new Date().toISOString();
+        const updatePayload: Record<string, string> = { activated_at: nowIso };
+        if (license.subscription_type === "single_use") {
+          const singleUseExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
+          updatePayload.expires_at = singleUseExpiry.toISOString();
+        }
         const { error: actErr } = await ext
           .from("licenses")
-          .update({ activated_at: new Date().toISOString() })
+          .update(updatePayload)
           .eq("id", license.id)
           .is("activated_at", null);
         if (actErr) throw new Error(actErr.message);
@@ -202,5 +211,54 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
     } catch (err) {
       console.error("verifyAndActivateLicense error:", err);
       return { ok: false, reason: "server_error", code: "E-500" };
+    }
+  });
+
+// Da chiamare subito dopo la generazione del PDF finale (report.tsx).
+// Se la licenza e' a uso singolo (subscription_type === "single_use"),
+// la disattiva immediatamente: al prossimo controllo di runLicenseStatus
+// (gia' eseguito ad ogni navigazione tramite AuthGate) l'accesso viene
+// bloccato senza bisogno di toccare AuthGate/license-status.server.ts.
+// Per qualsiasi altro tipo di licenza (monthly, annual, o nessuna) e' un no-op.
+export const burnLicenseIfSingleUse = createServerFn({ method: "POST" })
+  .inputValidator((input: { licenseId: string }) =>
+    z.object({ licenseId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data }): Promise<{ burned: boolean }> => {
+    try {
+      const { supabaseExternal } = await import(
+        "@/integrations/supabase/client.external"
+      );
+      const ext = supabaseExternal as unknown as {
+        from: (t: string) => any;
+      };
+
+      const { data: license, error: lErr } = await ext
+        .from("licenses")
+        .select("id, subscription_type, is_active")
+        .eq("id", data.licenseId)
+        .limit(1)
+        .maybeSingle();
+      if (lErr) throw new Error(lErr.message);
+      if (!license || license.subscription_type !== "single_use") {
+        return { burned: false };
+      }
+      if (license.is_active === false) {
+        // gia' bruciata (es. doppio click, retry di rete): no-op idempotente
+        return { burned: true };
+      }
+
+      const { error: updErr } = await ext
+        .from("licenses")
+        .update({ is_active: false })
+        .eq("id", data.licenseId);
+      if (updErr) throw new Error(updErr.message);
+
+      return { burned: true };
+    } catch (err) {
+      console.error("burnLicenseIfSingleUse error:", err);
+      // fail-open: non blocchiamo la generazione/consegna del PDF gia' avvenuta
+      // per un problema tecnico sul burn; verra' comunque bloccata alle 48h.
+      return { burned: false };
     }
   });
