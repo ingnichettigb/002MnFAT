@@ -149,8 +149,8 @@ Messaggi di errore mostrati (italiano, con codice in coda):
 | E-012 | Codice non corretto. Riprova o richiedi un nuovo invio. |
 | E-013 | Errore tecnico durante la verifica. Riprova. |
 
-**Bottone rosso "Sviluppatore — bypass"**: scrive `VERIFIED_EMAIL_KEY` e
-`ACTIVATED_KEY` e va a `/`. Da rimuovere prima della messa in produzione.
+Non esiste alcuna scorciatoia di sviluppo: l'unico modo di superare il
+passaggio 1 è la verifica OTP dell'email.
 
 ---
 
@@ -465,7 +465,7 @@ in alto a destra che rimuove tutte e 4 le chiavi localStorage e torna a `/auth`.
 7. Cambia il mittente email `from` e i testi delle sezioni se il prodotto ha
    condizioni diverse; mantieni il placeholder `{{APP_NAME}}`.
 8. Aggiorna i `head()` delle 3 route con il nome del nuovo prodotto.
-9. **Rimuovi il bottone rosso "Sviluppatore — bypass"** da `auth.tsx` prima del rilascio.
+9. **Non introdurre scorciatoie di bypass** in `auth.tsx`: il funnel deve essere l'unica via d'accesso.
 10. Test end-to-end: email nuova → OTP → licenza+PUK → condizioni → app;
     poi ripulisci il localStorage e verifica che ogni redirect scatti correttamente.
 
