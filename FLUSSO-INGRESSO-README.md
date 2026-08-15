@@ -149,8 +149,8 @@ Messaggi di errore mostrati (italiano, con codice in coda):
 | E-012 | Codice non corretto. Riprova o richiedi un nuovo invio. |
 | E-013 | Errore tecnico durante la verifica. Riprova. |
 
-**Bottone rosso "Sviluppatore — bypass"**: scrive `VERIFIED_EMAIL_KEY` e
-`ACTIVATED_KEY` e va a `/`. Da rimuovere prima della messa in produzione.
+Non esiste alcuna scorciatoia di sviluppo: l'unico modo di superare il
+passaggio 1 è la verifica OTP dell'email.
 
 ---
 
