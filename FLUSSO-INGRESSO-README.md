@@ -465,7 +465,7 @@ in alto a destra che rimuove tutte e 4 le chiavi localStorage e torna a `/auth`.
 7. Cambia il mittente email `from` e i testi delle sezioni se il prodotto ha
    condizioni diverse; mantieni il placeholder `{{APP_NAME}}`.
 8. Aggiorna i `head()` delle 3 route con il nome del nuovo prodotto.
-9. **Rimuovi il bottone rosso "Sviluppatore — bypass"** da `auth.tsx` prima del rilascio.
+9. **Non introdurre scorciatoie di bypass** in `auth.tsx`: il funnel deve essere l'unica via d'accesso.
 10. Test end-to-end: email nuova → OTP → licenza+PUK → condizioni → app;
     poi ripulisci il localStorage e verifica che ogni redirect scatti correttamente.
 
