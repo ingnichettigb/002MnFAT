@@ -65,6 +65,7 @@ function ReportPage() {
   // che sono i controlli di validita' gia' esistenti - qui leggiamo solo
   // il contatore, non decidiamo l'accesso).
   const [showLastExportWarning, setShowLastExportWarning] = useState(false);
+  const [pdfExportsBadge, setPdfExportsBadge] = useState<number | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -73,6 +74,8 @@ function ReportPage() {
     fetchPdfExportsStatus({ data: { licenseId } })
       .then(({ remaining }) => {
         setShowLastExportWarning(remaining === 1);
+        // 999 fisso quando illimitato (remaining === null), altrimenti il valore reale
+        setPdfExportsBadge(remaining === null ? 999 : remaining);
       })
       .catch((err) => {
         console.error("getPdfExportsStatus call failed:", err);
@@ -94,7 +97,8 @@ function ReportPage() {
       const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
       if (licenseId) {
         decrementExports({ data: { licenseId } })
-          .then(({ exhausted }) => {
+          .then(({ remaining, exhausted }) => {
+            setPdfExportsBadge(remaining === null ? 999 : remaining);
             if (exhausted) {
               showExhausted();
             }
@@ -286,16 +290,26 @@ function ReportPage() {
             <RotateCcw className="mr-2 h-4 w-4" />
             <Lbl id={LABELS.restart.id}>{t("restart")}</Lbl>
           </Button>
-          <Button
-            size="lg"
-            onClick={handleGenerate}
-            disabled={
-              selected.length === 0 || !general.produttore.ragioneSociale
-            }
-          >
-            <FileDown className="mr-2 h-4 w-4" />
-            <Lbl id={LABELS.generatePdf.id}>{t("generatePdf")}</Lbl>
-          </Button>
+          <div className="relative inline-flex">
+            {pdfExportsBadge !== null && (
+              <span
+                className="absolute -right-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white shadow"
+                title="Generazioni PDF rimanenti"
+              >
+                {pdfExportsBadge}
+              </span>
+            )}
+            <Button
+              size="lg"
+              onClick={handleGenerate}
+              disabled={
+                selected.length === 0 || !general.produttore.ragioneSociale
+              }
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              <Lbl id={LABELS.generatePdf.id}>{t("generatePdf")}</Lbl>
+            </Button>
+          </div>
         </div>
       </div>
       {pdfSavedDialog}
