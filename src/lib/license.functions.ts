@@ -214,17 +214,14 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
     }
   });
 
-// Da chiamare subito dopo la generazione del PDF finale (report.tsx).
-// Se la licenza e' a uso singolo (subscription_type === "single_use"),
-// la disattiva immediatamente: al prossimo controllo di runLicenseStatus
-// (gia' eseguito ad ogni navigazione tramite AuthGate) l'accesso viene
-// bloccato senza bisogno di toccare AuthGate/license-status.server.ts.
-// Per qualsiasi altro tipo di licenza (monthly, annual, o nessuna) e' un no-op.
-export const burnLicenseIfSingleUse = createServerFn({ method: "POST" })
+// Da chiamare al mount di report.tsx: dice se mostrare il banner
+// "questa e' l'ultima generazione disponibile" (remaining === 1).
+// remaining === null significa illimitato (nessun banner, nessun blocco).
+export const getPdfExportsStatus = createServerFn({ method: "POST" })
   .inputValidator((input: { licenseId: string }) =>
     z.object({ licenseId: z.string().uuid() }).parse(input),
   )
-  .handler(async ({ data }): Promise<{ burned: boolean }> => {
+  .handler(async ({ data }): Promise<{ remaining: number | null }> => {
     try {
       const { supabaseExternal } = await import(
         "@/integrations/supabase/client.external"
@@ -235,30 +232,85 @@ export const burnLicenseIfSingleUse = createServerFn({ method: "POST" })
 
       const { data: license, error: lErr } = await ext
         .from("licenses")
-        .select("id, subscription_type, is_active")
+        .select("pdf_exports_remaining")
         .eq("id", data.licenseId)
         .limit(1)
         .maybeSingle();
       if (lErr) throw new Error(lErr.message);
-      if (!license || license.subscription_type !== "single_use") {
-        return { burned: false };
+
+      return { remaining: license?.pdf_exports_remaining ?? null };
+    } catch (err) {
+      console.error("getPdfExportsStatus error:", err);
+      // fail-open: in caso di errore tecnico non mostriamo il banner
+      return { remaining: null };
+    }
+  });
+
+// Da chiamare subito dopo la generazione del PDF finale (report.tsx).
+// Scala atomicamente pdf_exports_remaining di 1 (solo se > 0). Se il
+// contatore arriva a 0, disattiva la licenza nello stesso UPDATE: al
+// prossimo controllo di runLicenseStatus (gia' eseguito ad ogni
+// navigazione tramite AuthGate) l'accesso viene bloccato senza bisogno
+// di toccare AuthGate/license-status.server.ts.
+// Le licenze single_use hanno pdf_exports_remaining = 1 fin dalla
+// creazione: questo stesso meccanismo le "brucia" automaticamente alla
+// prima generazione, senza bisogno di una funzione dedicata separata.
+// Licenze con pdf_exports_remaining = NULL (illimitato) sono un no-op.
+export const decrementPdfExports = createServerFn({ method: "POST" })
+  .inputValidator((input: { licenseId: string }) =>
+    z.object({ licenseId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data }): Promise<{ remaining: number | null; exhausted: boolean }> => {
+    try {
+      const { supabaseExternal } = await import(
+        "@/integrations/supabase/client.external"
+      );
+      const ext = supabaseExternal as unknown as {
+        from: (t: string) => any;
+      };
+
+      const { data: license, error: lErr } = await ext
+        .from("licenses")
+        .select("id, pdf_exports_remaining, is_active")
+        .eq("id", data.licenseId)
+        .limit(1)
+        .maybeSingle();
+      if (lErr) throw new Error(lErr.message);
+      if (!license) {
+        return { remaining: null, exhausted: false };
       }
-      if (license.is_active === false) {
-        // gia' bruciata (es. doppio click, retry di rete): no-op idempotente
-        return { burned: true };
+
+      // illimitato: nessuna azione
+      if (license.pdf_exports_remaining === null) {
+        return { remaining: null, exhausted: false };
+      }
+
+      // gia' esaurito in precedenza (es. doppio click, retry di rete):
+      // no-op idempotente, segnala comunque "esaurito"
+      if (license.pdf_exports_remaining <= 0) {
+        return { remaining: 0, exhausted: true };
+      }
+
+      const newRemaining = license.pdf_exports_remaining - 1;
+      const updatePayload: Record<string, unknown> = {
+        pdf_exports_remaining: newRemaining,
+      };
+      if (newRemaining <= 0) {
+        updatePayload.is_active = false;
       }
 
       const { error: updErr } = await ext
         .from("licenses")
-        .update({ is_active: false })
-        .eq("id", data.licenseId);
+        .update(updatePayload)
+        .eq("id", data.licenseId)
+        .eq("pdf_exports_remaining", license.pdf_exports_remaining); // guardia ottimistica anti-race
       if (updErr) throw new Error(updErr.message);
 
-      return { burned: true };
+      return { remaining: newRemaining, exhausted: newRemaining <= 0 };
     } catch (err) {
-      console.error("burnLicenseIfSingleUse error:", err);
-      // fail-open: non blocchiamo la generazione/consegna del PDF gia' avvenuta
-      // per un problema tecnico sul burn; verra' comunque bloccata alle 48h.
-      return { burned: false };
+      console.error("decrementPdfExports error:", err);
+      // fail-open: non blocchiamo la generazione/consegna del PDF gia'
+      // avvenuta per un problema tecnico sul decremento.
+      return { remaining: null, exhausted: false };
     }
   });

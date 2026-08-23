@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { FileDown, RotateCcw } from "lucide-react";
+import { FileDown, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 
 import { FatStepper } from "@/components/fat-stepper";
@@ -20,7 +21,8 @@ import {
 } from "@/components/ui/card";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
-import { burnLicenseIfSingleUse } from "@/lib/license.functions";
+import { usePdfExportsExhaustedDialog } from "@/components/pdf-exports-exhausted-dialog";
+import { getPdfExportsStatus, decrementPdfExports } from "@/lib/license.functions";
 import { LICENSE_ID_KEY } from "@/lib/app-config";
 
 
@@ -53,7 +55,30 @@ function ReportPage() {
   };
 
   const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
-  const burnIfSingleUse = useServerFn(burnLicenseIfSingleUse);
+  const { showExhausted, dialog: exhaustedDialog } = usePdfExportsExhaustedDialog();
+  const fetchPdfExportsStatus = useServerFn(getPdfExportsStatus);
+  const decrementExports = useServerFn(decrementPdfExports);
+
+  // Banner "questa e' l'ultima generazione disponibile": mostrato PRIMA che
+  // l'utente generi, cosi' puo' decidere consapevolmente. Letto al mount
+  // della pagina report (dopo verifyAndActivateLicense/checkLicenseStatus,
+  // che sono i controlli di validita' gia' esistenti - qui leggiamo solo
+  // il contatore, non decidiamo l'accesso).
+  const [showLastExportWarning, setShowLastExportWarning] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
+    if (!licenseId) return;
+    fetchPdfExportsStatus({ data: { licenseId } })
+      .then(({ remaining }) => {
+        setShowLastExportWarning(remaining === 1);
+      })
+      .catch((err) => {
+        console.error("getPdfExportsStatus call failed:", err);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleGenerate = () => {
     markDone();
@@ -61,15 +86,22 @@ function ReportPage() {
     const filename = generateFatPdf(state, lang, secondary);
     showPdfSaved(filename);
 
-    // Se la licenza corrente e' a uso singolo, la "brucia" subito dopo la
-    // generazione del PDF (no-op per licenze normali). Fire-and-forget:
-    // il PDF e' gia' stato scaricato, non blocchiamo/segnaliamo nulla in UI.
+    // Scala il contatore di generazioni PDF della licenza (no-op per
+    // licenze illimitate). Se questo era l'ultimo credito disponibile,
+    // la licenza viene disattivata dal server e mostriamo il dialog
+    // bloccante di avviso. Il PDF e' gia' stato scaricato in ogni caso.
     if (typeof window !== "undefined") {
       const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
       if (licenseId) {
-        void burnIfSingleUse({ data: { licenseId } }).catch((err) => {
-          console.error("burnLicenseIfSingleUse call failed:", err);
-        });
+        decrementExports({ data: { licenseId } })
+          .then(({ exhausted }) => {
+            if (exhausted) {
+              showExhausted();
+            }
+          })
+          .catch((err) => {
+            console.error("decrementPdfExports call failed:", err);
+          });
       }
     }
   };
@@ -97,6 +129,20 @@ function ReportPage() {
       </header>
 
       <FatToolbar />
+
+      {showLastExportWarning && (
+        <div className="mb-6 flex items-start gap-3 rounded-md border border-amber-300 bg-amber-50 p-4 text-amber-900">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+          <div className="text-sm">
+            <p className="font-semibold">
+              Attenzione: questa è l'ultima generazione PDF disponibile per questa licenza.
+            </p>
+            <p className="mt-0.5">
+              Dopo non potrai più generarne altri, fino al rinnovo della licenza o all'acquisto di una nuova licenza.
+            </p>
+          </div>
+        </div>
+      )}
 
       <FatStepper current={3} />
 
@@ -253,6 +299,7 @@ function ReportPage() {
         </div>
       </div>
       {pdfSavedDialog}
+      {exhaustedDialog}
     </div>
   );
 }
