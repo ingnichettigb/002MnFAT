@@ -1,16 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, dict } from "@/lib/i18n";
 import { LABELS } from "@/lib/fat-numbering";
 
 export function FatStepper({
   current,
-  onReportClick,
 }: {
   current: 1 | 2 | 3;
-  onReportClick?: () => void;
 }) {
-  const { t } = useI18n();
+  const { t, primary } = useI18n();
   const steps = [
     { to: "/" as const,          label: t("stepGeneral"),  num: LABELS.stepGeneral.id },
     { to: "/controlli" as const, label: t("stepControls"), num: LABELS.stepControls.id },
@@ -22,25 +20,23 @@ export function FatStepper({
         const n = (i + 1) as 1 | 2 | 3;
         const active = n === current;
         const done = n < current;
-        const isReportStep = n === 3;
-        const handleClick = isReportStep && onReportClick
-          ? (e: React.MouseEvent) => {
-              e.preventDefault();
-              onReportClick();
-            }
-          : undefined;
         return (
           <div key={s.to} className="flex items-center gap-2 sm:gap-4">
             <Link
               to={s.to}
-              onClick={handleClick}
+              aria-current={active ? "step" : undefined}
               className={cn(
-                "flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors",
-                active && "bg-primary text-primary-foreground",
+                "relative flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors",
+                active && "bg-primary text-primary-foreground ring-1 ring-green-500",
                 done && "bg-secondary text-secondary-foreground",
                 !active && !done && "text-muted-foreground hover:text-foreground",
               )}
             >
+              {active && (
+                <span className="absolute -top-2 left-2 bg-background px-1 text-[9px] font-semibold uppercase tracking-wider text-green-600">
+                  {dict.currentPhase[primary]}
+                </span>
+              )}
               <span
                 className={cn(
                   "grid h-6 w-6 place-content-center rounded-full text-xs font-semibold",

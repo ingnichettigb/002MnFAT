@@ -17,6 +17,7 @@ export const dict = {
   stepGeneral: { it: "Dati Generali", en: "General Data", de: "Allgemeine Daten", es: "Datos Generales" },
   stepControls: { it: "Controlli", en: "Checks", de: "Prüfungen", es: "Controles" },
   stepReport: { it: "Report PDF", en: "PDF Report", de: "PDF-Bericht", es: "Informe PDF" },
+  currentPhase: { it: "Fase di lavorazione", en: "Work in progress", de: "In Bearbeitung", es: "En elaboración" },
 
   // Common
   back: { it: "← Indietro", en: "← Back", de: "← Zurück", es: "← Atrás" },
