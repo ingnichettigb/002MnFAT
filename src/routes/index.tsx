@@ -94,14 +94,7 @@ function IndexPage() {
   const { state, setGeneral, activeId, markDone } = useFat();
   const { t, lang, secondary } = useI18n();
 
-  const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
-
-  const handleGenerateReport = () => {
-    markDone();
-    toast.success(t("reportGeneratedDone"));
-    const filename = generateFatPdf(state, lang, secondary);
-    showPdfSaved(filename);
-  };
+  const { dialog: pdfSavedDialog } = usePdfSavedDialog();
 
 
   const form = useForm<FormValues>({
@@ -141,7 +134,7 @@ function IndexPage() {
       </header>
 
       <FatToolbar />
-      <FatStepper current={1} onReportClick={handleGenerateReport} />
+      <FatStepper current={1} />
 
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
