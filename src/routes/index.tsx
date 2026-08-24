@@ -6,8 +6,6 @@ import { z } from "zod";
 import { useEffect, useId } from "react";
 import { Trash2, Plus } from "lucide-react";
 
-import { toast } from "sonner";
-
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
@@ -15,7 +13,6 @@ import { useFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { InfoDialog } from "@/components/info-dialog";
 import { LABELS, attendeeNumbers } from "@/lib/fat-numbering";
-import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,8 +88,8 @@ type FormValues = z.infer<typeof schema>;
 
 function IndexPage() {
   const navigate = useNavigate();
-  const { state, setGeneral, activeId, markDone } = useFat();
-  const { t, lang, secondary } = useI18n();
+  const { state, setGeneral, activeId } = useFat();
+  const { t } = useI18n();
 
   const { dialog: pdfSavedDialog } = usePdfSavedDialog();
 
