@@ -196,6 +196,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       clearLicenseKeys();
     }
     const licenseId = isUuid(storedLicenseId) ? storedLicenseId : null;
+    const activatedOk = licenseId ? activated : null;
 
     const settle = (value: boolean) => {
       if (cancelled) return;
