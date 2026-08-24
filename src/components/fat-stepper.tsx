@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, dict } from "@/lib/i18n";
 import { LABELS } from "@/lib/fat-numbering";
 
 export function FatStepper({
@@ -8,7 +8,7 @@ export function FatStepper({
 }: {
   current: 1 | 2 | 3;
 }) {
-  const { t } = useI18n();
+  const { t, primary } = useI18n();
   const steps = [
     { to: "/" as const,          label: t("stepGeneral"),  num: LABELS.stepGeneral.id },
     { to: "/controlli" as const, label: t("stepControls"), num: LABELS.stepControls.id },
@@ -34,7 +34,7 @@ export function FatStepper({
             >
               {active && (
                 <span className="absolute -top-2 left-2 bg-background px-1 text-[9px] font-semibold uppercase tracking-wider text-green-600">
-                  {t("currentPhase")}
+                  {dict.currentPhase[primary]}
                 </span>
               )}
               <span
