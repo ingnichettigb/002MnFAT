@@ -185,7 +185,18 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     const verified = window.localStorage.getItem(VERIFIED_EMAIL_KEY);
     const activated = window.localStorage.getItem(ACTIVATED_KEY);
     const consent = window.localStorage.getItem(CONSENT_KEY);
-    const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
+    const storedLicenseId = window.localStorage.getItem(LICENSE_ID_KEY);
+    const isUuid = (v: string | null): v is string =>
+      !!v &&
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        v,
+      );
+    // Un valore non-UUID in localStorage (residuo/legacy) va scartato.
+    if (storedLicenseId && !isUuid(storedLicenseId)) {
+      clearLicenseKeys();
+    }
+    const licenseId = isUuid(storedLicenseId) ? storedLicenseId : null;
+    const activatedOk = licenseId ? activated : null;
 
     const settle = (value: boolean) => {
       if (cancelled) return;
@@ -210,10 +221,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     } else if (licenseId && !consent && !isActivation) {
       navigate({ to: "/condizioni", replace: true });
       settle(false);
-    } else if (!activated && !isActivation) {
+    } else if (!activatedOk && !isActivation) {
       navigate({ to: "/attivazione", replace: true });
       settle(false);
-    } else if (!isActivation && activated && licenseId) {
+    } else if (!isActivation && activatedOk && licenseId) {
       // Rivalidazione della licenza a OGNI caricamento di pagina protetta.
       setChecked(false);
       void (async () => {
