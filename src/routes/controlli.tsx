@@ -82,7 +82,7 @@ function ControlliPage() {
       </header>
 
       <FatToolbar />
-      <FatStepper current={2} onReportClick={handleGenerateReport} />
+      <FatStepper current={2} />
 
       <Card>
         <CardHeader>
