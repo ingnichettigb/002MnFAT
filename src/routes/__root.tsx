@@ -221,10 +221,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     } else if (licenseId && !consent && !isActivation) {
       navigate({ to: "/condizioni", replace: true });
       settle(false);
-    } else if (!activated && !isActivation) {
+    } else if (!activatedOk && !isActivation) {
       navigate({ to: "/attivazione", replace: true });
       settle(false);
-    } else if (!isActivation && activated && licenseId) {
+    } else if (!isActivation && activatedOk && licenseId) {
       // Rivalidazione della licenza a OGNI caricamento di pagina protetta.
       setChecked(false);
       void (async () => {
