@@ -208,6 +208,7 @@ function ArchiveTable({
   activeId,
   onOpen,
   onView,
+  onSave,
   onDuplicate,
   onDelete,
 }: {
@@ -215,6 +216,7 @@ function ArchiveTable({
   activeId: string | null;
   onOpen: (id: string) => void;
   onView: (id: string) => void;
+  onSave: (id: string) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
