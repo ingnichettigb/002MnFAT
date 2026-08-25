@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Archive, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, Copy, Eye, FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 
@@ -33,6 +33,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Lbl } from "@/components/lbl";
 import { useFat, type FatStatus, type SavedFat } from "@/lib/fat-context";
 import { useI18n, LangSwitcher } from "@/lib/i18n";
@@ -317,5 +325,73 @@ function ArchiveTable({
         </TableBody>
       </Table>
     </div>
+  );
+}
+
+function LoadFileDialog({
+  rows,
+  onOpen,
+}: {
+  rows: SavedFat[];
+  onOpen: (id: string) => void;
+}) {
+  const { t } = useI18n();
+  const [open, setOpen] = React.useState(false);
+
+  const labelFor = (f: SavedFat) => {
+    const g = f.state.general;
+    const pieces = [g.commessa, g.numeroMatricola, g.cliente.ragioneSociale].filter(
+      Boolean,
+    );
+    return pieces.length ? pieces.join(" · ") : t("untitledFat");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          <FolderOpen className="mr-1 h-4 w-4" />
+          <Lbl id={LABELS.loadFileBtn.id}>{t("loadFile")}</Lbl>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{t("loadFileTitle")}</DialogTitle>
+          <DialogDescription>{t("loadFileDesc")}</DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[60vh] space-y-2 overflow-y-auto">
+          {rows.length === 0 && (
+            <p className="text-sm text-muted-foreground">{t("noFats")}</p>
+          )}
+          {rows.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                onOpen(f.id);
+              }}
+              className="flex w-full items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm transition-colors hover:bg-muted"
+            >
+              <span className="min-w-0 truncate font-medium">{labelFor(f)}</span>
+              <span className="flex shrink-0 items-center gap-2">
+                <Badge variant={statusVariant(f.status)}>
+                  {t(
+                    f.status === "done"
+                      ? "statusDone"
+                      : f.status === "in_progress"
+                        ? "statusInProgress"
+                        : "statusTodo",
+                  )}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {fmtDate(f.updatedAt)}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
