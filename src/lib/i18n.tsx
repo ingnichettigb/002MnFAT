@@ -196,6 +196,7 @@ export const dict = {
   newFat: { it: "Nuovo FAT", en: "New FAT", de: "Neues FAT", es: "Nuevo FAT" },
   open: { it: "Apri", en: "Open", de: "Öffnen", es: "Abrir" },
   duplicate: { it: "Duplica", en: "Duplicate", de: "Duplizieren", es: "Duplicar" },
+  saveFile: { it: "Salva file", en: "Save file", de: "Datei speichern", es: "Guardar archivo" },
   deleteAction: { it: "Elimina", en: "Delete", de: "Löschen", es: "Eliminar" },
   status: { it: "Stato", en: "Status", de: "Status", es: "Estado" },
   lastUpdated: { it: "Ultima modifica", en: "Last updated", de: "Zuletzt geändert", es: "Última modificación" },
