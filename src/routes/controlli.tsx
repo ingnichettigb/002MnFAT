@@ -30,7 +30,7 @@ export const Route = createFileRoute("/controlli")({
       { title: "Controlli — Mini F.A.T." },
       {
         name: "description",
-        content: "Seleziona i controlli da includere nel verbale F.A.T..",
+        content: "Seleziona i controlli da includere nel verbale F.A.T.",
       },
     ],
   }),

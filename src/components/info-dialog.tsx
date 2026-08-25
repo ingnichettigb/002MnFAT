@@ -118,7 +118,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Elenco di tutti i F.A.T. salvati, con filtri per stato: Da lavorare, In lavorazione, Completati, Tutti. Per ciascun F.A.T. sono disponibili le azioni:",
         bullets: [
           "Apri — carica il F.A.T. come attivo e torna alla compilazione.",
-          "Duplica — crea una copia indipendente del F.A.T..",
+          "Duplica — crea una copia indipendente del F.A.T.",
           "Elimina — rimuove definitivamente il F.A.T. (con conferma).",
         ],
       },
@@ -160,7 +160,7 @@ const GUIDE: Record<Lang, GuideContent> = {
         intro:
           "Below the header the active F.A.T. is shown (Job · Serial · Customer) with three buttons:",
         bullets: [
-          "Archive — opens the list of all saved F.A.T..",
+          "Archive — opens the list of all saved F.A.T.",
           "Save draft — saves the current state as a draft (\"In progress\").",
           "New F.A.T. — creates a new empty F.A.T. (the current one stays in the archive).",
         ],
@@ -213,7 +213,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "List of all saved F.A.T., filtered by status: To do, In progress, Completed, All. For each F.A.T.:",
         bullets: [
           "Open — loads the F.A.T. as active and returns to editing.",
-          "Duplicate — creates an independent copy of the F.A.T..",
+          "Duplicate — creates an independent copy of the F.A.T.",
           "Delete — permanently removes the F.A.T. (with confirmation).",
         ],
       },
@@ -255,7 +255,7 @@ const GUIDE: Record<Lang, GuideContent> = {
         intro:
           "Unter dem Header wird der aktive F.A.T. angezeigt (Auftrag · Seriennummer · Kunde) mit drei Schaltflächen:",
         bullets: [
-          "Archiv — öffnet die Liste aller gespeicherten F.A.T..",
+          "Archiv — öffnet die Liste aller gespeicherten F.A.T.",
           "Entwurf speichern — speichert den aktuellen Zustand als Entwurf (\"In Bearbeitung\").",
           "Neues F.A.T. — erstellt ein leeres F.A.T. (das aktuelle bleibt im Archiv).",
         ],
@@ -308,7 +308,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Liste aller gespeicherten F.A.T., gefiltert nach Status: Zu erledigen, In Bearbeitung, Abgeschlossen, Alle. Für jedes F.A.T.:",
         bullets: [
           "Öffnen — lädt das F.A.T. als aktives und kehrt zur Bearbeitung zurück.",
-          "Duplizieren — erstellt eine unabhängige Kopie des F.A.T..",
+          "Duplizieren — erstellt eine unabhängige Kopie des F.A.T.",
           "Löschen — entfernt das F.A.T. endgültig (mit Bestätigung).",
         ],
       },
@@ -403,7 +403,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Lista de todos los F.A.T. guardados, filtrada por estado: Por hacer, En curso, Completados, Todos. Para cada F.A.T.:",
         bullets: [
           "Abrir — carga el F.A.T. como activo y vuelve a la edición.",
-          "Duplicar — crea una copia independiente del F.A.T..",
+          "Duplicar — crea una copia independiente del F.A.T.",
           "Eliminar — quita definitivamente el F.A.T. (con confirmación).",
         ],
       },
