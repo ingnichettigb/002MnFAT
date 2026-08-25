@@ -14,12 +14,12 @@ import { useI18n, type Lang } from "@/lib/i18n";
 /* ─────────────────────────────────────────────────────────────
    Guida allineata al comportamento reale dell'app:
    - Header con LangSwitcher (primaria/secondaria) + pulsante info
-   - Toolbar: Archivio, Salva bozza, Nuovo FAT
+   - Toolbar: Archivio, Salva bozza, Nuovo F.A.T.
    - Stepper: Dati Generali → Controlli → Report
    - Dati Generali: Ente Costruttore, Ente Verificatore, Dati Collaudo,
      Presenti (blocco Costruttore + blocco Cliente)
    - Controlli: preset + personalizzati, selezione
-   - Report: riepilogo + Genera Report FAT (produce PDF e marca "completato")
+   - Report: riepilogo + Genera Report F.A.T. (produce PDF e marca "completato")
    - Archivio: filtri stato + apri/duplica/elimina, salvataggio in localStorage
    La guida usa SOLO la lingua primaria per leggibilità.
    ───────────────────────────────────────────────────────────── */
@@ -61,13 +61,13 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Il pulsante con l'icona (i) accanto alle bandiere apre questa guida. Il testo cambia automaticamente in base alla lingua primaria.",
       },
       {
-        title: "4. Toolbar del FAT attivo",
+        title: "4. Toolbar del F.A.T. attivo",
         intro:
-          "Sotto l'header è mostrato il FAT attivo (Commessa · Matricola · Cliente) con tre pulsanti:",
+          "Sotto l'header è mostrato il F.A.T. attivo (Commessa · Matricola · Cliente) con tre pulsanti:",
         bullets: [
-          "Archivio — apre l'elenco di tutti i FAT salvati.",
+          "Archivio — apre l'elenco di tutti i F.A.T. salvati.",
           "Salva bozza — salva lo stato corrente come bozza (\"In lavorazione\").",
-          "Nuovo FAT — crea un nuovo FAT vuoto (l'attuale resta salvato in archivio).",
+          "Nuovo F.A.T. — crea un nuovo F.A.T. vuoto (l'attuale resta salvato in archivio).",
         ],
       },
       {
@@ -88,7 +88,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Ente Costruttore — ragione sociale, indirizzo, referente, email, telefono.",
           "Ente Verificatore — stessi campi per il cliente/ente verificatore.",
           "Dati del Collaudo — descrizione, N° disegno, N° matricola, Tag, N° ordine cliente, commessa, luogo e data del collaudo.",
-          "Presenti al FAT — due blocchi separati (lato Costruttore e lato Cliente): aggiungi nome, ruolo; l'azienda viene compilata automaticamente dalla ragione sociale della relativa sezione.",
+          "Presenti al F.A.T. — due blocchi separati (lato Costruttore e lato Cliente): aggiungi nome, ruolo; l'azienda viene compilata automaticamente dalla ragione sociale della relativa sezione.",
         ],
       },
       {
@@ -108,18 +108,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Riepilogo dei dati generali e dei controlli selezionati.",
         bullets: [
           "Ogni controllo selezionato diventerà un capitolo dedicato nel PDF.",
-          "Il pulsante \"Genera Report FAT\" produce il PDF e marca il FAT come \"Completato\" nell'archivio.",
-          "Il pulsante \"Ricomincia\" azzera tutti i dati del FAT attivo (chiede conferma).",
+          "Il pulsante \"Genera Report F.A.T.\" produce il PDF e marca il F.A.T. come \"Completato\" nell'archivio.",
+          "Il pulsante \"Ricomincia\" azzera tutti i dati del F.A.T. attivo (chiede conferma).",
         ],
       },
       {
-        title: "9. Archivio FAT",
+        title: "9. Archivio F.A.T.",
         intro:
-          "Elenco di tutti i FAT salvati, con filtri per stato: Da lavorare, In lavorazione, Completati, Tutti. Per ciascun FAT sono disponibili le azioni:",
+          "Elenco di tutti i F.A.T. salvati, con filtri per stato: Da lavorare, In lavorazione, Completati, Tutti. Per ciascun F.A.T. sono disponibili le azioni:",
         bullets: [
-          "Apri — carica il FAT come attivo e torna alla compilazione.",
-          "Duplica — crea una copia indipendente del FAT.",
-          "Elimina — rimuove definitivamente il FAT (con conferma).",
+          "Apri — carica il F.A.T. come attivo e torna alla compilazione.",
+          "Duplica — crea una copia indipendente del F.A.T..",
+          "Elimina — rimuove definitivamente il F.A.T. (con conferma).",
         ],
       },
       {
@@ -156,13 +156,13 @@ const GUIDE: Record<Lang, GuideContent> = {
           "The (i) button next to the flags opens this guide. The text follows the primary language automatically.",
       },
       {
-        title: "4. Active FAT toolbar",
+        title: "4. Active F.A.T. toolbar",
         intro:
-          "Below the header the active FAT is shown (Job · Serial · Customer) with three buttons:",
+          "Below the header the active F.A.T. is shown (Job · Serial · Customer) with three buttons:",
         bullets: [
-          "Archive — opens the list of all saved FATs.",
+          "Archive — opens the list of all saved F.A.T..",
           "Save draft — saves the current state as a draft (\"In progress\").",
-          "New FAT — creates a new empty FAT (the current one stays in the archive).",
+          "New F.A.T. — creates a new empty F.A.T. (the current one stays in the archive).",
         ],
       },
       {
@@ -183,7 +183,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Manufacturer — company name, address, contact person, email, phone.",
           "Verifying Body — same fields for the customer / verifying body.",
           "Test Data — description, drawing no., serial no., tag, customer order no., job no., test location and date.",
-          "FAT Attendees — two separate blocks (Manufacturer side and Customer side): add name and role; the company is auto-filled from the relevant section's company name.",
+          "F.A.T. Attendees — two separate blocks (Manufacturer side and Customer side): add name and role; the company is auto-filled from the relevant section's company name.",
         ],
       },
       {
@@ -203,18 +203,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Summary of general data and selected checks.",
         bullets: [
           "Each selected check becomes a dedicated chapter in the PDF.",
-          "The \"Generate FAT Report\" button produces the PDF and marks the FAT as \"Completed\" in the archive.",
-          "The \"Restart\" button clears all data of the active FAT (asks for confirmation).",
+          "The \"Generate F.A.T. Report\" button produces the PDF and marks the F.A.T. as \"Completed\" in the archive.",
+          "The \"Restart\" button clears all data of the active F.A.T. (asks for confirmation).",
         ],
       },
       {
-        title: "9. FAT Archive",
+        title: "9. F.A.T. Archive",
         intro:
-          "List of all saved FATs, filtered by status: To do, In progress, Completed, All. For each FAT:",
+          "List of all saved F.A.T., filtered by status: To do, In progress, Completed, All. For each F.A.T.:",
         bullets: [
-          "Open — loads the FAT as active and returns to editing.",
-          "Duplicate — creates an independent copy of the FAT.",
-          "Delete — permanently removes the FAT (with confirmation).",
+          "Open — loads the F.A.T. as active and returns to editing.",
+          "Duplicate — creates an independent copy of the F.A.T..",
+          "Delete — permanently removes the F.A.T. (with confirmation).",
         ],
       },
       {
@@ -251,13 +251,13 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Die (i)-Schaltfläche neben den Flaggen öffnet diese Anleitung. Der Text wechselt automatisch mit der primären Sprache.",
       },
       {
-        title: "4. Toolbar des aktiven FAT",
+        title: "4. Toolbar des aktiven F.A.T.",
         intro:
-          "Unter dem Header wird der aktive FAT angezeigt (Auftrag · Seriennummer · Kunde) mit drei Schaltflächen:",
+          "Unter dem Header wird der aktive F.A.T. angezeigt (Auftrag · Seriennummer · Kunde) mit drei Schaltflächen:",
         bullets: [
-          "Archiv — öffnet die Liste aller gespeicherten FATs.",
+          "Archiv — öffnet die Liste aller gespeicherten F.A.T..",
           "Entwurf speichern — speichert den aktuellen Zustand als Entwurf (\"In Bearbeitung\").",
-          "Neues FAT — erstellt ein leeres FAT (das aktuelle bleibt im Archiv).",
+          "Neues F.A.T. — erstellt ein leeres F.A.T. (das aktuelle bleibt im Archiv).",
         ],
       },
       {
@@ -278,7 +278,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Hersteller — Firmenname, Adresse, Ansprechpartner, E-Mail, Telefon.",
           "Prüfstelle — gleiche Felder für den Kunden / die Prüfstelle.",
           "Prüfdaten — Beschreibung, Zeichnungsnr., Seriennummer, Tag, Kunden-Bestellnr., Auftragsnr., Prüfort und -datum.",
-          "FAT-Teilnehmer — zwei getrennte Blöcke (Hersteller- und Kundenseite): Name und Rolle eingeben; die Firma wird automatisch aus dem Firmennamen des jeweiligen Abschnitts übernommen.",
+          "F.A.T.-Teilnehmer — zwei getrennte Blöcke (Hersteller- und Kundenseite): Name und Rolle eingeben; die Firma wird automatisch aus dem Firmennamen des jeweiligen Abschnitts übernommen.",
         ],
       },
       {
@@ -298,18 +298,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Zusammenfassung der allgemeinen Daten und der ausgewählten Prüfungen.",
         bullets: [
           "Jede ausgewählte Prüfung erhält ein eigenes Kapitel im PDF.",
-          "Die Schaltfläche \"FAT-Bericht erstellen\" erzeugt das PDF und markiert das FAT im Archiv als \"Abgeschlossen\".",
-          "Die Schaltfläche \"Neu starten\" löscht alle Daten des aktiven FAT (mit Bestätigung).",
+          "Die Schaltfläche \"F.A.T.-Bericht erstellen\" erzeugt das PDF und markiert das F.A.T. im Archiv als \"Abgeschlossen\".",
+          "Die Schaltfläche \"Neu starten\" löscht alle Daten des aktiven F.A.T. (mit Bestätigung).",
         ],
       },
       {
-        title: "9. FAT-Archiv",
+        title: "9. F.A.T.-Archiv",
         intro:
-          "Liste aller gespeicherten FATs, gefiltert nach Status: Zu erledigen, In Bearbeitung, Abgeschlossen, Alle. Für jedes FAT:",
+          "Liste aller gespeicherten F.A.T., gefiltert nach Status: Zu erledigen, In Bearbeitung, Abgeschlossen, Alle. Für jedes F.A.T.:",
         bullets: [
-          "Öffnen — lädt das FAT als aktives und kehrt zur Bearbeitung zurück.",
-          "Duplizieren — erstellt eine unabhängige Kopie des FAT.",
-          "Löschen — entfernt das FAT endgültig (mit Bestätigung).",
+          "Öffnen — lädt das F.A.T. als aktives und kehrt zur Bearbeitung zurück.",
+          "Duplizieren — erstellt eine unabhängige Kopie des F.A.T..",
+          "Löschen — entfernt das F.A.T. endgültig (mit Bestätigung).",
         ],
       },
       {
@@ -346,13 +346,13 @@ const GUIDE: Record<Lang, GuideContent> = {
           "El botón con el icono (i) junto a las banderas abre esta guía. El texto cambia automáticamente según el idioma principal.",
       },
       {
-        title: "4. Barra del FAT activo",
+        title: "4. Barra del F.A.T. activo",
         intro:
-          "Bajo la cabecera se muestra el FAT activo (Pedido · N.º de serie · Cliente) con tres botones:",
+          "Bajo la cabecera se muestra el F.A.T. activo (Pedido · N.º de serie · Cliente) con tres botones:",
         bullets: [
-          "Archivo — abre la lista de todos los FAT guardados.",
+          "Archivo — abre la lista de todos los F.A.T. guardados.",
           "Guardar borrador — guarda el estado actual como borrador (\"En curso\").",
-          "Nuevo FAT — crea un FAT vacío (el actual queda guardado en el archivo).",
+          "Nuevo F.A.T. — crea un F.A.T. vacío (el actual queda guardado en el archivo).",
         ],
       },
       {
@@ -373,7 +373,7 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Fabricante — razón social, dirección, persona de contacto, correo, teléfono.",
           "Organismo Verificador — mismos campos para el cliente / organismo verificador.",
           "Datos de la prueba — descripción, n.º de plano, n.º de serie, tag, n.º de pedido cliente, n.º de trabajo, lugar y fecha de la prueba.",
-          "Asistentes al FAT — dos bloques separados (lado Fabricante y lado Cliente): añade nombre y rol; la empresa se rellena automáticamente con la razón social de la sección correspondiente.",
+          "Asistentes al F.A.T. — dos bloques separados (lado Fabricante y lado Cliente): añade nombre y rol; la empresa se rellena automáticamente con la razón social de la sección correspondiente.",
         ],
       },
       {
@@ -393,18 +393,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Resumen de los datos generales y de los controles seleccionados.",
         bullets: [
           "Cada control seleccionado será un capítulo dedicado en el PDF.",
-          "El botón \"Generar informe FAT\" produce el PDF y marca el FAT como \"Completado\" en el archivo.",
-          "El botón \"Reiniciar\" borra todos los datos del FAT activo (pide confirmación).",
+          "El botón \"Generar informe F.A.T.\" produce el PDF y marca el F.A.T. como \"Completado\" en el archivo.",
+          "El botón \"Reiniciar\" borra todos los datos del F.A.T. activo (pide confirmación).",
         ],
       },
       {
-        title: "9. Archivo FAT",
+        title: "9. Archivo F.A.T.",
         intro:
-          "Lista de todos los FAT guardados, filtrada por estado: Por hacer, En curso, Completados, Todos. Para cada FAT:",
+          "Lista de todos los F.A.T. guardados, filtrada por estado: Por hacer, En curso, Completados, Todos. Para cada F.A.T.:",
         bullets: [
-          "Abrir — carga el FAT como activo y vuelve a la edición.",
-          "Duplicar — crea una copia independiente del FAT.",
-          "Eliminar — quita definitivamente el FAT (con confirmación).",
+          "Abrir — carga el F.A.T. como activo y vuelve a la edición.",
+          "Duplicar — crea una copia independiente del F.A.T..",
+          "Eliminar — quita definitivamente el F.A.T. (con confirmación).",
         ],
       },
       {
