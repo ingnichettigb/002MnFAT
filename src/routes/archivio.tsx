@@ -303,6 +303,14 @@ function ArchiveTable({
                     >
                       <Copy className="h-3.5 w-3.5" />
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onSave(f.id)}
+                      title={t("saveFile")}
+                    >
+                      <Save className="h-3.5 w-3.5" />
+                    </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
