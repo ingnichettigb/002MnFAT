@@ -137,6 +137,7 @@ function ArchivioPage() {
             <Button asChild variant="outline" size="sm">
               <Link to="/">{t("back")}</Link>
             </Button>
+            <LoadFileDialog rows={sorted} onOpen={handleOpen} />
             <Button size="sm" onClick={handleNew}>
               <Plus className="mr-1 h-4 w-4" />
               <Lbl id={LABELS.newFatBtn.id}>{t("newFat")}</Lbl>
