@@ -103,6 +103,7 @@ export const LABELS = {
   tabInProgress:   { id: 410, i18nKey: "statusInProgress",desc: "Tab In lavorazione" },
   tabDone:         { id: 411, i18nKey: "statusDone",      desc: "Tab Completati" },
   loadFileBtn:     { id: 412, i18nKey: "loadFile",        desc: "Pulsante Carica file (elenco FAT salvati)" },
+  archiveSave:     { id: 413, i18nKey: "saveFile",        desc: "Riga archivio · Salva file" },
 } as const satisfies Record<string, LabelEntry>;
 
 export type LabelKey = keyof typeof LABELS;

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { Archive, Copy, Eye, FolderOpen, Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, Copy, Eye, FolderOpen, Pencil, Plus, Save, Trash2 } from "lucide-react";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 
@@ -109,6 +109,20 @@ function ArchivioPage() {
     const filename = generateFatPdf(f.state, lang, secondary);
     showPdfSaved(filename);
   };
+  const handleSave = (id: string) => {
+    const f = archive.find((x) => x.id === id);
+    if (!f) return;
+    const blob = new Blob([JSON.stringify(f, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const safeName = (f.state.general.commessa || f.id).replace(/[^a-zA-Z0-9_-]/g, "_");
+    a.download = `FAT_${safeName}_${new Date(f.updatedAt).toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const handleNew = () => {
     newFat();
@@ -175,6 +189,7 @@ function ArchivioPage() {
                 activeId={activeId}
                 onOpen={handleOpen}
                 onView={handleView}
+                onSave={handleSave}
                 onDuplicate={duplicateFat}
                 onDelete={deleteFat}
               />
@@ -193,6 +208,7 @@ function ArchiveTable({
   activeId,
   onOpen,
   onView,
+  onSave,
   onDuplicate,
   onDelete,
 }: {
@@ -200,6 +216,7 @@ function ArchiveTable({
   activeId: string | null;
   onOpen: (id: string) => void;
   onView: (id: string) => void;
+  onSave: (id: string) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
@@ -285,6 +302,14 @@ function ArchiveTable({
                       title={t("duplicate")}
                     >
                       <Copy className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onSave(f.id)}
+                      title={t("saveFile")}
+                    >
+                      <Save className="h-3.5 w-3.5" />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
