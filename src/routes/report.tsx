@@ -32,7 +32,7 @@ export const Route = createFileRoute("/report")({
       { title: "Genera Report — Mini F.A.T." },
       {
         name: "description",
-        content: "Riepilogo e generazione del PDF del verbale FAT (IT/EN).",
+        content: "Riepilogo e generazione del PDF del verbale F.A.T. (IT/EN).",
       },
     ],
   }),
