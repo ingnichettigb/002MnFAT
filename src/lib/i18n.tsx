@@ -203,6 +203,19 @@ export const dict = {
   statusInProgress: { it: "In lavorazione", en: "In progress", de: "In Bearbeitung", es: "En curso" },
   statusDone: { it: "Completati", en: "Completed", de: "Abgeschlossen", es: "Completados" },
   statusAll: { it: "Tutti", en: "All", de: "Alle", es: "Todos" },
+  loadFile: { it: "Carica file", en: "Load file", de: "Datei laden", es: "Cargar archivo" },
+  loadFileTitle: {
+    it: "Carica un FAT salvato",
+    en: "Load a saved FAT",
+    de: "Gespeichertes FAT laden",
+    es: "Cargar un FAT guardado",
+  },
+  loadFileDesc: {
+    it: "Scegli uno dei FAT salvati in precedenza per aprirlo e continuare la compilazione.",
+    en: "Choose one of the previously saved FATs to open it and continue filling it in.",
+    de: "Wählen Sie eines der zuvor gespeicherten FATs, um es zu öffnen und weiterzubearbeiten.",
+    es: "Elige uno de los FAT guardados anteriormente para abrirlo y continuar.",
+  },
   noFats: { it: "Nessun FAT in questa categoria.", en: "No FAT in this category.", de: "Keine FAT in dieser Kategorie.", es: "Ningún FAT en esta categoría." },
   confirmDelete: {
     it: "Eliminare definitivamente questo FAT?",
