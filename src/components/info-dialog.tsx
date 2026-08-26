@@ -110,15 +110,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Ogni controllo selezionato diventerà un capitolo dedicato nel PDF.",
           "Il pulsante \"Genera Report F.A.T.\" produce il PDF e marca il F.A.T. come \"Completato\" nell'archivio.",
           "Il pulsante \"Ricomincia\" azzera tutti i dati del F.A.T. attivo (chiede conferma).",
+          "Alcune licenze hanno un numero massimo di generazioni PDF: il badge accanto al pulsante mostra quante ne restano. Quando ne resta una sola compare un avviso; una volta esaurite, la generazione viene bloccata finché non si rinnova o acquista una nuova licenza.",
         ],
       },
       {
         title: "9. Archivio F.A.T.",
         intro:
-          "Elenco di tutti i F.A.T. salvati, con filtri per stato: Da lavorare, In lavorazione, Completati, Tutti. Per ciascun F.A.T. sono disponibili le azioni:",
+          "Elenco di tutti i F.A.T. salvati, con filtri per stato: Da lavorare, In lavorazione, Completati, Tutti. Il pulsante \"Carica file\" in alto apre un elenco rapido per aprire subito uno dei F.A.T. già salvati (non importa un file da fuori l'app). Per ciascun F.A.T. sono disponibili le azioni:",
         bullets: [
+          "Visualizza — rigenera e scarica di nuovo il PDF di quel F.A.T., senza aprirlo come attivo.",
           "Apri — carica il F.A.T. come attivo e torna alla compilazione.",
           "Duplica — crea una copia indipendente del F.A.T.",
+          "Salva file — esporta quel F.A.T. come file .json sul dispositivo, per backup o trasferimento.",
           "Elimina — rimuove definitivamente il F.A.T. (con conferma).",
         ],
       },
@@ -205,15 +208,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Each selected check becomes a dedicated chapter in the PDF.",
           "The \"Generate F.A.T. Report\" button produces the PDF and marks the F.A.T. as \"Completed\" in the archive.",
           "The \"Restart\" button clears all data of the active F.A.T. (asks for confirmation).",
+          "Some licenses have a maximum number of PDF generations: the badge next to the button shows how many remain. When only one is left a warning appears; once exhausted, generation is blocked until you renew or purchase a new licence.",
         ],
       },
       {
         title: "9. F.A.T. Archive",
         intro:
-          "List of all saved F.A.T., filtered by status: To do, In progress, Completed, All. For each F.A.T.:",
+          "List of all saved F.A.T., filtered by status: To do, In progress, Completed, All. The \"Load file\" button at the top opens a quick list to jump straight to one of the already saved F.A.T. (it does not import a file from outside the app). For each F.A.T.:",
         bullets: [
+          "View — regenerates and downloads that F.A.T.'s PDF again, without opening it as active.",
           "Open — loads the F.A.T. as active and returns to editing.",
           "Duplicate — creates an independent copy of the F.A.T.",
+          "Save file — exports that F.A.T. as a .json file to your device, for backup or transfer.",
           "Delete — permanently removes the F.A.T. (with confirmation).",
         ],
       },
@@ -300,15 +306,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Jede ausgewählte Prüfung erhält ein eigenes Kapitel im PDF.",
           "Die Schaltfläche \"F.A.T.-Bericht erstellen\" erzeugt das PDF und markiert das F.A.T. im Archiv als \"Abgeschlossen\".",
           "Die Schaltfläche \"Neu starten\" löscht alle Daten des aktiven F.A.T. (mit Bestätigung).",
+          "Manche Lizenzen haben eine maximale Anzahl an PDF-Erstellungen: das Abzeichen neben der Schaltfläche zeigt die verbleibende Anzahl. Bei nur noch einer verbleibenden erscheint ein Hinweis; sind alle aufgebraucht, wird die Erstellung blockiert, bis die Lizenz verlängert oder eine neue erworben wird.",
         ],
       },
       {
         title: "9. F.A.T.-Archiv",
         intro:
-          "Liste aller gespeicherten F.A.T., gefiltert nach Status: Zu erledigen, In Bearbeitung, Abgeschlossen, Alle. Für jedes F.A.T.:",
+          "Liste aller gespeicherten F.A.T., gefiltert nach Status: Zu erledigen, In Bearbeitung, Abgeschlossen, Alle. Die Schaltfläche \"Datei laden\" oben öffnet eine Schnellliste, um direkt eines der bereits gespeicherten F.A.T. zu öffnen (es wird keine Datei von außerhalb der App importiert). Für jedes F.A.T.:",
         bullets: [
+          "Ansehen — erstellt das PDF dieses F.A.T. erneut und lädt es herunter, ohne es als aktives zu öffnen.",
           "Öffnen — lädt das F.A.T. als aktives und kehrt zur Bearbeitung zurück.",
           "Duplizieren — erstellt eine unabhängige Kopie des F.A.T.",
+          "Datei speichern — exportiert dieses F.A.T. als .json-Datei auf das Gerät, für Backup oder Übertragung.",
           "Löschen — entfernt das F.A.T. endgültig (mit Bestätigung).",
         ],
       },
@@ -395,15 +404,18 @@ const GUIDE: Record<Lang, GuideContent> = {
           "Cada control seleccionado será un capítulo dedicado en el PDF.",
           "El botón \"Generar informe F.A.T.\" produce el PDF y marca el F.A.T. como \"Completado\" en el archivo.",
           "El botón \"Reiniciar\" borra todos los datos del F.A.T. activo (pide confirmación).",
+          "Algunas licencias tienen un número máximo de generaciones de PDF: el distintivo junto al botón muestra cuántas quedan. Cuando solo queda una aparece un aviso; una vez agotadas, la generación se bloquea hasta renovar o adquirir una nueva licencia.",
         ],
       },
       {
         title: "9. Archivo F.A.T.",
         intro:
-          "Lista de todos los F.A.T. guardados, filtrada por estado: Por hacer, En curso, Completados, Todos. Para cada F.A.T.:",
+          "Lista de todos los F.A.T. guardados, filtrada por estado: Por hacer, En curso, Completados, Todos. El botón \"Cargar archivo\" de arriba abre una lista rápida para abrir directamente uno de los F.A.T. ya guardados (no importa un archivo externo a la app). Para cada F.A.T.:",
         bullets: [
+          "Ver — vuelve a generar y descargar el PDF de ese F.A.T., sin abrirlo como activo.",
           "Abrir — carga el F.A.T. como activo y vuelve a la edición.",
           "Duplicar — crea una copia independiente del F.A.T.",
+          "Guardar archivo — exporta ese F.A.T. como archivo .json al dispositivo, para copia de seguridad o traspaso.",
           "Eliminar — quita definitivamente el F.A.T. (con confirmación).",
         ],
       },
