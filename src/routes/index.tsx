@@ -105,6 +105,24 @@ function IndexPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId]);
 
+  // Autosalvataggio: ogni modifica del form viene scritta nel FAT attivo
+  // (con debounce) così i dati non si perdono navigando tra le fasi.
+  const savingRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    const sub = form.watch((values) => {
+      if (savingRef.current) clearTimeout(savingRef.current);
+      savingRef.current = setTimeout(() => {
+        setGeneral(values as FormValues);
+      }, 300);
+    });
+    return () => {
+      sub.unsubscribe();
+      if (savingRef.current) clearTimeout(savingRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, setGeneral]);
+
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "presenti",
