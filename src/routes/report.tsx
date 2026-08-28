@@ -254,15 +254,7 @@ function ReportPage() {
             <RotateCcw className="mr-2 h-4 w-4" />
             <Lbl id={LABELS.restart.id}>{t("restart")}</Lbl>
           </Button>
-          <div className="relative inline-flex">
-            {pdfExportsBadge !== null && (
-              <span
-                className="absolute -right-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white shadow"
-                title="Generazioni PDF rimanenti"
-              >
-                {pdfExportsBadge}
-              </span>
-            )}
+          <ExportCountBadge count={pdfExportsBadge} lang={lang}>
             <Button
               size="lg"
               onClick={handleGenerate}
