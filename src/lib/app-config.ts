@@ -9,6 +9,7 @@ export const TERMS_VERSION = "v1";
 export const VERIFIED_EMAIL_KEY = "002MnFAT:verifiedEmail";
 export const ACTIVATED_KEY = "002MnFAT:activated";
 export const LICENSE_ID_KEY = "002MnFAT:licenseId";
+export const PUK_ID_KEY = "002MnFAT:pukId";
 export const CONSENT_KEY = "002MnFAT:consent";
 export const LAST_LICENSE_CHECK_KEY = "002MnFAT:lastLicenseCheck";
 export const LICENSE_INVALID_REASON_KEY = "002MnFAT:licenseInvalidReason";
