@@ -265,7 +265,7 @@ function ReportPage() {
               <FileDown className="mr-2 h-4 w-4" />
               <Lbl id={LABELS.generatePdf.id}>{t("generatePdf")}</Lbl>
             </Button>
-          </div>
+          </ExportCountBadge>
         </div>
       </div>
       {pdfSavedDialog}
