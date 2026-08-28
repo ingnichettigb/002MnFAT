@@ -19,6 +19,7 @@ export const GATE_KEYS = [
   VERIFIED_EMAIL_KEY,
   ACTIVATED_KEY,
   LICENSE_ID_KEY,
+  PUK_ID_KEY,
   CONSENT_KEY,
   LAST_LICENSE_CHECK_KEY,
 ] as const;
@@ -27,6 +28,7 @@ export const GATE_KEYS = [
 export const LICENSE_KEYS = [
   ACTIVATED_KEY,
   LICENSE_ID_KEY,
+  PUK_ID_KEY,
   CONSENT_KEY,
   LAST_LICENSE_CHECK_KEY,
 ] as const;
