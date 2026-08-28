@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { verifyAndActivateLicense } from "@/lib/license.functions";
-import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, CONSENT_KEY, clearGateKeys } from "@/lib/app-config";
+import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, PUK_ID_KEY, CONSENT_KEY, clearGateKeys } from "@/lib/app-config";
 import { APP_CODE } from "@/lib/app-config";
 
 export const Route = createFileRoute("/attivazione")({
@@ -112,6 +112,7 @@ function AttivazionePage() {
       if (res.ok) {
         if (typeof window !== "undefined") {
           window.localStorage.setItem(LICENSE_ID_KEY, res.licenseId);
+          window.localStorage.setItem(PUK_ID_KEY, res.pukId);
           window.localStorage.removeItem(ACTIVATED_KEY);
           window.localStorage.removeItem(CONSENT_KEY);
         }

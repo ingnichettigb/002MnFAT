@@ -217,9 +217,10 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
 // Da chiamare al mount di report.tsx: dice se mostrare il banner
 // "questa e' l'ultima generazione disponibile" (remaining === 1).
 // remaining === null significa illimitato (nessun banner, nessun blocco).
+// Il contatore e' per singola PUK (puk_codes.pdf_exports_remaining).
 export const getPdfExportsStatus = createServerFn({ method: "POST" })
-  .inputValidator((input: { licenseId: string }) =>
-    z.object({ licenseId: z.string().uuid() }).parse(input),
+  .inputValidator((input: { pukId: string }) =>
+    z.object({ pukId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data }): Promise<{ remaining: number | null }> => {
     try {
@@ -230,15 +231,15 @@ export const getPdfExportsStatus = createServerFn({ method: "POST" })
         from: (t: string) => any;
       };
 
-      const { data: license, error: lErr } = await ext
-        .from("licenses")
+      const { data: pukRow, error: lErr } = await ext
+        .from("puk_codes")
         .select("pdf_exports_remaining")
-        .eq("id", data.licenseId)
+        .eq("id", data.pukId)
         .limit(1)
         .maybeSingle();
       if (lErr) throw new Error(lErr.message);
 
-      return { remaining: license?.pdf_exports_remaining ?? null };
+      return { remaining: pukRow?.pdf_exports_remaining ?? null };
     } catch (err) {
       console.error("getPdfExportsStatus error:", err);
       // fail-open: in caso di errore tecnico non mostriamo il banner
@@ -247,18 +248,13 @@ export const getPdfExportsStatus = createServerFn({ method: "POST" })
   });
 
 // Da chiamare subito dopo la generazione del PDF finale (report.tsx).
-// Scala atomicamente pdf_exports_remaining di 1 (solo se > 0). Se il
-// contatore arriva a 0, disattiva la licenza nello stesso UPDATE: al
-// prossimo controllo di runLicenseStatus (gia' eseguito ad ogni
-// navigazione tramite AuthGate) l'accesso viene bloccato senza bisogno
-// di toccare AuthGate/license-status.server.ts.
-// Le licenze single_use hanno pdf_exports_remaining = 1 fin dalla
-// creazione: questo stesso meccanismo le "brucia" automaticamente alla
-// prima generazione, senza bisogno di una funzione dedicata separata.
-// Licenze con pdf_exports_remaining = NULL (illimitato) sono un no-op.
+// Scala atomicamente puk_codes.pdf_exports_remaining di 1 (solo se > 0).
+// L'esaurimento riguarda SOLO la singola PUK: la licenza non viene
+// disattivata (piu' PUK possono condividere la stessa licenza).
+// PUK con pdf_exports_remaining = NULL (illimitato) sono un no-op.
 export const decrementPdfExports = createServerFn({ method: "POST" })
-  .inputValidator((input: { licenseId: string }) =>
-    z.object({ licenseId: z.string().uuid() }).parse(input),
+  .inputValidator((input: { pukId: string }) =>
+    z.object({ pukId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data }): Promise<{ remaining: number | null; exhausted: boolean }> => {
     try {
@@ -269,41 +265,35 @@ export const decrementPdfExports = createServerFn({ method: "POST" })
         from: (t: string) => any;
       };
 
-      const { data: license, error: lErr } = await ext
-        .from("licenses")
-        .select("id, pdf_exports_remaining, is_active")
-        .eq("id", data.licenseId)
+      const { data: pukRow, error: lErr } = await ext
+        .from("puk_codes")
+        .select("id, pdf_exports_remaining")
+        .eq("id", data.pukId)
         .limit(1)
         .maybeSingle();
       if (lErr) throw new Error(lErr.message);
-      if (!license) {
+      if (!pukRow) {
         return { remaining: null, exhausted: false };
       }
 
       // illimitato: nessuna azione
-      if (license.pdf_exports_remaining === null) {
+      if (pukRow.pdf_exports_remaining === null) {
         return { remaining: null, exhausted: false };
       }
 
       // gia' esaurito in precedenza (es. doppio click, retry di rete):
       // no-op idempotente, segnala comunque "esaurito"
-      if (license.pdf_exports_remaining <= 0) {
+      if (pukRow.pdf_exports_remaining <= 0) {
         return { remaining: 0, exhausted: true };
       }
 
-      const newRemaining = license.pdf_exports_remaining - 1;
-      const updatePayload: Record<string, unknown> = {
-        pdf_exports_remaining: newRemaining,
-      };
-      if (newRemaining <= 0) {
-        updatePayload.is_active = false;
-      }
+      const newRemaining = pukRow.pdf_exports_remaining - 1;
 
       const { error: updErr } = await ext
-        .from("licenses")
-        .update(updatePayload)
-        .eq("id", data.licenseId)
-        .eq("pdf_exports_remaining", license.pdf_exports_remaining); // guardia ottimistica anti-race
+        .from("puk_codes")
+        .update({ pdf_exports_remaining: newRemaining })
+        .eq("id", data.pukId)
+        .eq("pdf_exports_remaining", pukRow.pdf_exports_remaining); // guardia ottimistica anti-race
       if (updErr) throw new Error(updErr.message);
 
       return { remaining: newRemaining, exhausted: newRemaining <= 0 };
