@@ -53,60 +53,26 @@ function ReportPage() {
   };
 
   const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
-  const { showExhausted, dialog: exhaustedDialog } = usePdfExportsExhaustedDialog();
-  const fetchPdfExportsStatus = useServerFn(getPdfExportsStatus);
-  const decrementExports = useServerFn(decrementPdfExports);
 
-  // Banner "questa e' l'ultima generazione disponibile": mostrato PRIMA che
-  // l'utente generi, cosi' puo' decidere consapevolmente. Letto al mount
-  // della pagina report (dopo verifyAndActivateLicense/checkLicenseStatus,
-  // che sono i controlli di validita' gia' esistenti - qui leggiamo solo
-  // il contatore, non decidiamo l'accesso).
-  const [showLastExportWarning, setShowLastExportWarning] = useState(false);
-  const [pdfExportsBadge, setPdfExportsBadge] = useState<number | null>(null);
+  // Quota export PDF per singola PUK, gestita centralmente dall'hook
+  // standard di portfolio (src/common/exports/useExportQuota).
+  const {
+    remaining: pdfExportsBadge,
+    showLastExportWarning,
+    consume,
+    dialog: exhaustedDialog,
+  } = useExportQuota();
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
-    if (!licenseId) return;
-    fetchPdfExportsStatus({ data: { licenseId } })
-      .then(({ remaining }) => {
-        setShowLastExportWarning(remaining === 1);
-        // 999 fisso quando illimitato (remaining === null), altrimenti il valore reale
-        setPdfExportsBadge(remaining === null ? 999 : remaining);
-      })
-      .catch((err) => {
-        console.error("getPdfExportsStatus call failed:", err);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const handleGenerate = async () => {
+    const allowed = await consume();
+    if (!allowed) return;
 
-  const handleGenerate = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
     const filename = generateFatPdf(state, lang, secondary);
     showPdfSaved(filename);
-
-    // Scala il contatore di generazioni PDF della licenza (no-op per
-    // licenze illimitate). Se questo era l'ultimo credito disponibile,
-    // la licenza viene disattivata dal server e mostriamo il dialog
-    // bloccante di avviso. Il PDF e' gia' stato scaricato in ogni caso.
-    if (typeof window !== "undefined") {
-      const licenseId = window.localStorage.getItem(LICENSE_ID_KEY);
-      if (licenseId) {
-        decrementExports({ data: { licenseId } })
-          .then(({ remaining, exhausted }) => {
-            setPdfExportsBadge(remaining === null ? 999 : remaining);
-            if (exhausted) {
-              showExhausted();
-            }
-          })
-          .catch((err) => {
-            console.error("decrementPdfExports call failed:", err);
-          });
-      }
-    }
   };
+
 
 
   const handleReset = () => {
