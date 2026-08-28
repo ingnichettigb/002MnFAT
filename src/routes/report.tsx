@@ -20,9 +20,8 @@ import {
 } from "@/components/ui/card";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
-import { usePdfExportsExhaustedDialog } from "@/components/pdf-exports-exhausted-dialog";
-import { getPdfExportsStatus, decrementPdfExports } from "@/lib/license.functions";
-import { LICENSE_ID_KEY } from "@/lib/app-config";
+import { useExportQuota } from "@/common/exports/useExportQuota";
+import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
 
 
 export const Route = createFileRoute("/report")({
