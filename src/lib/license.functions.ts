@@ -217,9 +217,10 @@ export const verifyAndActivateLicense = createServerFn({ method: "POST" })
 // Da chiamare al mount di report.tsx: dice se mostrare il banner
 // "questa e' l'ultima generazione disponibile" (remaining === 1).
 // remaining === null significa illimitato (nessun banner, nessun blocco).
+// Il contatore e' per singola PUK (puk_codes.pdf_exports_remaining).
 export const getPdfExportsStatus = createServerFn({ method: "POST" })
-  .inputValidator((input: { licenseId: string }) =>
-    z.object({ licenseId: z.string().uuid() }).parse(input),
+  .inputValidator((input: { pukId: string }) =>
+    z.object({ pukId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data }): Promise<{ remaining: number | null }> => {
     try {
@@ -230,15 +231,15 @@ export const getPdfExportsStatus = createServerFn({ method: "POST" })
         from: (t: string) => any;
       };
 
-      const { data: license, error: lErr } = await ext
-        .from("licenses")
+      const { data: pukRow, error: lErr } = await ext
+        .from("puk_codes")
         .select("pdf_exports_remaining")
-        .eq("id", data.licenseId)
+        .eq("id", data.pukId)
         .limit(1)
         .maybeSingle();
       if (lErr) throw new Error(lErr.message);
 
-      return { remaining: license?.pdf_exports_remaining ?? null };
+      return { remaining: pukRow?.pdf_exports_remaining ?? null };
     } catch (err) {
       console.error("getPdfExportsStatus error:", err);
       // fail-open: in caso di errore tecnico non mostriamo il banner
