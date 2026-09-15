@@ -267,16 +267,34 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!isPublic && (
-        <button
-          type="button"
-          onClick={() => {
-            clearGateKeys();
-            navigate({ to: "/auth", replace: true });
-          }}
-          className="fixed right-3 top-3 z-50 rounded-md border border-input bg-background/80 px-2.5 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur hover:bg-accent"
-        >
-          Esci
-        </button>
+        <div className="fixed right-3 top-3 z-50 flex items-center gap-2">
+          {/* Esci: chiusura semplice. NON tocca localStorage/sessionStorage:
+              email verificata, licenza e PUK restano salvati sul dispositivo. */}
+          <button
+            type="button"
+            onClick={() => {
+              void supabase.auth.signOut().catch(() => undefined);
+              navigate({ to: "/auth", replace: true });
+            }}
+            className="rounded-md border-2 border-primary bg-background/80 px-2.5 py-1 text-xs font-medium text-primary shadow-sm backdrop-blur hover:bg-accent"
+          >
+            {t("exit")}
+          </button>
+          {/* Esci e cancella tutto: reset completo e irreversibile di ogni dato
+              locale e di sessione; al prossimo accesso il funnel riparte da zero. */}
+          <button
+            type="button"
+            onClick={() => {
+              window.localStorage.clear();
+              window.sessionStorage.clear();
+              void supabase.auth.signOut().catch(() => undefined);
+              navigate({ to: "/auth", replace: true });
+            }}
+            className="rounded-md border-2 border-destructive bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive shadow-sm backdrop-blur hover:bg-destructive/20"
+          >
+            {t("exitEraseAll")}
+          </button>
+        </div>
       )}
       {children}
     </>
