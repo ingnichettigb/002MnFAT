@@ -14,9 +14,10 @@ import {
 
 import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
-import { I18nProvider } from "@/lib/i18n";
+import { I18nProvider, useI18n } from "@/lib/i18n";
 import { Toaster } from "@/components/ui/sonner";
 import { checkLicenseStatus } from "@/lib/license.functions";
+import { supabase } from "@/integrations/supabase/client";
 import {
   VERIFIED_EMAIL_KEY,
   ACTIVATED_KEY,
