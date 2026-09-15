@@ -25,6 +25,7 @@ import {
   CONSENT_KEY,
   LAST_LICENSE_CHECK_KEY,
   LICENSE_INVALID_REASON_KEY,
+  clearGateKeys,
   clearLicenseKeys,
 } from "@/lib/app-config";
 
@@ -281,12 +282,14 @@ function AuthGate({ children }: { children: React.ReactNode }) {
           >
             {t("exit")}
           </button>
-          {/* Esci e cancella tutto: reset completo e irreversibile di ogni dato
-              locale e di sessione; al prossimo accesso il funnel riparte da zero. */}
+          {/* Esci e cancella tutto: reset completo dei dati del funnel
+              (email, licenza, PUK, consenso) e di sessione. L'archivio dei
+              F.A.T. salvati NON viene toccato. */}
           <button
             type="button"
             onClick={() => {
-              window.localStorage.clear();
+              clearGateKeys();
+              window.localStorage.removeItem(LICENSE_INVALID_REASON_KEY);
               window.sessionStorage.clear();
               void supabase.auth.signOut().catch(() => undefined);
               navigate({ to: "/auth", replace: true });
