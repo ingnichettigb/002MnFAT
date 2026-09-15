@@ -225,6 +225,8 @@ export const dict = {
     es: "¿Eliminar definitivamente este F.A.T.?",
   },
   draftSaved: { it: "Bozza salvata.", en: "Draft saved.", de: "Entwurf gespeichert.", es: "Borrador guardado." },
+  exit: { it: "Esci", en: "Exit", de: "Beenden", es: "Salir" },
+  exitEraseAll: { it: "Esci e cancella tutto", en: "Exit and erase all", de: "Beenden und alles löschen", es: "Salir y borrar todo" },
   reportGeneratedDone: {
     it: "Report generato — F.A.T. completato.",
     en: "Report generated — F.A.T. marked as done.",
