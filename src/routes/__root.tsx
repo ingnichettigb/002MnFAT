@@ -171,6 +171,7 @@ function RootComponent() {
 }
 
 function AuthGate({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const statusFn = useServerFn(checkLicenseStatus);
