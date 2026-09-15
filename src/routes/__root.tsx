@@ -25,7 +25,6 @@ import {
   CONSENT_KEY,
   LAST_LICENSE_CHECK_KEY,
   LICENSE_INVALID_REASON_KEY,
-  clearGateKeys,
   clearLicenseKeys,
 } from "@/lib/app-config";
 
