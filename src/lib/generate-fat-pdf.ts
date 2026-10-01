@@ -336,15 +336,16 @@ export function generateFatPdf(
 
 
   // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
-  // Titolo centrato, posizionato più in basso
-  const titleY = TOP + 20;
+  // Titolo subito sotto la cornice di intestazione (evita sovrapposizioni in basso)
+  const titleY = HEADER_H + 12;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.text(bl("title", lang), pageW / 2, titleY, { align: "center" });
   doc.setFontSize(14);
-  doc.text("F.A.T. — " + bl("subtitle", lang), pageW / 2, titleY + 10, { align: "center" });
+  doc.text("F.A.T. — " + bl("subtitle", lang), pageW / 2, titleY + 8, { align: "center" });
 
-  let cursorY = titleY + 25;
+  let cursorY = titleY + 16;
+
 
   // ── Test data (sulla prima pagina) ──
   {
