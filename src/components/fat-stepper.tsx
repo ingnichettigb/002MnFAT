@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useI18n, dict } from "@/lib/i18n";
 import { LABELS } from "@/lib/fat-numbering";
+import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
+import { useExportQuota } from "@/common/exports/useExportQuota";
 
 export function FatStepper({
   current,
@@ -9,11 +11,13 @@ export function FatStepper({
   current: 1 | 2 | 3;
 }) {
   const { t, primary } = useI18n();
+  const { remaining } = useExportQuota();
   const steps = [
     { to: "/" as const,          label: t("stepGeneral"),  num: LABELS.stepGeneral.id },
     { to: "/controlli" as const, label: t("stepControls"), num: LABELS.stepControls.id },
     { to: "/report" as const,    label: t("stepReport"),   num: LABELS.stepReport.id },
   ];
+
   return (
     <div className="relative mb-8 rounded-xl border border-green-500/60 bg-green-500/[0.02] px-4 py-5 sm:px-6 sm:py-6">
       <span className="absolute -top-2 left-3 bg-background px-2 text-[10px] font-semibold uppercase tracking-wider text-green-600 sm:left-4">
