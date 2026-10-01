@@ -112,9 +112,10 @@ function ReportPage() {
         </div>
       )}
 
-      <FatStepper
+            <FatStepper
         current={3}
         onPrint={handleGenerate}
+        remaining={pdfExportsBadge}
         printDisabled={
           selected.length === 0 || !general.produttore.ragioneSociale
         }
