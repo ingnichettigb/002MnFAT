@@ -18,6 +18,7 @@ export const dict = {
   stepControls: { it: "Controlli", en: "Checks", de: "Prüfungen", es: "Controles" },
   stepReport: { it: "Report PDF", en: "PDF Report", de: "PDF-Bericht", es: "Informe PDF" },
   currentPhase: { it: "Fase di lavorazione", en: "Work in progress", de: "In Bearbeitung", es: "En elaboración" },
+  stepPrintPdf: { it: "Stampa PDF", en: "Print PDF", de: "PDF drucken", es: "Imprimir PDF" },
 
   // Common
   back: { it: "← Indietro", en: "← Back", de: "← Zurück", es: "← Atrás" },
