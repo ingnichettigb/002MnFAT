@@ -480,7 +480,7 @@ export function generateFatPdf(
       aY + rowH * 2,
     );
 
-    const aTextY = (r: number) => aY + rowH * r + 6;
+    const aTextY = (r: number) => aY + rowH * r + 4.6;
     addRadioGroup({
       name: "esito_iniziale",
       items: [
@@ -619,11 +619,11 @@ export function generateFatPdf(
         { x: x0 + textPadX, y: caY + (caH - cbSize) / 2, size: cbSize, value: "completato" },
       ],
     });
-    drawBl("caCompleted", x0 + textPadX + cbSize + 2, caY + 6, { fontSize: 9 });
+    drawBl("caCompleted", x0 + textPadX + cbSize + 2, caY + 4.6, { fontSize: 9 });
     // etichetta "Firma costruttore" + campo editabile
     const caSignLblW = 38;
     doc.line(x0 + caTitleW + caSignLblW, caY, x0 + caTitleW + caSignLblW, caY + caH);
-    drawBl("constructorSign", x0 + caTitleW + 2, caY + 6, { fontSize: 8 });
+    drawBl("constructorSign", x0 + caTitleW + 2, caY + 4.6, { fontSize: 8 });
     addField({
       x: x0 + caTitleW + caSignLblW + 0.5,
       y: caY + 1,
@@ -653,9 +653,9 @@ export function generateFatPdf(
         },
       ],
     });
-    drawBl("accettato", x0 + textPadX + cbSize + 2, bY + 6);
-    drawBl("nonAccettato", x0 + accW + textPadX + cbSize + 2, bY + 6);
-    drawBl("date", x0 + accW * 2 + 2, bY + 6, { fontSize: 9 });
+    drawBl("accettato", x0 + textPadX + cbSize + 2, bY + 4.6);
+    drawBl("nonAccettato", x0 + accW + textPadX + cbSize + 2, bY + 4.6);
+    drawBl("date", x0 + accW * 2 + 2, bY + 4.6, { fontSize: 9 });
     addField({
       x: x0 + accW * 2 + dataLblW + 0.5,
       y: bY + 1,
