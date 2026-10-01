@@ -6,11 +6,7 @@ interface ExportCountBadgeProps {
   children: ReactNode;
 }
 
-export function ExportCountBadge({
-  count,
-  lang = "it",
-  children,
-}: ExportCountBadgeProps) {
+export function ExportCountBadge({ count, lang = "it", children }: ExportCountBadgeProps) {
   const title =
     lang === "en"
       ? "PDF exports remaining"
@@ -24,7 +20,7 @@ export function ExportCountBadge({
     <div className="relative inline-flex">
       {count !== null && count !== undefined && (
         <span
-          className="absolute -right-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white shadow"
+          className="absolute -left-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white shadow"
           title={title}
         >
           {count}
