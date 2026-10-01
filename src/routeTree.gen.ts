@@ -9,43 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ReportRouteImport } from './routes/report'
-import { Route as LicenzaScadutaRouteImport } from './routes/licenza-scaduta'
-import { Route as ControlliRouteImport } from './routes/controlli'
-import { Route as CondizioniRouteImport } from './routes/condizioni'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AttivazioneRouteImport } from './routes/attivazione'
-import { Route as ArchivioRouteImport } from './routes/archivio'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ArchivioRouteImport } from './routes/archivio'
+import { Route as AttivazioneRouteImport } from './routes/attivazione'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CondizioniRouteImport } from './routes/condizioni'
+import { Route as ControlliRouteImport } from './routes/controlli'
+import { Route as LicenzaScadutaRouteImport } from './routes/licenza-scaduta'
+import { Route as ReportRouteImport } from './routes/report'
 
-const ReportRoute = ReportRouteImport.update({
-  id: '/report',
-  path: '/report',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LicenzaScadutaRoute = LicenzaScadutaRouteImport.update({
-  id: '/licenza-scaduta',
-  path: '/licenza-scaduta',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ControlliRoute = ControlliRouteImport.update({
-  id: '/controlli',
-  path: '/controlli',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CondizioniRoute = CondizioniRouteImport.update({
-  id: '/condizioni',
-  path: '/condizioni',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AttivazioneRoute = AttivazioneRouteImport.update({
-  id: '/attivazione',
-  path: '/attivazione',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArchivioRoute = ArchivioRouteImport.update({
@@ -53,9 +28,34 @@ const ArchivioRoute = ArchivioRouteImport.update({
   path: '/archivio',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AttivazioneRoute = AttivazioneRouteImport.update({
+  id: '/attivazione',
+  path: '/attivazione',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CondizioniRoute = CondizioniRouteImport.update({
+  id: '/condizioni',
+  path: '/condizioni',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ControlliRoute = ControlliRouteImport.update({
+  id: '/controlli',
+  path: '/controlli',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicenzaScadutaRoute = LicenzaScadutaRouteImport.update({
+  id: '/licenza-scaduta',
+  path: '/licenza-scaduta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -136,46 +136,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/report': {
-      id: '/report'
-      path: '/report'
-      fullPath: '/report'
-      preLoaderRoute: typeof ReportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/licenza-scaduta': {
-      id: '/licenza-scaduta'
-      path: '/licenza-scaduta'
-      fullPath: '/licenza-scaduta'
-      preLoaderRoute: typeof LicenzaScadutaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/controlli': {
-      id: '/controlli'
-      path: '/controlli'
-      fullPath: '/controlli'
-      preLoaderRoute: typeof ControlliRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/condizioni': {
-      id: '/condizioni'
-      path: '/condizioni'
-      fullPath: '/condizioni'
-      preLoaderRoute: typeof CondizioniRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/attivazione': {
-      id: '/attivazione'
-      path: '/attivazione'
-      fullPath: '/attivazione'
-      preLoaderRoute: typeof AttivazioneRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/archivio': {
@@ -185,11 +150,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArchivioRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/attivazione': {
+      id: '/attivazione'
+      path: '/attivazione'
+      fullPath: '/attivazione'
+      preLoaderRoute: typeof AttivazioneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/condizioni': {
+      id: '/condizioni'
+      path: '/condizioni'
+      fullPath: '/condizioni'
+      preLoaderRoute: typeof CondizioniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/controlli': {
+      id: '/controlli'
+      path: '/controlli'
+      fullPath: '/controlli'
+      preLoaderRoute: typeof ControlliRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licenza-scaduta': {
+      id: '/licenza-scaduta'
+      path: '/licenza-scaduta'
+      fullPath: '/licenza-scaduta'
+      preLoaderRoute: typeof LicenzaScadutaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
