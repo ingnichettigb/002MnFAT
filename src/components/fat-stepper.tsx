@@ -10,6 +10,7 @@ export function FatStepper({
   current,
   onPrint,
   printDisabled = false,
+  remaining: remainingProp,
 }: {
   current: 1 | 2 | 3;
   /** Handler della stampa PDF (stessa funzione del pulsante "Genera Report F.A.T." in fondo).
@@ -17,9 +18,13 @@ export function FatStepper({
   onPrint?: () => void;
   /** Stessa condizione di disabilitazione del pulsante in fondo alla pagina. */
   printDisabled?: boolean;
+  /** Quota PDF residua già gestita dalla pagina (es. ReportPage). Se presente, il pallino verde
+   *  usa questo valore e si aggiorna insieme al pulsante in fondo; altrimenti usa il proprio hook. */
+  remaining?: number | null;
 }) {
   const { t, primary } = useI18n();
-  const { remaining } = useExportQuota();
+  const { remaining: ownRemaining } = useExportQuota();
+  const remaining = remainingProp !== undefined ? remainingProp : ownRemaining;
   const steps = [
     { to: "/" as const,          label: t("stepGeneral"),  num: LABELS.stepGeneral.id },
     { to: "/controlli" as const, label: t("stepControls"), num: LABELS.stepControls.id },
