@@ -196,8 +196,10 @@ export function generateFatPdf(state: FatState, lang: Lang = "it", secondary: La
   }) => {
     const f = new TextField();
     f.Rect = [opts.x, opts.y, opts.w, opts.h];
-    f.value = opts.value ?? "";
-    f.fontName = "helvetica";
+       const rawValue = opts.value ?? "";
+    // jsPDF toglie la "(" iniziale e la ")" finale dal testo dei campi: li proteggo con uno spazio
+    f.value = (rawValue.startsWith("(") ? " " : "") + rawValue + (rawValue.endsWith(")") ? " " : "");
+        f.fontName = "helvetica";
     f.fontSize = opts.fontSize ?? 12;
     if (opts.fontSize) {
       f.maxFontSize = opts.fontSize;
