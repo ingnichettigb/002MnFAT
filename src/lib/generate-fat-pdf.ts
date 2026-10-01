@@ -514,8 +514,9 @@ export function generateFatPdf(
 
     // ===== SIG TABLE A (compatta: header + righe) =====
     const sigAY = aY + blockAH + gap;
-    const sigNameW = 68;
+    const sigNameW = 78;
     const sigRoleW = 42;
+
     const sigSignW = blockW - sigNameW - sigRoleW;
 
     const drawSigSection = (
