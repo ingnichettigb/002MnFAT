@@ -336,8 +336,8 @@ export function generateFatPdf(
 
 
   // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
-  // Titolo subito sotto la cornice di intestazione (evita sovrapposizioni in basso)
-  const titleY = HEADER_H + 12;
+  // Titolo con un margine bianco adeguato sotto la cornice di intestazione
+  const titleY = HEADER_H + 22;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.text(bl("title", lang), pageW / 2, titleY, { align: "center" });
@@ -410,7 +410,7 @@ export function generateFatPdf(
   // ── Riquadro di accettazione in fondo alla prima pagina ──
   {
     const blockW = pageW - margin * 2;
-    const rowH = 14;
+    const rowH = 10;
     const sigHeadH = 7;
     const sigRowH = 8;
     const gap = 2;
@@ -480,7 +480,7 @@ export function generateFatPdf(
       aY + rowH * 2,
     );
 
-    const aTextY = (r: number) => aY + rowH * r + 6;
+    const aTextY = (r: number) => aY + rowH * r + 4.6;
     addRadioGroup({
       name: "esito_iniziale",
       items: [
@@ -514,7 +514,7 @@ export function generateFatPdf(
 
     // ===== SIG TABLE A (compatta: header + righe) =====
     const sigAY = aY + blockAH + gap;
-    const sigNameW = 78;
+    const sigNameW = 88;
     const sigRoleW = 42;
 
     const sigSignW = blockW - sigNameW - sigRoleW;
@@ -549,7 +549,7 @@ export function generateFatPdf(
       }
       // Header
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(6);
+      doc.setFontSize(5.5);
       doc.setTextColor(0);
       const sectionLbl =
         sectionKey === "verifier" ? bl("clientFatAttendees", lang) : bl("constructorTitle", lang);
@@ -619,11 +619,11 @@ export function generateFatPdf(
         { x: x0 + textPadX, y: caY + (caH - cbSize) / 2, size: cbSize, value: "completato" },
       ],
     });
-    drawBl("caCompleted", x0 + textPadX + cbSize + 2, caY + 6, { fontSize: 9 });
+    drawBl("caCompleted", x0 + textPadX + cbSize + 2, caY + 4.6, { fontSize: 9 });
     // etichetta "Firma costruttore" + campo editabile
     const caSignLblW = 38;
     doc.line(x0 + caTitleW + caSignLblW, caY, x0 + caTitleW + caSignLblW, caY + caH);
-    drawBl("constructorSign", x0 + caTitleW + 2, caY + 6, { fontSize: 8 });
+    drawBl("constructorSign", x0 + caTitleW + 2, caY + 4.6, { fontSize: 8 });
     addField({
       x: x0 + caTitleW + caSignLblW + 0.5,
       y: caY + 1,
@@ -653,9 +653,9 @@ export function generateFatPdf(
         },
       ],
     });
-    drawBl("accettato", x0 + textPadX + cbSize + 2, bY + 6);
-    drawBl("nonAccettato", x0 + accW + textPadX + cbSize + 2, bY + 6);
-    drawBl("date", x0 + accW * 2 + 2, bY + 6, { fontSize: 9 });
+    drawBl("accettato", x0 + textPadX + cbSize + 2, bY + 4.6);
+    drawBl("nonAccettato", x0 + accW + textPadX + cbSize + 2, bY + 4.6);
+    drawBl("date", x0 + accW * 2 + 2, bY + 4.6, { fontSize: 9 });
     addField({
       x: x0 + accW * 2 + dataLblW + 0.5,
       y: bY + 1,
