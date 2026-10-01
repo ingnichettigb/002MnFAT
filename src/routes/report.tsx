@@ -112,7 +112,13 @@ function ReportPage() {
         </div>
       )}
 
-      <FatStepper current={3} />
+      <FatStepper
+        current={3}
+        onPrint={handleGenerate}
+        printDisabled={
+          selected.length === 0 || !general.produttore.ragioneSociale
+        }
+      />
 
 
       <Card className="mb-6">
