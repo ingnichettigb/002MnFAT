@@ -28,38 +28,48 @@ export function FatStepper({
           const n = (i + 1) as 1 | 2 | 3;
           const active = n === current;
           const done = n < current;
-          return (
-            <div key={s.to} className="flex items-center gap-2 sm:gap-4">
-              <Link
-                to={s.to}
-                aria-current={active ? "step" : undefined}
+          const link = (
+            <Link
+              to={s.to}
+              aria-current={active ? "step" : undefined}
+              className={cn(
+                "relative flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors",
+                active && "bg-primary text-primary-foreground",
+                done && "bg-secondary text-secondary-foreground",
+                !active && !done && "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <span
                 className={cn(
-                  "relative flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors",
-                  active && "bg-primary text-primary-foreground",
-                  done && "bg-secondary text-secondary-foreground",
-                  !active && !done && "text-muted-foreground hover:text-foreground",
+                  "grid h-6 w-6 place-content-center rounded-full text-xs font-semibold",
+                  active && "bg-primary-foreground text-primary",
+                  done && "bg-primary text-primary-foreground",
+                  !active && !done && "border border-current",
                 )}
               >
-                <span
-                  className={cn(
-                    "grid h-6 w-6 place-content-center rounded-full text-xs font-semibold",
-                    active && "bg-primary-foreground text-primary",
-                    done && "bg-primary text-primary-foreground",
-                    !active && !done && "border border-current",
-                  )}
-                >
-                  {n}
-                </span>
-                <span className="hidden items-start gap-1 sm:inline-flex">
-                  <sup className="mt-[1px] text-[8px] font-semibold leading-none opacity-70">
-                    {s.num}
-                  </sup>
-                  <span>{s.label}</span>
-                </span>
-              </Link>
+                {n}
+              </span>
+              <span className="hidden items-start gap-1 sm:inline-flex">
+                <sup className="mt-[1px] text-[8px] font-semibold leading-none opacity-70">
+                  {s.num}
+                </sup>
+                <span>{s.label}</span>
+              </span>
+            </Link>
+          );
+          return (
+            <div key={s.to} className="flex items-center gap-2 sm:gap-4">
+              {n === 3 && active ? (
+                <ExportCountBadge count={remaining} lang={primary}>
+                  {link}
+                </ExportCountBadge>
+              ) : (
+                link
+              )}
               {i < steps.length - 1 && <div className="h-px w-6 bg-border sm:w-12" />}
             </div>
           );
+
         })}
       </nav>
     </div>
