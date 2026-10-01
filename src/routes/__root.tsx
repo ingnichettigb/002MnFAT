@@ -10,7 +10,9 @@ import {
   useNavigate,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
+
 
 import appCss from "../styles.css?url";
 import { FatProvider } from "@/lib/fat-context";
