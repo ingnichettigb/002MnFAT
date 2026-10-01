@@ -336,8 +336,8 @@ export function generateFatPdf(
 
 
   // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
-  // Titolo subito sotto la cornice di intestazione (evita sovrapposizioni in basso)
-  const titleY = HEADER_H + 12;
+  // Titolo con un margine bianco adeguato sotto la cornice di intestazione
+  const titleY = HEADER_H + 22;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.text(bl("title", lang), pageW / 2, titleY, { align: "center" });
@@ -410,7 +410,7 @@ export function generateFatPdf(
   // ── Riquadro di accettazione in fondo alla prima pagina ──
   {
     const blockW = pageW - margin * 2;
-    const rowH = 14;
+    const rowH = 10;
     const sigHeadH = 7;
     const sigRowH = 8;
     const gap = 2;
@@ -514,7 +514,7 @@ export function generateFatPdf(
 
     // ===== SIG TABLE A (compatta: header + righe) =====
     const sigAY = aY + blockAH + gap;
-    const sigNameW = 78;
+    const sigNameW = 88;
     const sigRoleW = 42;
 
     const sigSignW = blockW - sigNameW - sigRoleW;
@@ -549,7 +549,7 @@ export function generateFatPdf(
       }
       // Header
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(6);
+      doc.setFontSize(5.5);
       doc.setTextColor(0);
       const sectionLbl =
         sectionKey === "verifier" ? bl("clientFatAttendees", lang) : bl("constructorTitle", lang);
