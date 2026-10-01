@@ -12,7 +12,12 @@ import { translateControl } from "./fat-defaults";
 
 const D = {
   title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA" },
-  subtitle: { it: "FACTORY ACCEPTANCE TEST", en: "FACTORY ACCEPTANCE TEST", de: "FACTORY ACCEPTANCE TEST", es: "FACTORY ACCEPTANCE TEST" },
+  subtitle: {
+    it: "FACTORY ACCEPTANCE TEST",
+    en: "FACTORY ACCEPTANCE TEST",
+    de: "FACTORY ACCEPTANCE TEST",
+    es: "FACTORY ACCEPTANCE TEST",
+  },
   manufacturer: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
   customer: { it: "Ente Verificatore", en: "Verifying Body", de: "Prüfstelle", es: "Organismo Verificador" },
   constructorTitle: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
@@ -47,7 +52,12 @@ const D = {
     de: "Liste der während der Prüfung festgestellten Abweichungen.",
     es: "Lista de las desviaciones detectadas durante la prueba.",
   },
-  azioniCorrettive: { it: "AZIONI CORRETTIVE", en: "CORRECTIVE ACTIONS", de: "KORREKTURMASSNAHMEN", es: "ACCIONES CORRECTIVAS" },
+  azioniCorrettive: {
+    it: "AZIONI CORRETTIVE",
+    en: "CORRECTIVE ACTIONS",
+    de: "KORREKTURMASSNAHMEN",
+    es: "ACCIONES CORRECTIVAS",
+  },
   azioniCorrettiveDesc: {
     it: "Azioni correttive da intraprendere e relativa verifica.",
     en: "Corrective actions to be taken and related verification.",
@@ -102,17 +112,9 @@ type DKey = keyof typeof D;
  *  - altrimenti     → "<lang> / EN"
  * Se le due stringhe coincidono mostra una sola volta.
  */
-const blParts = (
-  key: DKey,
-  lang: Lang,
-  secondary?: Lang | null,
-): { p: string; s: string | null } => {
+const blParts = (key: DKey, lang: Lang, secondary?: Lang | null): { p: string; s: string | null } => {
   const p = D[key][lang];
-  const s = secondary
-    ? D[key][secondary]
-    : lang === "en"
-      ? D[key].it
-      : D[key].en;
+  const s = secondary ? D[key][secondary] : lang === "en" ? D[key].it : D[key].en;
   return { p, s: p === s ? null : s };
 };
 
@@ -125,17 +127,11 @@ const fmtDate = (iso: string, lang: Lang) => {
   if (!iso) return "";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  const loc =
-    lang === "it" ? "it-IT" : lang === "de" ? "de-DE" : lang === "es" ? "es-ES" : "en-GB";
+  const loc = lang === "it" ? "it-IT" : lang === "de" ? "de-DE" : lang === "es" ? "es-ES" : "en-GB";
   return d.toLocaleDateString(loc);
 };
 
-export function generateFatPdf(
-  state: FatState,
-  lang: Lang = "it",
-  secondary: Lang | null = null,
-): string {
-
+export function generateFatPdf(state: FatState, lang: Lang = "it", secondary: Lang | null = null): string {
   const { general, controls } = state;
   // Escludo dalle pagine "controllo" le voci che hanno una pagina fissa dedicata
   // in fondo al report (Varie / Deviazioni / Azioni correttive), così non vengono
@@ -163,11 +159,8 @@ export function generateFatPdf(
   };
   const UP = (s: string) => (s || "").toLocaleUpperCase();
   const isMfgAttendee = (a: { azienda?: string; side?: string }) =>
-    (a as { side?: string }).side === "mfg" ||
-    sameCompany(a.azienda || "", general.produttore.ragioneSociale);
-  const nonEmptyAttendees = general.presenti.filter(
-    (a) => a.nome || a.ruolo || a.azienda,
-  );
+    (a as { side?: string }).side === "mfg" || sameCompany(a.azienda || "", general.produttore.ragioneSociale);
+  const nonEmptyAttendees = general.presenti.filter((a) => a.nome || a.ruolo || a.azienda);
   // Ordine: prima firmatari cliente, poi firmatari produttore
   const orderedAttendees = [
     ...nonEmptyAttendees.filter((a) => !isMfgAttendee(a)),
@@ -282,7 +275,11 @@ export function generateFatPdf(
     doc.setLineWidth(0.35);
     doc.rect(x, y, size, size);
     // ripristina
-    try { doc.setDrawColor(prevDraw as any); } catch { doc.setDrawColor(0); }
+    try {
+      doc.setDrawColor(prevDraw as any);
+    } catch {
+      doc.setDrawColor(0);
+    }
     doc.setLineWidth(prevLw as number);
   };
 
@@ -314,7 +311,11 @@ export function generateFatPdf(
     rg.value = "Off";
     rg.AS = "/Off";
     // Permetti di deselezionare cliccando di nuovo sull'opzione attiva.
-    try { (rg as any).noToggleToOff = false; } catch { /* ignore */ }
+    try {
+      (rg as any).noToggleToOff = false;
+    } catch {
+      /* ignore */
+    }
     doc.addField(rg);
     opts.items.forEach((it) => {
       drawCbBorder(it.x, it.y, it.size);
@@ -334,7 +335,6 @@ export function generateFatPdf(
     }
   };
 
-
   // ── PAGINA 1: solo titolo + Dati del Collaudo ───────────
   // Titolo con un margine bianco adeguato sotto la cornice di intestazione
   const titleY = HEADER_H + 22;
@@ -345,7 +345,6 @@ export function generateFatPdf(
   doc.text("F.A.T. — " + bl("subtitle", lang), pageW / 2, titleY + 8, { align: "center" });
 
   let cursorY = titleY + 16;
-
 
   // ── Test data (sulla prima pagina) ──
   {
@@ -361,9 +360,7 @@ export function generateFatPdf(
     const lineH = 5; // mm per riga a fontSize 12
     const padV = 4; // cellPadding 2 sopra + 2 sotto
     const descText = general.descrizione || "";
-    const descLines = descText
-      ? doc.splitTextToSize(descText, valueColW - 2).length
-      : 1;
+    const descLines = descText ? doc.splitTextToSize(descText, valueColW - 2).length : 1;
     rows[0].minH = Math.max(lineH + padV, descLines * lineH + padV);
     autoTable(doc, {
       startY: cursorY,
@@ -428,21 +425,16 @@ export function generateFatPdf(
     const totalSigRows = 4; // 3 verificatore + 1 costruttore
     const sigH = sigHeadH * 2 + sigRowH * totalSigRows;
 
-    const blockAH = rowH * 2;     // accettato/non + in_attesa+data
-    const caH = rowH;             // completate + firma costruttore
-    const blockBH = rowH;         // accettato/non + data finale
+    const blockAH = rowH * 2; // accettato/non + in_attesa+data
+    const caH = rowH; // completate + firma costruttore
+    const blockBH = rowH; // accettato/non + data finale
 
     const totalH = blockAH + gap + sigH + gap + caH + blockBH + gap + sigH;
     const x0 = margin;
-    const y0 = pageH - margin - totalH;
+    const y0 = pageH - margin - totalH - 20;
 
     // helper testo bilingue (primaria sopra, secondaria sotto più piccola)
-    const drawBl = (
-      key: DKey,
-      x: number,
-      y: number,
-      opts?: { align?: "left" | "center"; fontSize?: number },
-    ) => {
+    const drawBl = (key: DKey, x: number, y: number, opts?: { align?: "left" | "center"; fontSize?: number }) => {
       const { p, s } = blP(key);
       const fs = opts?.fontSize ?? 9;
       const align = opts?.align ?? "left";
@@ -473,12 +465,7 @@ export function generateFatPdf(
     doc.line(x0 + blockW / 2, aY, x0 + blockW / 2, aY + rowH);
     // colonna DATA su riga 2
     doc.line(x0 + blockW - dataColW, aY + rowH, x0 + blockW - dataColW, aY + rowH * 2);
-    doc.line(
-      x0 + blockW - dataColW + dataLblW,
-      aY + rowH,
-      x0 + blockW - dataColW + dataLblW,
-      aY + rowH * 2,
-    );
+    doc.line(x0 + blockW - dataColW + dataLblW, aY + rowH, x0 + blockW - dataColW + dataLblW, aY + rowH * 2);
 
     const aTextY = (r: number) => aY + rowH * r + 4.6;
     addRadioGroup({
@@ -529,10 +516,8 @@ export function generateFatPdf(
       const nRows = rows.length;
       const sectionH = sigHeadH + sigRowH * nRows;
       // Sfondo header + righe
-      const headFill: [number, number, number] =
-        sectionKey === "verifier" ? [219, 234, 254] : [209, 250, 229]; // azzurro chiaro / verde chiaro
-      const rowFill: [number, number, number] =
-        sectionKey === "verifier" ? [239, 246, 255] : [236, 253, 245];
+      const headFill: [number, number, number] = sectionKey === "verifier" ? [219, 234, 254] : [209, 250, 229]; // azzurro chiaro / verde chiaro
+      const rowFill: [number, number, number] = sectionKey === "verifier" ? [239, 246, 255] : [236, 253, 245];
       doc.setFillColor(...headFill);
       doc.rect(x0, sy, blockW, sigHeadH, "F");
       doc.setFillColor(...rowFill);
@@ -551,8 +536,7 @@ export function generateFatPdf(
       doc.setFont("helvetica", "bold");
       doc.setFontSize(5.5);
       doc.setTextColor(0);
-      const sectionLbl =
-        sectionKey === "verifier" ? bl("clientFatAttendees", lang) : bl("constructorTitle", lang);
+      const sectionLbl = sectionKey === "verifier" ? bl("clientFatAttendees", lang) : bl("constructorTitle", lang);
       const nameLbl = bl("attName", lang);
       doc.text(`${sectionLbl}  ·  ${nameLbl}`, x0 + 2, sy + 4.6, { maxWidth: sigNameW - 4 });
       doc.text(bl("attRole", lang), x0 + sigNameW + 2, sy + 4.6, { maxWidth: sigRoleW - 4 });
@@ -564,11 +548,7 @@ export function generateFatPdf(
         const globalIdx = startIndex + i;
         const nameUp = UP(a?.nome || "");
         const compUp = UP(a?.azienda || "");
-        const nameValue = compUp
-          ? nameUp
-            ? `${nameUp} (${compUp})`
-            : `(${compUp})`
-          : nameUp;
+        const nameValue = compUp ? (nameUp ? `${nameUp} (${compUp})` : `(${compUp})`) : nameUp;
         addField({
           x: x0 + 0.5,
           y: ry + 0.5,
@@ -605,7 +585,6 @@ export function generateFatPdf(
     };
     drawSigTable(sigAY, "client_signature_initial");
 
-
     // ===== CA HEADER: "COMPLETATE LE AZIONI CORRETTIVE" + Firma costruttore =====
     const caY = sigAY + sigH + gap;
     doc.setDrawColor(30, 64, 175);
@@ -615,9 +594,7 @@ export function generateFatPdf(
     doc.line(x0 + caTitleW, caY, x0 + caTitleW, caY + caH);
     addRadioGroup({
       name: "ca_completed",
-      items: [
-        { x: x0 + textPadX, y: caY + (caH - cbSize) / 2, size: cbSize, value: "completato" },
-      ],
+      items: [{ x: x0 + textPadX, y: caY + (caH - cbSize) / 2, size: cbSize, value: "completato" }],
     });
     drawBl("caCompleted", x0 + textPadX + cbSize + 2, caY + 4.6, { fontSize: 9 });
     // etichetta "Firma costruttore" + campo editabile
@@ -669,7 +646,6 @@ export function generateFatPdf(
     const sigBY = bY + blockBH + gap;
     drawSigTable(sigBY, "client_signature_final");
   }
-
 
   // ── PAGINA 2: Produttore / Cliente / Presenti ───────────
   doc.addPage();
@@ -832,8 +808,6 @@ export function generateFatPdf(
     });
   }
 
-
-
   // ── Pagina per ogni controllo selezionato ───────────────
   // Tengo traccia del numero di pagina di ciascun controllo per l'indice finale.
   const ctrlPages: Array<{ primary: string; secondary: string | null; page: number }> = [];
@@ -843,12 +817,9 @@ export function generateFatPdf(
     // Intestazione capitolo: blu, "Controllo N / Check N" sulla prima riga,
     // poi la descrizione IT (primaria) e la traduzione (secondaria) a seguire.
     const labelIt = String(ctrl.label || "");
-    const secLang: Lang | null =
-      secondary ?? (lang === "en" ? "it" : "en");
+    const secLang: Lang | null = secondary ?? (lang === "en" ? "it" : "en");
     const labelPrimary = lang === "it" ? labelIt : translateControl(labelIt, lang);
-    const labelSecondary = secLang
-      ? (secLang === "it" ? labelIt : translateControl(labelIt, secLang))
-      : null;
+    const labelSecondary = secLang ? (secLang === "it" ? labelIt : translateControl(labelIt, secLang)) : null;
     const showSecondary = !!labelSecondary && labelSecondary !== labelPrimary;
 
     ctrlPages.push({
@@ -889,7 +860,13 @@ export function generateFatPdf(
       margin: { left: margin, right: margin, top: TOP },
       body: [
         // Esito occupa tutta la larghezza (titolo + checkbox)
-        [{ content: bl("outcome", lang), colSpan: 2, styles: { fontStyle: "bold", fillColor: [240, 240, 240] } } as any],
+        [
+          {
+            content: bl("outcome", lang),
+            colSpan: 2,
+            styles: { fontStyle: "bold", fillColor: [240, 240, 240] },
+          } as any,
+        ],
         [labelCell("notes"), ""],
         [labelCell("inspectorSign"), ""],
       ],
@@ -996,8 +973,6 @@ export function generateFatPdf(
       },
     });
   });
-
-
 
   // ── Pagina VARIE — Allegati tecnici ─────────────────────
   doc.addPage();
@@ -1108,12 +1083,7 @@ export function generateFatPdf(
     });
 
     const NUM_ROWS = 10;
-    const headerRow = [
-      bl("num", lang),
-      bl("description", lang),
-      bl("notes", lang),
-      bl("status", lang),
-    ];
+    const headerRow = [bl("num", lang), bl("description", lang), bl("notes", lang), bl("status", lang)];
     autoTable(doc, {
       startY: titleY + 22,
       margin: { left: margin, right: margin, top: TOP },
@@ -1243,8 +1213,7 @@ export function generateFatPdf(
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
-    const idxTitle =
-      lang === "en" ? "INDEX" : lang === "de" ? "INHALT" : lang === "es" ? "ÍNDICE" : "INDICE";
+    const idxTitle = lang === "en" ? "INDEX" : lang === "de" ? "INHALT" : lang === "es" ? "ÍNDICE" : "INDICE";
     const idxSec =
       secondary === "it"
         ? "INDICE"
@@ -1274,11 +1243,9 @@ export function generateFatPdf(
     autoTable(doc, {
       startY: titleY + 14,
       margin: { left: margin, right: margin, top: TOP },
-      head: [[
-        bl("num", lang),
-        bl("chapter", lang) + (blP("chapter").s ? " / " + blP("chapter").s : ""),
-        bl("page", lang),
-      ]],
+      head: [
+        [bl("num", lang), bl("chapter", lang) + (blP("chapter").s ? " / " + blP("chapter").s : ""), bl("page", lang)],
+      ],
       body: ctrlPages.map((c, i) => [
         String(i + 1),
         c.secondary ? `${c.primary}\n${c.secondary}` : c.primary,
@@ -1300,9 +1267,7 @@ export function generateFatPdf(
     });
   }
 
-
-  const safe = (s: string) =>
-    (s || "report").replace(/[^a-z0-9-_]+/gi, "_").slice(0, 40);
+  const safe = (s: string) => (s || "report").replace(/[^a-z0-9-_]+/gi, "_").slice(0, 40);
   const filename = `mini-fat_${safe(general.numeroMatricola)}_${
     general.dataCollaudo || new Date().toISOString().slice(0, 10)
   }.pdf`;
@@ -1321,12 +1286,7 @@ export function generateFatPdf(
       maxWidth: pageW - margin * 2 - 40,
     });
     // Destra: numero pagina
-    doc.text(
-      `${bl("page", lang)} ${i} ${bl("of", lang)} ${pageCount}`,
-      pageW - margin,
-      pageH - 8,
-      { align: "right" },
-    );
+    doc.text(`${bl("page", lang)} ${i} ${bl("of", lang)} ${pageCount}`, pageW - margin, pageH - 8, { align: "right" });
     doc.setTextColor(0);
   }
 
@@ -1352,4 +1312,3 @@ export function generateFatPdf(
   }
   return filename;
 }
-
