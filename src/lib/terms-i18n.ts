@@ -64,21 +64,26 @@ export const TERMS: Record<Lang, TermsContent> = {
             "Il Software è fornito \"così com'è\". Il Fornitore non garantisce l'assenza di errori o interruzioni del servizio e non risponde di danni indiretti, salvo dolo o colpa grave.",
         },
         {
-          title: "7. DURATA E RISOLUZIONE",
+          title: "7. GESTIONE E DISINSTALLAZIONE DELL'APP",
+          body:
+            "L'icona installata può chiamarsi Mini F.A.T., 002mnfat, 002-mnfat o Smart Launcher.\n\n• Google Chrome (computer): scrivi chrome://apps nella barra degli indirizzi e premi Invio, poi clic destro sull'icona > \"Rimuovi da Chrome\" / \"Disinstalla\". In alternativa: apri l'app, menu a 3 puntini in alto > \"Disinstalla Mini F.A.T.\".\n• Microsoft Edge (computer): scrivi edge://apps e premi Invio, poi clic sui 3 puntini accanto all'app > \"Disinstalla\". In alternativa: menu ... > App > Gestisci app.\n• Brave: scrivi brave://apps e premi Invio, poi clic destro sull'icona > \"Rimuovi da Brave\".\n• Opera / Vivaldi: scrivi opera://apps oppure vivaldi://apps e rimuovi l'icona con clic destro.\n• Safari (Mac, macOS Sonoma o successivi): apri il Finder > cartella Applicazioni (o Applicazioni utente), trascina l'icona nel Cestino.\n• Mozilla Firefox: non installa app su computer; se hai creato un segnalibro o un collegamento, eliminalo con clic destro > \"Elimina\".\n• Windows (qualsiasi browser): Impostazioni > App > App installate, cerca il nome dell'app > \"Disinstalla\".\n• Android (Chrome / Samsung Internet): tieni premuta l'icona nella schermata Home > \"Disinstalla\" (oppure Impostazioni > App).\n• iPhone / iPad (Safari): tieni premuta l'icona nella schermata Home > \"Rimuovi app\" > \"Elimina dalla schermata Home\".\n\nNota: la disinstallazione rimuove solo l'icona; la licenza e i verbali F.A.T. restano salvati nel browser e non vengono cancellati.",
+        },
+        {
+          title: "8. DURATA E RISOLUZIONE",
           body:
             "La licenza ha validità secondo quanto indicato al momento dell'acquisto. Il Fornitore si riserva il diritto di sospendere l'accesso in caso di violazione delle presenti condizioni.",
         },
         {
-          title: "8. MODIFICHE ALLE CONDIZIONI",
+          title: "9. MODIFICHE ALLE CONDIZIONI",
           body: "In caso di modifiche sostanziali, sarà richiesta nuova accettazione.",
         },
         {
-          title: "9. LEGGE APPLICABILE E FORO COMPETENTE",
+          title: "10. LEGGE APPLICABILE E FORO COMPETENTE",
           body:
             "Legge italiana. Foro di Cremona, salvo diversa disposizione inderogabile a tutela del consumatore.",
         },
       ],
-      footer: "Versione: v1 — Ultimo aggiornamento: 14 luglio 2026",
+      footer: "Versione: v1 — Ultimo aggiornamento: 18 ottobre 2026",
     },
   },
   en: {
@@ -126,21 +131,26 @@ export const TERMS: Record<Lang, TermsContent> = {
             "The Software is provided \"as is\". The Supplier does not warrant that it will be free from errors or service interruptions and shall not be liable for indirect damages, save for wilful misconduct or gross negligence.",
         },
         {
-          title: "7. DURATION AND TERMINATION",
+          title: "7. APP MANAGEMENT AND UNINSTALLATION",
+          body:
+            "The installed icon may be named Mini F.A.T., 002mnfat, 002-mnfat, or Smart Launcher.\n\n• Google Chrome (desktop): type chrome://apps in the address bar and press Enter, then right-click the icon > \"Remove from Chrome\" / \"Uninstall\". Alternatively: open the app, 3-dots menu at the top > \"Uninstall Mini F.A.T.\".\n• Microsoft Edge (desktop): type edge://apps and press Enter, then click the 3 dots next to the app > \"Uninstall\". Alternatively: menu ... > Apps > Manage apps.\n• Brave: type brave://apps and press Enter, then right-click the icon > \"Remove from Brave\".\n• Opera / Vivaldi: type opera://apps or vivaldi://apps and remove the icon via right-click.\n• Safari (Mac, macOS Sonoma or later): open Finder > Applications folder (or User Applications), drag the icon to the Trash.\n• Mozilla Firefox: does not install desktop apps; if you created a bookmark or desktop shortcut, right-click > \"Delete\".\n• Windows (any browser): Settings > Apps > Installed apps, search for the app name > \"Uninstall\".\n• Android (Chrome / Samsung Internet): tap and hold the icon on the Home screen > \"Uninstall\" (or Settings > Apps).\n• iPhone / iPad (Safari): tap and hold the icon on the Home screen > \"Remove App\" > \"Delete from Home Screen\".\n\nNote: uninstalling only removes the icon; your licence and F.A.T. reports remain safely stored and are not deleted.",
+        },
+        {
+          title: "8. DURATION AND TERMINATION",
           body:
             "The licence is valid for the period indicated at the time of purchase. The Supplier reserves the right to suspend access in the event of a breach of these terms.",
         },
         {
-          title: "8. CHANGES TO THE TERMS",
+          title: "9. CHANGES TO THE TERMS",
           body: "In the event of material changes, renewed acceptance will be required.",
         },
         {
-          title: "9. APPLICABLE LAW AND JURISDICTION",
+          title: "10. APPLICABLE LAW AND JURISDICTION",
           body:
             "Italian law shall apply. The Court of Cremona shall have jurisdiction, without prejudice to any mandatory consumer-protection provisions.",
         },
       ],
-      footer: "Version: v1 — Last updated: 14 July 2026",
+      footer: "Version: v1 — Last updated: 18 October 2026",
     },
   },
   de: {
@@ -189,22 +199,27 @@ export const TERMS: Record<Lang, TermsContent> = {
             "Die Software wird \"wie besehen\" bereitgestellt. Der Anbieter übernimmt keine Gewähr für Fehlerfreiheit oder ununterbrochene Verfügbarkeit und haftet nicht für indirekte Schäden, außer bei Vorsatz oder grober Fahrlässigkeit.",
         },
         {
-          title: "7. LAUFZEIT UND KÜNDIGUNG",
+          title: "7. VERWALTUNG UND DEINSTALLATION DER APP",
+          body:
+            "Das installierte Symbol kann Mini F.A.T., 002mnfat, 002-mnfat oder Smart Launcher heißen.\n\n• Google Chrome (Computer): Geben Sie chrome://apps in die Adressleiste ein und drücken Sie die Eingabetaste, dann Rechtsklick auf das Symbol > \"Aus Chrome entfernen\" / \"Deinstallieren\". Alternativ: App öffnen, 3-Punkte-Menü oben > \"Mini F.A.T. deinstallieren\".\n• Microsoft Edge (Computer): Geben Sie edge://apps ein und drücken Sie die Eingabetaste, dann auf die 3 Punkte neben der App klicken > \"Deinstallieren\". Alternativ: Menü ... > Apps > Apps verwalten.\n• Brave: Geben Sie brave://apps ein und drücken Sie die Eingabetaste, dann Rechtsklick auf das Symbol > \"Aus Brave entfernen\".\n• Opera / Vivaldi: Geben Sie opera://apps oder vivaldi://apps ein und entfernen Sie das Symbol per Rechtsklick.\n• Safari (Mac, macOS Sonoma oder neuer): Öffnen Sie den Finder > Ordner Programme, ziehen Sie das Symbol in den Papierkorb.\n• Mozilla Firefox: Installiert keine Desktop-Apps; wenn Sie ein Lesezeichen oder eine Verknüpfung erstellt haben, Rechtsklick > \"Löschen\".\n• Windows (beliebiger Browser): Einstellungen > Apps > Installierte Apps, nach dem App-Namen suchen > \"Deinstallieren\".\n• Android (Chrome / Samsung Internet): Symbol auf dem Startbildschirm gedrückt halten > \"Deinstallieren\" (oder Einstellungen > Apps).\n• iPhone / iPad (Safari): Symbol auf dem Startbildschirm gedrückt halten > \"App entfernen\" > \"Vom Home-Bildschirm löschen\".\n\nHinweis: Die Deinstallation entfernt nur das Symbol; Ihre Lizenz und die F.A.T.-Berichte bleiben gespeichert und gehen nicht verloren.",
+        },
+        {
+          title: "8. LAUFZEIT UND KÜNDIGUNG",
           body:
             "Die Lizenz gilt für den zum Zeitpunkt des Kaufs angegebenen Zeitraum. Der Anbieter behält sich das Recht vor, den Zugang bei Verstoß gegen diese Bedingungen zu sperren.",
         },
         {
-          title: "8. ÄNDERUNGEN DER BEDINGUNGEN",
+          title: "9. ÄNDERUNGEN DER BEDINGUNGEN",
           body:
             "Bei wesentlichen Änderungen ist eine erneute Zustimmung erforderlich.",
         },
         {
-          title: "9. ANWENDBARES RECHT UND GERICHTSSTAND",
+          title: "10. ANWENDBARES RECHT UND GERICHTSSTAND",
           body:
             "Es gilt italienisches Recht. Gerichtsstand ist Cremona, vorbehaltlich zwingender verbraucherschützender Bestimmungen.",
         },
       ],
-      footer: "Version: v1 — Letzte Aktualisierung: 14. Juli 2026",
+      footer: "Version: v1 — Letzte Aktualisierung: 18. Oktober 2026",
     },
   },
   es: {
@@ -253,22 +268,27 @@ export const TERMS: Record<Lang, TermsContent> = {
             "El Software se suministra \"tal cual\". El Proveedor no garantiza la ausencia de errores o interrupciones del servicio y no responde de los daños indirectos, salvo dolo o culpa grave.",
         },
         {
-          title: "7. DURACIÓN Y RESOLUCIÓN",
+          title: "7. GESTIÓN Y DESINSTALACIÓN DE LA APLICACIÓN",
+          body:
+            "El icono instalado puede llamarse Mini F.A.T., 002mnfat, 002-mnfat o Smart Launcher.\n\n• Google Chrome (ordenador): escribe chrome://apps en la barra de direcciones y pulsa Intro, luego clic derecho en el icono > \"Eliminar de Chrome\" / \"Desinstalar\". Alternativamente: abre la app, menú de 3 puntos arriba > \"Desinstalar Mini F.A.T.\".\n• Microsoft Edge (ordenador): escribe edge://apps e Intro, luego clic en los 3 puntos junto a la app > \"Desinstalar\". Alternativamente: menú ... > Aplicaciones > Administrar aplicaciones.\n• Brave: escribe brave://apps e Intro, luego clic derecho en el icono > \"Eliminar de Brave\".\n• Opera / Vivaldi: escribe opera://apps o vivaldi://apps y elimina el icono con clic derecho.\n• Safari (Mac, macOS Sonoma o posterior): abre Finder > carpeta Aplicaciones, arrastra el icono a la Papelera.\n• Mozilla Firefox: no instala aplicaciones en ordenador; si creaste un marcador o acceso directo, clic derecho > \"Eliminar\".\n• Windows (cualquier navegador): Configuración > Aplicaciones > Aplicaciones instaladas, busca el nombre de la app > \"Desinstalar\".\n• Android (Chrome / Samsung Internet): mantén presionado el icono en la pantalla de inicio > \"Desinstalar\" (o Ajustes > Aplicaciones).\n• iPhone / iPad (Safari): mantén presionado el icono en la pantalla de inicio > \"Eliminar app\" > \"Eliminar de la pantalla de inicio\".\n\nNota: la desinstalación elimina únicamente el icono; la licencia y los informes F.A.T. permanecen guardados.",
+        },
+        {
+          title: "8. DURACIÓN Y RESOLUCIÓN",
           body:
             "La licencia tiene la validez indicada en el momento de la compra. El Proveedor se reserva el derecho a suspender el acceso en caso de incumplimiento de estas condiciones.",
         },
         {
-          title: "8. MODIFICACIONES DE LAS CONDICIONES",
+          title: "9. MODIFICACIONES DE LAS CONDICIONES",
           body:
             "En caso de modificaciones sustanciales, será necesaria una nueva aceptación.",
         },
         {
-          title: "9. LEY APLICABLE Y JURISDICCIÓN",
+          title: "10. LEY APLICABLE Y JURISDICCIÓN",
           body:
             "Se aplica la ley italiana. Fuero de Cremona, salvo disposición imperativa distinta en protección del consumidor.",
         },
       ],
-      footer: "Versión: v1 — Última actualización: 14 de julio de 2026",
+      footer: "Versión: v1 — Última actualización: 18 de octubre de 2026",
     },
   },
 };
