@@ -12,6 +12,7 @@ import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { LABELS, controlNumber } from "@/lib/fat-numbering";
 import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
+import { formatControlLabel } from "@/lib/fat-defaults";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,7 @@ function ControlliPage() {
   const navigate = useNavigate();
   const { state, toggleControl, addCustomControl, removeControl, markDone, refreshDefaultControls, reorderControls } =
     useFat();
-  const { t, lang, secondary } = useI18n();
+  const { t, primary, secondary } = useI18n();
   const [newLabel, setNewLabel] = useState("");
 
   const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
@@ -49,10 +50,9 @@ function ControlliPage() {
   const handleGenerateReport = () => {
     markDone();
     toast.success(t("reportGeneratedDone"));
-    const filename = generateFatPdf(state, lang, secondary);
+    const filename = generateFatPdf(state, primary, secondary);
     showPdfSaved(filename);
   };
-
 
   const selectedCount = state.controls.filter((c) => c.selected).length;
 
@@ -120,7 +120,7 @@ function ControlliPage() {
                     {controlNumber(idx)}
                   </sup>
                   <span>
-                    {c.label}
+                    {formatControlLabel(c.label, primary, secondary)}
                     {c.custom && (
                       <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
                         {t("customLabel")}
@@ -190,4 +190,3 @@ function ControlliPage() {
     </div>
   );
 }
-
