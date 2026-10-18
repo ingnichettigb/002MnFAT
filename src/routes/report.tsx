@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { FileDown, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-
 import { FatStepper } from "@/components/fat-stepper";
 import { FatToolbar } from "@/components/fat-toolbar";
 import { Lbl } from "@/components/lbl";
@@ -22,7 +21,7 @@ import { generateFatPdf } from "@/lib/generate-fat-pdf";
 import { usePdfSavedDialog } from "@/components/pdf-saved-dialog";
 import { useExportQuota } from "@/common/exports/useExportQuota";
 import { ExportCountBadge } from "@/common/exports/ExportCountBadge";
-
+import { formatControlLabel } from "@/lib/fat-defaults";
 
 export const Route = createFileRoute("/report")({
   head: () => ({
@@ -40,7 +39,7 @@ export const Route = createFileRoute("/report")({
 function ReportPage() {
   const navigate = useNavigate();
   const { state, reset, reorderControls, markDone } = useFat();
-  const { t, lang, secondary } = useI18n();
+  const { t, primary, secondary, lang } = useI18n();
   const { general } = state;
   const selected = state.controls.filter((c) => c.selected);
 
@@ -49,7 +48,7 @@ function ReportPage() {
     const d = new Date(iso);
     return isNaN(d.getTime())
       ? iso
-      : d.toLocaleDateString(lang === "it" ? "it-IT" : "en-GB");
+      : d.toLocaleDateString(primary === "it" ? "it-IT" : "en-GB");
   };
 
   const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
@@ -69,11 +68,9 @@ function ReportPage() {
 
     markDone();
     toast.success(t("reportGeneratedDone"));
-    const filename = generateFatPdf(state, lang, secondary);
+    const filename = generateFatPdf(state, primary, secondary);
     showPdfSaved(filename);
   };
-
-
 
   const handleReset = () => {
     if (confirm(t("restartConfirm"))) {
@@ -112,7 +109,7 @@ function ReportPage() {
         </div>
       )}
 
-            <FatStepper
+      <FatStepper
         current={3}
         onPrint={handleGenerate}
         remaining={pdfExportsBadge}
@@ -120,7 +117,6 @@ function ReportPage() {
           selected.length === 0 || !general.produttore.ragioneSociale
         }
       />
-
 
       <Card className="mb-6">
         <CardHeader>
@@ -242,7 +238,7 @@ function ReportPage() {
                   <span className="min-w-[1.5rem] text-muted-foreground">
                     {idx + 1}.
                   </span>
-                  <span>{c.label}</span>
+                  <span>{formatControlLabel(c.label, primary, secondary)}</span>
                 </div>
               )}
             />
@@ -280,7 +276,6 @@ function ReportPage() {
     </div>
   );
 }
-
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
