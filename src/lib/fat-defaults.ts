@@ -333,3 +333,12 @@ export function translateControl(label: string, lang: Lang): string {
   if (!tr) return label;
   return tr[lang] ?? tr.en ?? label;
 }
+
+/** Formatta l'etichetta del controllo rispettando lingua primaria ed eventuale secondaria ("Primaria / Secondaria"). */
+export function formatControlLabel(label: string, primary: Lang, secondary: Lang | null): string {
+  const p = translateControl(label, primary);
+  if (!secondary || secondary === primary) return p;
+  const s = translateControl(label, secondary);
+  if (p === s) return p;
+  return `${p} / ${s}`;
+}
