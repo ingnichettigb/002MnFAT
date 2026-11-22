@@ -53,7 +53,7 @@ const GUIDE: Record<Lang, GuideContent> = {
       {
         title: "2. Barra lingue",
         intro:
-          "In alto a destra ci sono quattro bandiere (IT / EN / DE / ES). Cliccando una bandiera diventa la lingua primaria (badge 1); un secondo click su una bandiera diversa la rende secondaria (badge 2). I campi mostrano allora le etichette affiancate nel formato \"primaria / secondaria\" (es. \"Costruttore / Manufacturer\"). Cliccando di nuovo la primaria si rimuove la secondaria.",
+          "In alto a destra ci sono cinque bandiere (IT / EN / DE / ES / FR). Cliccando una bandiera diventa la lingua primaria (badge 1); un secondo click su una bandiera diversa la rende secondaria (badge 2). I campi mostrano allora le etichette affiancate nel formato \"primaria / secondaria\" (es. \"Costruttore / Manufacturer\"). Cliccando di nuovo la primaria si rimuove la secondaria.",
       },
       {
         title: "3. Pulsante Informazioni",
@@ -151,7 +151,7 @@ const GUIDE: Record<Lang, GuideContent> = {
       {
         title: "2. Language bar",
         intro:
-          "Top right you have four flags (IT / EN / DE / ES). Clicking a flag makes it the primary language (badge 1); a second click on a different flag makes it the secondary (badge 2). Fields then show the labels side by side as \"primary / secondary\" (e.g. \"Manufacturer / Costruttore\"). Clicking the primary again removes the secondary.",
+          "Top right you have five flags (IT / EN / DE / ES / FR). Clicking a flag makes it the primary language (badge 1); a second click on a different flag makes it the secondary (badge 2). Fields then show the labels side by side as \"primary / secondary\" (e.g. \"Manufacturer / Costruttore\"). Clicking the primary again removes the secondary.",
       },
       {
         title: "3. Info button",
@@ -249,7 +249,7 @@ const GUIDE: Record<Lang, GuideContent> = {
       {
         title: "2. Sprachleiste",
         intro:
-          "Oben rechts gibt es vier Flaggen (IT / EN / DE / ES). Ein Klick auf eine Flagge macht sie zur primären Sprache (Abzeichen 1); ein zweiter Klick auf eine andere Flagge macht sie zur sekundären (Abzeichen 2). Die Felder zeigen dann die Beschriftungen nebeneinander als \"primär / sekundär\" (z. B. \"Hersteller / Manufacturer\"). Ein erneuter Klick auf die primäre entfernt die sekundäre.",
+          "Oben rechts gibt es fünf Flaggen (IT / EN / DE / ES / FR). Ein Klick auf eine Flagge macht sie zur primären Sprache (Abzeichen 1); ein zweiter Klick auf eine andere Flagge macht sie zur sekundären (Abzeichen 2). Die Felder zeigen dann die Beschriftungen nebeneinander als \"primär / sekundär\" (z. B. \"Hersteller / Manufacturer\"). Ein erneuter Klick auf die primäre entfernt die sekundäre.",
       },
       {
         title: "3. Info-Schaltfläche",
@@ -347,7 +347,7 @@ const GUIDE: Record<Lang, GuideContent> = {
       {
         title: "2. Barra de idiomas",
         intro:
-          "Arriba a la derecha hay cuatro banderas (IT / EN / DE / ES). Al pulsar una bandera se convierte en el idioma principal (distintivo 1); un segundo clic en otra bandera la convierte en secundaria (distintivo 2). Los campos muestran entonces las etiquetas juntas como \"principal / secundaria\" (p. ej. \"Fabricante / Manufacturer\"). Pulsando de nuevo la principal se quita la secundaria.",
+          "Arriba a la derecha hay cinco banderas (IT / EN / DE / ES / FR). Al pulsar una bandera se convierte en el idioma principal (distintivo 1); un segundo clic en otra bandera la convierte en secundaria (distintivo 2). Los campos muestran entonces las etiquetas juntas como \"principal / secundaria\" (p. ej. \"Fabricante / Manufacturer\"). Pulsando de nuevo la principal se quita la secundaria.",
       },
       {
         title: "3. Botón Información",
@@ -430,6 +430,104 @@ const GUIDE: Record<Lang, GuideContent> = {
       },
     ],
   },
+  fr: {
+    dialogTitle: "Mini F.A.T. — Guide d'utilisation",
+    dialogDescription:
+      "Fonctionnement du générateur de procès-verbaux de Factory Acceptance Test.",
+    langNote:
+      "Ce guide suit la langue principale sélectionnée en haut (drapeau avec badge 1).",
+    sections: [
+      {
+        title: "1. Qu'est-ce que Mini F.A.T.",
+        intro:
+          "Application web pour remplir et générer en PDF les procès-verbaux de Factory Acceptance Test. Les données sont enregistrées localement dans le navigateur ; le PDF est généré sur l'appareil, sans envoi à des serveurs externes.",
+      },
+      {
+        title: "2. Barre des langues",
+        intro:
+          "En haut à droite se trouvent cinq drapeaux (IT / EN / DE / ES / FR). Un clic sur un drapeau en fait la langue principale (badge 1) ; un second clic sur un autre drapeau en fait la langue secondaire (badge 2). Les champs affichent alors les libellés côte à côte au format \"principale / secondaire\" (ex. \"Fabricant / Manufacturer\"). Un nouveau clic sur la langue principale supprime la secondaire.",
+      },
+      {
+        title: "3. Bouton Informations",
+        intro:
+          "Le bouton avec l'icône (i) à côté des drapeaux ouvre ce guide. Le texte change automatiquement selon la langue principale.",
+      },
+      {
+        title: "4. Barre d'outils du F.A.T. actif",
+        intro:
+          "Sous l'en-tête s'affiche le F.A.T. actif (Affaire · N° de série · Client) avec trois boutons :",
+        bullets: [
+          "Archives — ouvre la liste de tous les F.A.T. enregistrés.",
+          "Enregistrer le brouillon — enregistre l'état actuel comme brouillon (\"En cours\").",
+          "Nouveau F.A.T. — crée un nouveau F.A.T. vide (l'actuel reste enregistré dans les archives).",
+        ],
+      },
+      {
+        title: "5. Étapes — les 3 phases",
+        intro:
+          "Un indicateur en haut montre où vous en êtes. Vous pouvez passer d'une étape à l'autre en cliquant sur le numéro.",
+        bullets: [
+          "1. Données générales — coordonnées et données de l'essai.",
+          "2. Contrôles — liste des contrôles à inclure dans le procès-verbal.",
+          "3. Rapport — récapitulatif et génération du PDF.",
+        ],
+      },
+      {
+        title: "6. Étape 1 — Données générales",
+        intro:
+          "Remplissez ces sections (les champs marqués * sont obligatoires) :",
+        bullets: [
+          "Fabricant — raison sociale, adresse, interlocuteur, e-mail, téléphone.",
+          "Organisme vérificateur — mêmes champs pour le client / l'organisme vérificateur.",
+          "Données de l'essai — description, N° de plan, N° de série, repère, N° de commande client, affaire, lieu et date de l'essai.",
+          "Participants au F.A.T. — deux blocs séparés (côté fabricant et côté client) : ajoutez nom et fonction ; la société est remplie automatiquement à partir de la raison sociale de la section correspondante.",
+        ],
+      },
+      {
+        title: "7. Étape 2 — Contrôles",
+        intro:
+          "Liste des contrôles (mécaniques, électriques, logiciels) à inclure dans le procès-verbal.",
+        bullets: [
+          "Cochez / décochez les contrôles dans la liste.",
+          "Vous pouvez ajouter des contrôles personnalisés depuis le champ dédié.",
+          "Vous pouvez réorganiser les contrôles par glisser-déposer.",
+          "En bas de page, un compteur indique combien de contrôles sont sélectionnés.",
+        ],
+      },
+      {
+        title: "8. Étape 3 — Rapport",
+        intro:
+          "Récapitulatif des données générales et des contrôles sélectionnés.",
+        bullets: [
+          "Chaque contrôle sélectionné deviendra un chapitre dédié dans le PDF.",
+          "Le bouton \"Générer le rapport F.A.T.\" produit le PDF et marque le F.A.T. comme \"Terminé\" dans les archives.",
+          "Le bouton \"Recommencer\" efface toutes les données du F.A.T. actif (avec confirmation).",
+          "Certaines licences ont un nombre maximal de générations PDF : la pastille près du bouton indique combien il en reste. Lorsqu'il n'en reste qu'une, un avertissement s'affiche ; une fois épuisées, la génération est bloquée jusqu'au renouvellement ou à l'achat d'une nouvelle licence.",
+        ],
+      },
+      {
+        title: "9. Archives F.A.T.",
+        intro:
+          "Liste de tous les F.A.T. enregistrés, avec filtres par état : À traiter, En cours, Terminés, Tous. Le bouton \"Charger un fichier\" en haut ouvre une liste rapide pour ouvrir immédiatement un F.A.T. déjà enregistré. Pour chaque F.A.T., les actions suivantes sont disponibles :",
+        bullets: [
+          "Afficher — régénère et télécharge à nouveau le PDF de ce F.A.T., sans l'ouvrir comme actif.",
+          "Ouvrir — charge le F.A.T. comme actif et revient à la saisie.",
+          "Dupliquer — crée une copie indépendante du F.A.T.",
+          "Enregistrer le fichier — exporte ce F.A.T. en fichier .json sur l'appareil, pour sauvegarde ou transfert.",
+          "Supprimer — supprime définitivement le F.A.T. (avec confirmation).",
+        ],
+      },
+      {
+        title: "10. Notes techniques",
+        bullets: [
+          "Toutes les données sont enregistrées dans le navigateur, pas sur un serveur.",
+          "Le PDF est entièrement généré sur l'appareil.",
+          "En changeant de langue, les textes déjà saisis (descriptions, notes) ne sont pas traduits : seuls les libellés de l'interface changent.",
+          "En effaçant les données du navigateur, les archives sont perdues : exportez les PDF importants.",
+        ],
+      },
+    ],
+  },
 };
 
 const ARIA_LABEL: Record<Lang, string> = {
@@ -437,6 +535,7 @@ const ARIA_LABEL: Record<Lang, string> = {
   en: "Guide",
   de: "Anleitung",
   es: "Guía",
+  fr: "Guide",
 };
 
 export function InfoDialog() {

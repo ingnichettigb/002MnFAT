@@ -15,6 +15,7 @@ import {
 import { verifyAndActivateLicense } from "@/lib/license.functions";
 import { VERIFIED_EMAIL_KEY, ACTIVATED_KEY, LICENSE_ID_KEY, PUK_ID_KEY, CONSENT_KEY, clearGateKeys } from "@/lib/app-config";
 import { APP_CODE } from "@/lib/app-config";
+import { useI18n, LangSwitcher } from "@/lib/i18n";
 
 export const Route = createFileRoute("/attivazione")({
   head: () => ({
@@ -28,53 +29,26 @@ export const Route = createFileRoute("/attivazione")({
 
 type ReasonInfo = { message: string; code: string };
 
-const REASON_MESSAGES: Record<string, ReasonInfo> = {
-  email_not_verified: {
-    message:
-      "La tua email non risulta ancora verificata. Torna al passaggio precedente e completa la verifica con il codice ricevuto via email.",
-    code: "E-001",
-  },
-  license_not_found: {
-    message:
-      "Il codice licenza inserito non è valido. Controlla di averlo copiato correttamente dall'email di acquisto (senza spazi iniziali o finali).",
-    code: "E-101",
-  },
-  license_expired: {
-    message:
-      "Questa licenza risulta scaduta. Contatta il supporto per verificare il rinnovo o l'acquisto di una nuova licenza.",
-    code: "E-103",
-  },
-  puk_not_found: {
-    message:
-      "Il codice PUK (numero ebook) inserito non è valido. Verifica di averlo copiato correttamente dall'email di acquisto.",
-    code: "E-201",
-  },
-  puk_wrong_product: {
-    message:
-      "Questo codice PUK non è valido per questa applicazione. Verifica di aver inserito il codice corretto per il prodotto che stai attivando.",
-    code: "E-203",
-  },
-  puk_not_in_license: {
-    message:
-      "Questo codice PUK non risulta associato alla licenza inserita. Verifica che entrambi i codici provengano dalla stessa email di acquisto.",
-    code: "E-204",
-  },
-  puk_claimed_by_other: {
-    message:
-      "Questo codice PUK è già stato attivato da un altro utente. Ogni codice PUK è personale e può essere usato una sola volta. Se la licenza prevede più utenti, contatta chi ha effettuato l'acquisto per ricevere un codice PUK non ancora utilizzato.",
-    code: "E-202",
-  },
-  server_error: {
-    message:
-      "Si è verificato un errore tecnico imprevisto. Riprova tra qualche minuto o contattaci indicando il codice errore (E-500).",
-    code: "E-500",
-  },
-};
-
+const REASON_KEYS = {
+  email_not_verified: ["E001", "E-001"],
+  license_not_found: ["E101", "E-101"],
+  license_expired: ["E103", "E-103"],
+  puk_not_found: ["E201", "E-201"],
+  puk_wrong_product: ["E203", "E-203"],
+  puk_not_in_license: ["E204", "E-204"],
+  puk_claimed_by_other: ["E202", "E-202"],
+  server_error: ["E500", "E-500"],
+} as const;
+type ReasonKey = keyof typeof REASON_KEYS;
 
 function AttivazionePage() {
   const navigate = useNavigate();
   const activate = useServerFn(verifyAndActivateLicense);
+  const { t } = useI18n();
+  const reasonInfo = (r: string): ReasonInfo => {
+    const [k, code] = REASON_KEYS[(r in REASON_KEYS ? r : "server_error") as ReasonKey];
+    return { message: t(k), code };
+  };
 
   const [email, setEmail] = React.useState<string | null>(null);
   const [licenseKey, setLicenseKey] = React.useState("");
@@ -97,7 +71,7 @@ function AttivazionePage() {
     setError(null);
     if (!email) return;
     if (!licenseKey.trim() || !puk.trim()) {
-      setError({ message: "Compila entrambi i campi.", code: "" });
+      setError({ message: t("errFillBoth"), code: "" });
       return;
     }
     setLoading(true);
@@ -124,12 +98,10 @@ function AttivazionePage() {
         navigate({ to: "/auth", replace: true });
         return;
       }
-      setError(
-        REASON_MESSAGES[res.reason] ?? REASON_MESSAGES.server_error,
-      );
+      setError(reasonInfo(res.reason));
     } catch (err) {
       console.error(err);
-      setError(REASON_MESSAGES.server_error);
+      setError(reasonInfo("server_error"));
 
     } finally {
       setLoading(false);
@@ -142,20 +114,20 @@ function AttivazionePage() {
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-8">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Attivazione licenza — {APP_CODE}</CardTitle>
+          <div className="mb-2 flex justify-end"><LangSwitcher /></div>
+          <CardTitle>{t("actTitle")} — {APP_CODE}</CardTitle>
           <CardDescription>
-            Passaggio 2 di 3 — Inserisci il codice licenza e il PUK ricevuti via
-            email al momento dell'acquisto.
+            {t("actDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="space-y-1.5">
-              <Label>Email verificata</Label>
+              <Label>{t("verifiedEmail")}</Label>
               <Input value={email} disabled readOnly />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="license">Codice licenza</Label>
+              <Label htmlFor="license">{t("licenseCode")}</Label>
               <Input
                 id="license"
                 value={licenseKey}
@@ -165,12 +137,12 @@ function AttivazionePage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="puk">Codice PUK</Label>
+              <Label htmlFor="puk">{t("pukCode")}</Label>
               <Input
                 id="puk"
                 value={puk}
                 onChange={(e) => setPuk(e.target.value)}
-                placeholder="Codice PUK"
+                placeholder="PUK"
                 autoComplete="off"
               />
             </div>
@@ -179,13 +151,13 @@ function AttivazionePage() {
                 <p className="text-sm text-destructive">{error.message}</p>
                 {error.code && (
                   <p className="text-xs text-muted-foreground">
-                    Codice errore: {error.code}
+                    {t("errorCode")}: {error.code}
                   </p>
                 )}
               </div>
             )}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Attivazione…" : "Attiva"}
+              {loading ? t("activating") : t("activate")}
             </Button>
             <button
               type="button"
@@ -196,7 +168,7 @@ function AttivazionePage() {
 
               className="text-xs text-muted-foreground underline"
             >
-              Cambia email
+              {t("changeEmail")}
             </button>
           </form>
         </CardContent>

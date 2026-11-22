@@ -92,7 +92,7 @@ function ControlliPage() {
           <CardDescription>{t("controlsDesc")}</CardDescription>
           <div className="pt-2">
             <Button type="button" variant="outline" size="sm" onClick={refreshDefaultControls}>
-              Aggiorna lista predefinita
+              {t("resetDefaultList")}
             </Button>
           </div>
         </CardHeader>

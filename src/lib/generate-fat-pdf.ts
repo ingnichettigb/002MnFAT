@@ -11,96 +11,96 @@ import type { Lang } from "./i18n";
 import { translateControl } from "./fat-defaults";
 
 const D = {
-  title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA" },
+  title: { it: "VERBALE DI COLLAUDO", en: "TEST REPORT", de: "PRÜFBERICHT", es: "INFORME DE PRUEBA", fr: "PROCÈS-VERBAL D'ESSAI" },
   subtitle: {
     it: "FACTORY ACCEPTANCE TEST",
     en: "FACTORY ACCEPTANCE TEST",
     de: "FACTORY ACCEPTANCE TEST",
-    es: "FACTORY ACCEPTANCE TEST",
+    es: "FACTORY ACCEPTANCE TEST", fr: "FACTORY ACCEPTANCE TEST",
   },
-  manufacturer: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
-  customer: { it: "Ente Verificatore", en: "Verifying Body", de: "Prüfstelle", es: "Organismo Verificador" },
-  constructorTitle: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante" },
-  testData: { it: "Dati del Collaudo", en: "Test Data", de: "Prüfdaten", es: "Datos de la prueba" },
-  attendees: { it: "Presenti al FAT", en: "FAT Attendees", de: "FAT-Teilnehmer", es: "Asistentes al FAT" },
-  companyName: { it: "Ragione Sociale", en: "Company Name", de: "Firmenname", es: "Razón social" },
-  address: { it: "Indirizzo", en: "Address", de: "Adresse", es: "Dirección" },
-  contact: { it: "Referente", en: "Contact", de: "Ansprechpartner", es: "Contacto" },
-  email: { it: "Email", en: "Email", de: "E-Mail", es: "Correo" },
-  phone: { it: "Telefono", en: "Phone", de: "Telefon", es: "Teléfono" },
-  drawingNo: { it: "N° Disegno", en: "Drawing No.", de: "Zeichnungsnr.", es: "N.º Plano" },
-  serialNo: { it: "N° Matricola", en: "Serial No.", de: "Seriennr.", es: "N.º de serie" },
-  tagNo: { it: "Tag Cliente", en: "Customer Tag", de: "Kunden-Tag", es: "Tag Cliente" },
-  orderNo: { it: "Nr Ordine Cliente", en: "Customer Order No.", de: "Kunden-Bestellnummer", es: "N.º Pedido Cliente" },
-  commessa: { it: "Commessa", en: "Job No.", de: "Auftragsnr.", es: "N.º Pedido" },
-  testDate: { it: "Data Collaudo", en: "Test Date", de: "Prüfdatum", es: "Fecha Prueba" },
-  testPlace: { it: "Luogo Collaudo", en: "Test Location", de: "Prüfort", es: "Lugar Prueba" },
-  descrizione: { it: "Descrizione", en: "Description", de: "Beschreibung", es: "Descripción" },
-  attName: { it: "Nome e Cognome", en: "Full Name", de: "Name", es: "Nombre y Apellido" },
-  attRole: { it: "Ruolo", en: "Role", de: "Rolle", es: "Rol" },
-  attCompany: { it: "Azienda", en: "Company", de: "Firma", es: "Empresa" },
-  chapter: { it: "Controllo", en: "Check", de: "Prüfung", es: "Control" },
-  outcome: { it: "Esito", en: "Outcome", de: "Ergebnis", es: "Resultado" },
-  notes: { it: "Note / Rilievi", en: "Notes / Findings", de: "Anmerkungen", es: "Notas / Observaciones" },
-  inspectorSign: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma" },
-  page: { it: "Pagina", en: "Page", de: "Seite", es: "Página" },
-  of: { it: "di", en: "of", de: "von", es: "de" },
-  deviazioni: { it: "DEVIAZIONI", en: "DEVIATIONS", de: "ABWEICHUNGEN", es: "DESVIACIONES" },
+  manufacturer: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante", fr: "Fabricant" },
+  customer: { it: "Ente Verificatore", en: "Verifying Body", de: "Prüfstelle", es: "Organismo Verificador", fr: "Organisme vérificateur" },
+  constructorTitle: { it: "Ente Costruttore", en: "Manufacturer", de: "Hersteller", es: "Fabricante", fr: "Fabricant" },
+  testData: { it: "Dati del Collaudo", en: "Test Data", de: "Prüfdaten", es: "Datos de la prueba", fr: "Données de l'essai" },
+  attendees: { it: "Presenti al FAT", en: "FAT Attendees", de: "FAT-Teilnehmer", es: "Asistentes al FAT", fr: "Participants au FAT" },
+  companyName: { it: "Ragione Sociale", en: "Company Name", de: "Firmenname", es: "Razón social", fr: "Raison sociale" },
+  address: { it: "Indirizzo", en: "Address", de: "Adresse", es: "Dirección", fr: "Adresse" },
+  contact: { it: "Referente", en: "Contact", de: "Ansprechpartner", es: "Contacto", fr: "Interlocuteur" },
+  email: { it: "Email", en: "Email", de: "E-Mail", es: "Correo", fr: "E-mail" },
+  phone: { it: "Telefono", en: "Phone", de: "Telefon", es: "Teléfono", fr: "Téléphone" },
+  drawingNo: { it: "N° Disegno", en: "Drawing No.", de: "Zeichnungsnr.", es: "N.º Plano", fr: "N° de plan" },
+  serialNo: { it: "N° Matricola", en: "Serial No.", de: "Seriennr.", es: "N.º de serie", fr: "N° de série" },
+  tagNo: { it: "Tag Cliente", en: "Customer Tag", de: "Kunden-Tag", es: "Tag Cliente", fr: "Repère client" },
+  orderNo: { it: "Nr Ordine Cliente", en: "Customer Order No.", de: "Kunden-Bestellnummer", es: "N.º Pedido Cliente", fr: "N° de commande client" },
+  commessa: { it: "Commessa", en: "Job No.", de: "Auftragsnr.", es: "N.º Pedido", fr: "N° d'affaire" },
+  testDate: { it: "Data Collaudo", en: "Test Date", de: "Prüfdatum", es: "Fecha Prueba", fr: "Date de l'essai" },
+  testPlace: { it: "Luogo Collaudo", en: "Test Location", de: "Prüfort", es: "Lugar Prueba", fr: "Lieu de l'essai" },
+  descrizione: { it: "Descrizione", en: "Description", de: "Beschreibung", es: "Descripción", fr: "Description" },
+  attName: { it: "Nome e Cognome", en: "Full Name", de: "Name", es: "Nombre y Apellido", fr: "Nom et prénom" },
+  attRole: { it: "Ruolo", en: "Role", de: "Rolle", es: "Rol", fr: "Fonction" },
+  attCompany: { it: "Azienda", en: "Company", de: "Firma", es: "Empresa", fr: "Société" },
+  chapter: { it: "Controllo", en: "Check", de: "Prüfung", es: "Control", fr: "Contrôle" },
+  outcome: { it: "Esito", en: "Outcome", de: "Ergebnis", es: "Resultado", fr: "Résultat" },
+  notes: { it: "Note / Rilievi", en: "Notes / Findings", de: "Anmerkungen", es: "Notas / Observaciones", fr: "Notes / Constatations" },
+  inspectorSign: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma", fr: "Signature" },
+  page: { it: "Pagina", en: "Page", de: "Seite", es: "Página", fr: "Page" },
+  of: { it: "di", en: "of", de: "von", es: "de", fr: "sur" },
+  deviazioni: { it: "DEVIAZIONI", en: "DEVIATIONS", de: "ABWEICHUNGEN", es: "DESVIACIONES", fr: "ÉCARTS" },
   deviazioniDesc: {
     it: "Elenco delle deviazioni rilevate durante il collaudo.",
     en: "List of deviations observed during the test.",
     de: "Liste der während der Prüfung festgestellten Abweichungen.",
-    es: "Lista de las desviaciones detectadas durante la prueba.",
+    es: "Lista de las desviaciones detectadas durante la prueba.", fr: "Liste des écarts constatés lors de l'essai.",
   },
   azioniCorrettive: {
     it: "AZIONI CORRETTIVE",
     en: "CORRECTIVE ACTIONS",
     de: "KORREKTURMASSNAHMEN",
-    es: "ACCIONES CORRECTIVAS",
+    es: "ACCIONES CORRECTIVAS", fr: "ACTIONS CORRECTIVES",
   },
   azioniCorrettiveDesc: {
     it: "Azioni correttive da intraprendere e relativa verifica.",
     en: "Corrective actions to be taken and related verification.",
     de: "Zu ergreifende Korrekturmaßnahmen und zugehörige Überprüfung.",
-    es: "Acciones correctivas a tomar y verificación correspondiente.",
+    es: "Acciones correctivas a tomar y verificación correspondiente.", fr: "Actions correctives à mettre en œuvre et vérification associée.",
   },
-  num: { it: "N°", en: "No.", de: "Nr.", es: "N.º" },
-  description: { it: "Descrizione", en: "Description", de: "Beschreibung", es: "Descripción" },
-  responsible: { it: "Responsabile", en: "Responsible", de: "Verantwortlich", es: "Responsable" },
-  dueDate: { it: "Data prevista", en: "Due date", de: "Fälligkeitsdatum", es: "Fecha prevista" },
-  status: { it: "Stato", en: "Status", de: "Status", es: "Estado" },
-  signature: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma" },
-  date: { it: "Data", en: "Date", de: "Datum", es: "Fecha" },
-  accettato: { it: "ACCETTATO", en: "ACCEPTED", de: "AKZEPTIERT", es: "ACEPTADO" },
-  nonAccettato: { it: "NON ACCETTATO", en: "NOT ACCEPTED", de: "NICHT AKZEPTIERT", es: "NO ACEPTADO" },
-  nonApplicabile: { it: "NON APPLICABILE", en: "NOT APPLICABLE", de: "NICHT ANWENDBAR", es: "NO APLICABLE" },
-  daCompletare: { it: "DA COMPLETARE", en: "TO BE COMPLETED", de: "ZU VERVOLLSTÄNDIGEN", es: "POR COMPLETAR" },
-  definitivo: { it: "DEFINITIVO", en: "FINAL", de: "ENDGÜLTIG", es: "DEFINITIVO" },
-  provvisorio: { it: "PROVVISORIO", en: "PROVISIONAL", de: "VORLÄUFIG", es: "PROVISIONAL" },
-  daDefinire: { it: "DA DEFINIRE", en: "TO BE DEFINED", de: "ZU DEFINIEREN", es: "POR DEFINIR" },
+  num: { it: "N°", en: "No.", de: "Nr.", es: "N.º", fr: "N°" },
+  description: { it: "Descrizione", en: "Description", de: "Beschreibung", es: "Descripción", fr: "Description" },
+  responsible: { it: "Responsabile", en: "Responsible", de: "Verantwortlich", es: "Responsable", fr: "Responsable" },
+  dueDate: { it: "Data prevista", en: "Due date", de: "Fälligkeitsdatum", es: "Fecha prevista", fr: "Date prévue" },
+  status: { it: "Stato", en: "Status", de: "Status", es: "Estado", fr: "État" },
+  signature: { it: "Firma", en: "Signature", de: "Unterschrift", es: "Firma", fr: "Signature" },
+  date: { it: "Data", en: "Date", de: "Datum", es: "Fecha", fr: "Date" },
+  accettato: { it: "ACCETTATO", en: "ACCEPTED", de: "AKZEPTIERT", es: "ACEPTADO", fr: "ACCEPTÉ" },
+  nonAccettato: { it: "NON ACCETTATO", en: "NOT ACCEPTED", de: "NICHT AKZEPTIERT", es: "NO ACEPTADO", fr: "NON ACCEPTÉ" },
+  nonApplicabile: { it: "NON APPLICABILE", en: "NOT APPLICABLE", de: "NICHT ANWENDBAR", es: "NO APLICABLE", fr: "NON APPLICABLE" },
+  daCompletare: { it: "DA COMPLETARE", en: "TO BE COMPLETED", de: "ZU VERVOLLSTÄNDIGEN", es: "POR COMPLETAR", fr: "À COMPLÉTER" },
+  definitivo: { it: "DEFINITIVO", en: "FINAL", de: "ENDGÜLTIG", es: "DEFINITIVO", fr: "DÉFINITIF" },
+  provvisorio: { it: "PROVVISORIO", en: "PROVISIONAL", de: "VORLÄUFIG", es: "PROVISIONAL", fr: "PROVISOIRE" },
+  daDefinire: { it: "DA DEFINIRE", en: "TO BE DEFINED", de: "ZU DEFINIEREN", es: "POR DEFINIR", fr: "À DÉFINIR" },
   pendingCA: {
     it: "IN ATTESA DEL COMPLETAMENTO DELLE AZIONI CORRETTIVE",
     en: "PENDING COMPLETION OF CORRECTIVE ACTIONS",
     de: "AUSSTEHEND BIS ABSCHLUSS DER KORREKTURMASSNAHMEN",
-    es: "A LA ESPERA DE COMPLETAR LAS ACCIONES CORRECTIVAS",
+    es: "A LA ESPERA DE COMPLETAR LAS ACCIONES CORRECTIVAS", fr: "EN ATTENTE DE RÉALISATION DES ACTIONS CORRECTIVES",
   },
   caCompleted: {
     it: "COMPLETATE LE AZIONI CORRETTIVE",
     en: "CORRECTIVE ACTIONS COMPLETED",
     de: "KORREKTURMASSNAHMEN ABGESCHLOSSEN",
-    es: "ACCIONES CORRECTIVAS COMPLETADAS",
+    es: "ACCIONES CORRECTIVAS COMPLETADAS", fr: "ACTIONS CORRECTIVES RÉALISÉES",
   },
   clientFatAttendees: {
     it: "Ente Verificatore",
     en: "Verifying Body",
     de: "Prüfstelle",
-    es: "Organismo Verificador",
+    es: "Organismo Verificador", fr: "Organisme vérificateur",
   },
   constructorSign: {
     it: "Firma costruttore",
     en: "Manufacturer signature",
     de: "Unterschrift Hersteller",
-    es: "Firma fabricante",
+    es: "Firma fabricante", fr: "Signature du fabricant",
   },
 } as const;
 
@@ -127,7 +127,7 @@ const fmtDate = (iso: string, lang: Lang) => {
   if (!iso) return "";
   const d = new Date(iso);
   if (isNaN(d.getTime())) return iso;
-  const loc = lang === "it" ? "it-IT" : lang === "de" ? "de-DE" : lang === "es" ? "es-ES" : "en-GB";
+  const loc = ({ it: "it-IT", en: "en-GB", de: "de-DE", es: "es-ES", fr: "fr-FR" } as const)[lang];
   return d.toLocaleDateString(loc);
 };
 
@@ -985,26 +985,15 @@ export function generateFatPdf(state: FatState, lang: Lang = "it", secondary: La
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
-    const varieTitle =
-      lang === "en"
-        ? "MISCELLANEOUS — Technical attachments"
-        : lang === "de"
-          ? "VERSCHIEDENES — Technische Anlagen"
-          : lang === "es"
-            ? "VARIOS — Anexos técnicos"
-            : "VARIE — Allegati tecnici";
-    const varieSec =
-      secondary === "it"
-        ? "VARIE — Allegati tecnici"
-        : secondary === "en"
-          ? "MISCELLANEOUS — Technical attachments"
-          : secondary === "de"
-            ? "VERSCHIEDENES — Technische Anlagen"
-            : secondary === "es"
-              ? "VARIOS — Anexos técnicos"
-              : lang === "it"
-                ? "MISCELLANEOUS — Technical attachments"
-                : "VARIE — Allegati tecnici";
+    const VARIE: Record<Lang, string> = {
+      it: "VARIE — Allegati tecnici",
+      en: "MISCELLANEOUS — Technical attachments",
+      de: "VERSCHIEDENES — Technische Anlagen",
+      es: "VARIOS — Anexos técnicos",
+      fr: "DIVERS — Annexes techniques",
+    };
+    const varieTitle = VARIE[lang];
+    const varieSec = VARIE[secondary ?? (lang === "it" ? "en" : "it")];
     const varieNo = ctrlPages.length + 1;
     ctrlPages.push({
       primary: varieTitle,
@@ -1022,7 +1011,7 @@ export function generateFatPdf(state: FatState, lang: Lang = "it", secondary: La
     const NUM_ROWS = 12;
     const headerRow = [
       bl("num", lang),
-      lang === "en" ? "Attachment description" : "Descrizione allegato",
+      ({ it: "Descrizione allegato", en: "Attachment description", de: "Beschreibung der Anlage", es: "Descripción del anexo", fr: "Description de l'annexe" } as Record<Lang, string>)[lang],
       "Rev.",
       bl("notes", lang),
     ];
@@ -1215,19 +1204,9 @@ export function generateFatPdf(state: FatState, lang: Lang = "it", secondary: La
     doc.setFont("helvetica", "bold");
     doc.setFontSize(13);
     doc.setTextColor(255);
-    const idxTitle = lang === "en" ? "INDEX" : lang === "de" ? "INHALT" : lang === "es" ? "ÍNDICE" : "INDICE";
-    const idxSec =
-      secondary === "it"
-        ? "INDICE"
-        : secondary === "en"
-          ? "INDEX"
-          : secondary === "de"
-            ? "INHALT"
-            : secondary === "es"
-              ? "ÍNDICE"
-              : lang === "it"
-                ? "INDEX"
-                : "INDICE";
+    const IDX: Record<Lang, string> = { it: "INDICE", en: "INDEX", de: "INHALT", es: "ÍNDICE", fr: "SOMMAIRE" };
+    const idxTitle = IDX[lang];
+    const idxSec = IDX[secondary ?? (lang === "it" ? "en" : "it")];
     const idxNo = ctrlPages.length + 1;
     doc.text(
       `${idxNo} ${idxSec && idxSec !== idxTitle ? `${idxTitle} / ${idxSec}` : idxTitle}`,

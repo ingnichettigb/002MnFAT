@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { requestOtp, verifyOtp } from "@/lib/otp.functions";
+import { useI18n, LangSwitcher } from "@/lib/i18n";
 import { VERIFIED_EMAIL_KEY } from "@/lib/app-config";
 
 export const Route = createFileRoute("/auth")({
@@ -27,20 +28,15 @@ export const Route = createFileRoute("/auth")({
 
 type Stage = "email" | "otp" | "done";
 
-const RATE_LIMIT_MSG =
-  "Hai già ricevuto 3 codici di verifica. Riprova tra 24 ore. (E-011)";
-const SEND_FAIL_MSG =
-  "Impossibile inviare il codice. Verifica l'indirizzo email. (E-010)";
-const OTP_INVALID_MSG =
-  "Codice non corretto. Riprova o richiedi un nuovo invio. (E-012)";
-const OTP_SAVE_FAIL_MSG =
-  "Errore tecnico durante la verifica. Riprova. (E-013)";
-
-
 function AuthPage() {
   const navigate = useNavigate();
   const reqOtp = useServerFn(requestOtp);
   const vOtp = useServerFn(verifyOtp);
+  const { t } = useI18n();
+  const RATE_LIMIT_MSG = `${t("errRateLimit")} (E-011)`;
+  const SEND_FAIL_MSG = `${t("errSendFail")} (E-010)`;
+  const OTP_INVALID_MSG = `${t("errOtpInvalid")} (E-012)`;
+  const OTP_SAVE_FAIL_MSG = `${t("errOtpSave")} (E-013)`;
 
   const [stage, setStage] = React.useState<Stage>("email");
   const [email, setEmail] = React.useState("");
@@ -63,7 +59,7 @@ function AuthPage() {
 
     const normalized = email.trim().toLowerCase();
     if (!normalized) {
-      setError("Inserisci una email valida.");
+      setError(t("errEmailInvalid"));
       return;
     }
 
@@ -76,7 +72,7 @@ function AuthPage() {
         return;
       }
       setStage("otp");
-      setInfo(`Abbiamo inviato il codice a ${normalized}`);
+      setInfo(`${t("codeSentTo")} ${normalized}`);
     } catch (err) {
       console.error(err);
       setError(SEND_FAIL_MSG);
@@ -91,7 +87,7 @@ function AuthPage() {
     setError(null);
     const normalized = email.trim().toLowerCase();
     if (!/^\d{6}$/.test(code.trim())) {
-      setError("Il codice deve essere di 6 cifre.");
+      setError(t("errCode6"));
       return;
     }
     setLoading(true);
@@ -128,7 +124,7 @@ function AuthPage() {
         else setError(SEND_FAIL_MSG);
         return;
       }
-      setInfo(`Nuovo codice inviato a ${normalized}`);
+      setInfo(`${t("newCodeSentTo")} ${normalized}`);
       setCode("");
     } catch (err) {
       console.error(err);
@@ -143,11 +139,12 @@ function AuthPage() {
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-8">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>002MnFAT — Accesso</CardTitle>
+          <div className="mb-2 flex justify-end"><LangSwitcher /></div>
+          <CardTitle>002MnFAT — {t("authTitle")}</CardTitle>
           <CardDescription>
-            {stage === "email" && "Passaggio 1 di 2 — Verifica email."}
-            {stage === "otp" && "Inserisci il codice ricevuto per email."}
-            {stage === "done" && "Email verificata con successo."}
+            {stage === "email" && t("authStepEmail")}
+            {stage === "otp" && t("authStepOtp")}
+            {stage === "done" && t("authVerified")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -166,7 +163,7 @@ function AuthPage() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Attendere…" : "Invia codice"}
+                {loading ? t("pleaseWait") : t("sendCode")}
               </Button>
             </form>
           )}
@@ -177,7 +174,7 @@ function AuthPage() {
                 <p className="text-sm text-muted-foreground">{info}</p>
               )}
               <div className="space-y-1.5">
-                <Label htmlFor="code">Codice (6 cifre)</Label>
+                <Label htmlFor="code">{t("codeLabel")}</Label>
                 <Input
                   id="code"
                   inputMode="numeric"
@@ -194,7 +191,7 @@ function AuthPage() {
               {error && <p className="text-sm text-destructive">{error}</p>}
               <div className="flex gap-2">
                 <Button type="submit" className="flex-1" disabled={loading}>
-                  {loading ? "Verifica…" : "Verifica"}
+                  {loading ? t("verifying") : t("verify")}
                 </Button>
                 <Button
                   type="button"
@@ -202,7 +199,7 @@ function AuthPage() {
                   onClick={handleResend}
                   disabled={loading}
                 >
-                  Reinvia
+                  {t("resend")}
                 </Button>
               </div>
               <button
@@ -215,14 +212,14 @@ function AuthPage() {
                 }}
                 className="text-xs text-muted-foreground underline"
               >
-                Cambia email
+                {t("changeEmail")}
               </button>
             </form>
           )}
 
           {stage === "done" && (
             <p className="text-sm text-green-600">
-              Email verificata con successo. Reindirizzamento…
+              {t("authVerified")} {t("authRedirecting")}
             </p>
           )}
 

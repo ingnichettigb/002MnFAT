@@ -8,13 +8,13 @@ interface ExportCountBadgeProps {
 
 export function ExportCountBadge({ count, lang = "it", children }: ExportCountBadgeProps) {
   const title =
-    lang === "en"
-      ? "PDF exports remaining"
-      : lang === "es"
-        ? "Exportaciones PDF restantes"
-        : lang === "de"
-          ? "Verbleibende PDF-Exporte"
-          : "Export PDF rimanenti";
+    ({
+      it: "Export PDF rimanenti",
+      en: "PDF exports remaining",
+      de: "Verbleibende PDF-Exporte",
+      es: "Exportaciones PDF restantes",
+      fr: "Exportations PDF restantes",
+    } as Record<string, string>)[lang] ?? "Export PDF rimanenti";
 
   return (
     <div className="relative inline-flex">

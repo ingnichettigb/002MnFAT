@@ -9,8 +9,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 
 export function usePdfExportsExhaustedDialog() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
   const showExhausted = useCallback(() => {
@@ -33,13 +35,11 @@ export function usePdfExportsExhaustedDialog() {
               <Lock className="h-6 w-6 text-red-600" />
             </div>
             <DialogTitle className="text-xl">
-              Generazioni esaurite
+              {t("exhaustedTitle")}
             </DialogTitle>
           </div>
           <DialogDescription className="pt-3 text-base">
-            Hai esaurito le generazioni PDF disponibili per questa
-            licenza. Per continuare, rinnova la licenza oppure acquista
-            una nuova licenza a uso singolo.
+            {t("exhaustedBody")}
           </DialogDescription>
         </DialogHeader>
 
@@ -49,7 +49,7 @@ export function usePdfExportsExhaustedDialog() {
             size="lg"
             onClick={() => setOpen(false)}
           >
-            Ho capito
+            {t("understood")}
           </Button>
         </DialogFooter>
       </DialogContent>

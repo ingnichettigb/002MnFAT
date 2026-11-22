@@ -4,7 +4,7 @@ import { z } from "zod";
 import { APP_CODE, TERMS_VERSION } from "@/lib/app-config";
 
 const uuidSchema = z.string().uuid();
-const langSchema = z.enum(["it", "en", "de", "es"]);
+const langSchema = z.enum(["it", "en", "de", "es", "fr"]);
 
 export const checkTermsConsent = createServerFn({ method: "POST" })
   .inputValidator((input: { licenseId: string }) =>
@@ -37,7 +37,7 @@ type RecordResult =
 
 export const recordTermsConsent = createServerFn({ method: "POST" })
   .inputValidator(
-    (input: { licenseId: string; language: "it" | "en" | "de" | "es" }) =>
+    (input: { licenseId: string; language: "it" | "en" | "de" | "es" | "fr" }) =>
       z
         .object({ licenseId: uuidSchema, language: langSchema })
         .parse(input),

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useI18n, type Lang } from "@/lib/i18n";
+import { useI18n, LangSwitcher, type Lang } from "@/lib/i18n";
 import {
   LICENSE_INVALID_REASON_KEY,
   VERIFIED_EMAIL_KEY,
@@ -76,6 +76,16 @@ const COPY: Record<
       generic: "La licencia asociada a este dispositivo ya no es válida. Introduce de nuevo la licencia y el código PUK.",
     },
   },
+  fr: {
+    title: "Licence non valide",
+    cta: "Aller à l'activation",
+    body: {
+      expired: "Votre licence a expiré. Renouvelez-la ou saisissez une nouvelle licence pour continuer.",
+      deactivated: "Votre licence a été désactivée. Contactez le support ou saisissez une nouvelle licence.",
+      not_found: "La licence associée à cet appareil est introuvable. Saisissez à nouveau la licence et le code PUK.",
+      generic: "La licence associée à cet appareil n'est plus valide. Saisissez à nouveau la licence et le code PUK.",
+    },
+  },
 };
 
 function LicenzaScadutaPage() {
@@ -107,6 +117,7 @@ function LicenzaScadutaPage() {
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-8">
       <Card className="w-full">
         <CardHeader>
+          <div className="mb-2 flex justify-end"><LangSwitcher /></div>
           <CardTitle>{copy.title}</CardTitle>
           <CardDescription>{APP_NAME}</CardDescription>
         </CardHeader>

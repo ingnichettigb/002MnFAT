@@ -17,6 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Lock } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 import type { ControlItem } from "@/lib/fat-context";
 
@@ -38,6 +39,7 @@ type Props = {
 };
 
 export function SortableControlsList({ controls, onReorder, renderItem }: Props) {
+  const { t } = useI18n();
   const unlocked = React.useMemo(
     () => controls.filter((c) => !c.locked),
     [controls],
@@ -84,7 +86,7 @@ export function SortableControlsList({ controls, onReorder, renderItem }: Props)
         <li
           key={c.id}
           className="flex items-start gap-3 bg-muted/30 px-4 py-3"
-          title="Posizione fissa / Feste Position"
+          title={t("fixedPosition")}
         >
           <span className="mt-1 flex h-4 w-4 items-center justify-center text-muted-foreground">
             <Lock className="h-3.5 w-3.5" />
@@ -107,6 +109,7 @@ function SortableRow({
   id: string;
   children: React.ReactNode;
 }) {
+  const { t } = useI18n();
   const {
     attributes,
     listeners,
@@ -131,7 +134,7 @@ function SortableRow({
     >
       <button
         type="button"
-        aria-label="Trascina per riordinare"
+        aria-label={t("dragToReorder")}
         className="mt-1 cursor-grab touch-none text-muted-foreground hover:text-foreground active:cursor-grabbing"
         {...attributes}
         {...listeners}

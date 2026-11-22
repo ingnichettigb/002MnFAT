@@ -9,8 +9,10 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 
 export function usePdfSavedDialog() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [filename, setFilename] = useState<string>("");
 
@@ -27,12 +29,10 @@ export function usePdfSavedDialog() {
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
               <CheckCircle2 className="h-6 w-6 text-green-600" />
             </div>
-            <DialogTitle className="text-xl">PDF generato</DialogTitle>
+            <DialogTitle className="text-xl">{t("pdfSavedTitle")}</DialogTitle>
           </div>
           <DialogDescription className="pt-3 text-base">
-            Il file è stato salvato nella cartella{" "}
-            <strong>Download</strong> del tuo browser (o nella cartella
-            che hai impostato come predefinita per i download).
+            {t("pdfSavedBody")}
           </DialogDescription>
         </DialogHeader>
 
@@ -47,7 +47,7 @@ export function usePdfSavedDialog() {
             size="lg"
             onClick={() => setOpen(false)}
           >
-            Clicca per proseguire
+            {t("clickToContinue")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -291,4 +291,61 @@ export const TERMS: Record<Lang, TermsContent> = {
       footer: "Versión: v1 — Última actualización: 18 de octubre de 2026",
     },
   },
+  fr: {
+    langLabel: "Français",
+    pageTitle: "Conditions d'utilisation",
+    stepLabel: "Étape 3 sur 3",
+    intro: "Pour terminer l'activation, lisez et acceptez les conditions d'utilisation du logiciel.",
+    checkboxLabel: "J'ai lu et j'accepte les conditions d'utilisation",
+    acceptButton: "Accepter et continuer",
+    acceptingButton: "Enregistrement…",
+    errorGeneric: "Impossible d'enregistrer le consentement. Réessayez dans quelques instants.",
+    content: {
+      heading: "CONDITIONS D'UTILISATION DU LOGICIEL",
+      subheading: "{{APP_NAME}} — Version 1.0",
+      sections: [
+        {
+          title: "1. OBJET",
+          body: "Les présentes conditions régissent l'utilisation du logiciel {{APP_NAME}} (« Logiciel »), fourni par Dott. Ing. Nichetti Gian Battista, N° TVA IT01235350194, dont le siège est à Soresina (CR), Italie, sous la marque CorporateBoostService (« Fournisseur »).",
+        },
+        {
+          title: "2. LICENCE D'UTILISATION",
+          body: "Le Fournisseur accorde à l'Utilisateur une licence d'utilisation non exclusive, non transférable et limitée dans le temps, selon les conditions de validité associées à la licence achetée. La licence ne constitue pas une cession de la propriété intellectuelle du Logiciel, qui reste la propriété exclusive du Fournisseur.",
+        },
+        {
+          title: "3. MODALITÉS D'ACHAT ET DE FACTURATION",
+          body: "Les paiements sont gérés par Paddle.com Market Limited en qualité de Merchant of Record. Pour plus de détails, consultez la page /pagamenti-merchant-of-record.",
+        },
+        {
+          title: "4. UTILISATION AUTORISÉE",
+          body: "L'Utilisateur s'engage à utiliser le Logiciel exclusivement aux fins prévues, à ne pas tenter de le décompiler, de le modifier ou de le distribuer, et à ne pas partager ses identifiants d'accès.",
+        },
+        {
+          title: "5. DONNÉES ET CONFIDENTIALITÉ",
+          body: "Le traitement des données personnelles est régi par la Politique de confidentialité disponible sur le site, conformément au Règlement (UE) 2016/679 (RGPD).",
+        },
+        {
+          title: "6. LIMITATION DE RESPONSABILITÉ",
+          body: "Le Logiciel est fourni « en l'état ». Le Fournisseur ne garantit pas l'absence d'erreurs ou d'interruptions du service et ne répond pas des dommages indirects, sauf dol ou faute grave.",
+        },
+        {
+          title: "7. GESTION ET DÉSINSTALLATION DE L'APPLICATION",
+          body: "L'icône installée peut s'appeler Mini F.A.T., 002mnfat, 002-mnfat ou Smart Launcher.\n\n• Google Chrome (ordinateur) : tapez chrome://apps dans la barre d'adresse et appuyez sur Entrée, puis clic droit sur l'icône > « Supprimer de Chrome » / « Désinstaller ». Sinon : ouvrez l'application, menu à 3 points en haut > « Désinstaller Mini F.A.T. ».\n• Microsoft Edge (ordinateur) : tapez edge://apps et appuyez sur Entrée, puis cliquez sur les 3 points à côté de l'application > « Désinstaller ». Sinon : menu ... > Applications > Gérer les applications.\n• Brave : tapez brave://apps et appuyez sur Entrée, puis clic droit sur l'icône > « Supprimer de Brave ».\n• Opera / Vivaldi : tapez opera://apps ou vivaldi://apps et supprimez l'icône par clic droit.\n• Safari (Mac, macOS Sonoma ou ultérieur) : ouvrez le Finder > dossier Applications, faites glisser l'icône dans la Corbeille.\n• Mozilla Firefox : n'installe pas d'applications sur ordinateur ; si vous avez créé un favori ou un raccourci, clic droit > « Supprimer ».\n• Windows (tout navigateur) : Paramètres > Applications > Applications installées, recherchez le nom de l'application > « Désinstaller ».\n• Android (Chrome / Samsung Internet) : appuyez longuement sur l'icône de l'écran d'accueil > « Désinstaller » (ou Paramètres > Applications).\n• iPhone / iPad (Safari) : appuyez longuement sur l'icône de l'écran d'accueil > « Supprimer l'app » > « Supprimer de l'écran d'accueil ».\n\nRemarque : la désinstallation supprime uniquement l'icône ; la licence et les procès-verbaux F.A.T. restent enregistrés et ne sont pas effacés.",
+        },
+        {
+          title: "8. DURÉE ET RÉSILIATION",
+          body: "La licence est valable pour la durée indiquée lors de l'achat. Le Fournisseur se réserve le droit de suspendre l'accès en cas de violation des présentes conditions.",
+        },
+        {
+          title: "9. MODIFICATION DES CONDITIONS",
+          body: "En cas de modifications substantielles, une nouvelle acceptation sera demandée.",
+        },
+        {
+          title: "10. DROIT APPLICABLE ET TRIBUNAL COMPÉTENT",
+          body: "Droit italien. Tribunal de Crémone, sauf disposition impérative contraire en faveur du consommateur.",
+        },
+      ],
+      footer: "Version : v1 — Dernière mise à jour : 18 octobre 2026",
+    },
+  },
 };

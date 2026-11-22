@@ -27,6 +27,7 @@ const LANGS: { code: Lang; flag: string }[] = [
   { code: "en", flag: "🇬🇧" },
   { code: "de", flag: "🇩🇪" },
   { code: "es", flag: "🇪🇸" },
+  { code: "fr", flag: "🇫🇷" },
 ];
 
 const BRAND_BG = "#06090f";
@@ -98,7 +99,7 @@ export function TermsConsent({
                     onClick={() => setLang(o.code)}
                     aria-label={TERMS[o.code].langLabel}
                     title={TERMS[o.code].langLabel}
-                    className="h-8 w-9 rounded-md border text-base leading-none transition-all hover:scale-110"
+                    className="flex h-8 items-center gap-1 rounded-md border px-1.5 text-base leading-none transition-all hover:scale-105"
                     style={{
                       borderColor: active ? BRAND_ACCENT : BRAND_SURFACE,
                       backgroundColor: active
@@ -107,7 +108,8 @@ export function TermsConsent({
                       opacity: active ? 1 : 0.7,
                     }}
                   >
-                    {o.flag}
+                    <span aria-hidden>{o.flag}</span>
+                    <span className="text-[11px] font-semibold uppercase">{o.code}</span>
                   </button>
                 );
               })}

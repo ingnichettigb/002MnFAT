@@ -48,7 +48,7 @@ function ReportPage() {
     const d = new Date(iso);
     return isNaN(d.getTime())
       ? iso
-      : d.toLocaleDateString(primary === "it" ? "it-IT" : "en-GB");
+      : d.toLocaleDateString(({ it: "it-IT", en: "en-GB", de: "de-DE", es: "es-ES", fr: "fr-FR" } as const)[primary]);
   };
 
   const { showPdfSaved, dialog: pdfSavedDialog } = usePdfSavedDialog();
@@ -100,10 +100,10 @@ function ReportPage() {
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
           <div className="text-sm">
             <p className="font-semibold">
-              Attenzione: questa è l'ultima generazione PDF disponibile per questa licenza.
+              {t("lastExportTitle")}
             </p>
             <p className="mt-0.5">
-              Dopo non potrai più generarne altri, fino al rinnovo della licenza o all'acquisto di una nuova licenza.
+              {t("lastExportBody")}
             </p>
           </div>
         </div>
